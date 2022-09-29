@@ -12,6 +12,7 @@ class Integration {
    * @var $javascriptFiles - this array contains list of javascript files for inclusion into page
    */
   public static $javascriptFiles = [
+    'config',
     //'js/main.js',    
   ];
 
