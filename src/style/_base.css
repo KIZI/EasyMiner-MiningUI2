@@ -1,0 +1,132 @@
+html,
+body,
+#app {
+    height: 100%;
+}
+
+body {
+    background: theme("colors.slate.200");
+    overflow-y: scroll;
+}
+
+@layer vueBase {
+    :root {
+        --slider-connect-bg: theme("colors.blue.200");
+        --slider-tooltip-bg: theme("colors.blue.200");
+        --slider-handle-ring-color: theme("colors.blue.300");
+
+        --slider-height: theme("spacing[1]");
+        --slider-handle-height: theme("spacing[3]");
+        --slider-handle-width: theme("spacing[3]");
+
+        --ms-py: theme("spacing.1");
+        --ms-font-size: theme("fontSize.sm");
+        --ms-option-font-size: theme("fontSize.sm");
+        --ms-tag-font-size: theme("fontSize.xs");
+        --ms-tag-bg: theme("colors.slate.200");
+        --ms-tag-color: theme("colors.gray.800");
+        --ms-ring-color: theme("colors.blue.100");
+        --ms-tag-py: theme("spacing[px]");
+        --ms-tag-px: theme("spacing[1.5]");
+        --ms-tag-font-weight: theme("fontWeight.medium");
+
+        --ms-option-color-selected: theme("colors.gray.800");
+        --ms-option-color-selected-pointed: theme("colors.gray.800");
+        --ms-option-bg-selected: theme("colors.blue.100");
+        --ms-option-bg-selected-pointed: theme("colors.blue.100");
+        --ms-option-bg-pointed: theme("colors.slate.100");
+    }
+
+    @keyframes shake {
+
+        10%,
+        90% {
+            transform: translate3d(-1px, 0, 0);
+        }
+
+        20%,
+        80% {
+            transform: translate3d(2px, 0, 0);
+        }
+
+        30%,
+        50%,
+        70% {
+            transform: translate3d(-4px, 0, 0);
+        }
+
+        40%,
+        60% {
+            transform: translate3d(4px, 0, 0);
+        }
+    }
+
+    .shake {
+        animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .multiselect[data-invalid="true"] {
+        --ms-border-color: theme("colors.red.300");
+    }
+
+    .multiselect :is(.multiselect-caret, .multiselect-clear) {
+        align-self: start;
+        margin-top: theme("spacing[0.5]");
+    }
+
+    .multiselect-sm {
+        --ms-py: theme("spacing[0.5]");
+        --ms-px: theme("spacing[2.5]");
+
+        --ms-font-size: theme("fontSize.xs");
+        --ms-line-height: 1.2;
+
+        --ms-option-py: theme("spacing[1.5]");
+        --ms-option-px: var(--ms-px);
+        --ms-option-font-size: theme("fontSize.xs");
+    }
+
+    .multiselect-sm :is(.multiselect-caret, .multiselect-clear-icon) {
+        width: 0.5rem;
+    }
+
+    .multiselect-tags {
+        min-height: 26px;
+    }
+
+    .multiselect-dropdown::-webkit-scrollbar-thumb {
+        background-color: theme("colors.blue.300");
+    }
+
+    .multiselect-dropdown {
+        @apply shadow-lg;
+        overflow-y: auto;
+    }
+
+    * {
+        scrollbar-color: #0369a1 #ffffff;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: #ffffff;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: #0369a1;
+    }
+
+    button {
+        @apply select-none;
+    }
+
+    body.dragging-active * {
+        cursor: move !important;
+        user-select: none !important;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none !important;
+        margin: 0;
+    }
+}

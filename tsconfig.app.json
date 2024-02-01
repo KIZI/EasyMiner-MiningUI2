@@ -1,0 +1,26 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "components.d.ts"
+  ],
+  "exclude": ["src/**/__tests__/*"],
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@rulesMining/*": ["./src/features/rulesMining/*"],
+      "@preprocessing/*": ["./src/features/preprocessing/*"],
+      "@discoveredRules/*": ["./src/features/discoveredRules/*"],
+      "@selectedRules/*": ["./src/features/selectedRules/*"],
+      "@tasksHistory/*": ["./src/features/tasksHistory/*"],
+      "@/*": ["./src/*"]
+    },
+    "types": [
+      "unplugin-icons/types/vue"
+    ]
+  }
+}
