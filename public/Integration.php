@@ -7,30 +7,44 @@ namespace EasyMiner\MiningUI2;
  * @package EasyMiner\MiningUI2
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
-class Integration
-{
+class Integration {
+
+  private static $initialized = false;
+  
   /**
    * @var $javascriptFiles - this array contains list of javascript files for inclusion into page
    */
-  public static $javascriptFiles = [
+  private static $javascriptFiles = [
     'config',
   ];
 
-  /**i
+  /**
    * @var $cssFiles - this array contains list of CSS files for inclusion into page
    */
-  public static $cssFiles = [
+  private static $cssFiles = [
   ];
 
-  static function parseAbsolutePath($absolutePath)
-  {
+  public static function getJavascriptFiles(){
+    if (!self::$initialized){
+      self::init();
+    }
+    return self::$javascriptFiles;
+  }
+
+  public static function getCssFiles(){
+    if (!self::$initialized){
+      self::init();
+    }
+    return self::$cssFiles;
+  }
+  
+  private static function parseAbsolutePath($absolutePath){
     $parts = explode("/", $absolutePath);
     $relativeParts = array_slice($parts, count($parts) - 2);
     return join("/", $relativeParts);
   }
 
-  static function init()
-  {
+  private static function init(){
     $indexJsAbsolutePath = glob(__DIR__ . "/assets/index-*.js")[0];
     $indexCssAbsolutePath = glob(__DIR__ . "/assets/index-*.css")[0];
 
@@ -38,5 +52,3 @@ class Integration
     self::$cssFiles[] = self::parseAbsolutePath($indexCssAbsolutePath);
   }
 }
-
-Integration::init();
