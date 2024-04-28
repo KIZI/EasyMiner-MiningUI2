@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDefaultTwClass } from '@/composables/useDefaultTwClass';
+import { useDefaultTwClass } from '@/composables/useDefaultTwClass'
 
-const { defaultTwClass } = useDefaultTwClass();
+const { defaultTwClass } = useDefaultTwClass()
 </script>

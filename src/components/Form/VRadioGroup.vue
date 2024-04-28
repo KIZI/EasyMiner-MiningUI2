@@ -27,13 +27,13 @@
 import {
   RadioGroup,
   RadioGroupOption,
-} from '@headlessui/vue';
+} from '@headlessui/vue'
 
 defineProps<{
   options: {
-    label: string,
-    value: string,
-  }[],
-}>();
-const modelValue = defineModel<string>();
+    label: string
+    value: string
+  }[]
+}>()
+const modelValue = defineModel<string>()
 </script>

@@ -10,7 +10,7 @@ namespace EasyMiner\MiningUI2;
 class Integration {
 
   private static $initialized = false;
-  
+
   /**
    * @var $javascriptFiles - this array contains list of javascript files for inclusion into page
    */
@@ -37,7 +37,7 @@ class Integration {
     }
     return self::$cssFiles;
   }
-  
+
   private static function parseAbsolutePath($absolutePath){
     $parts = explode("/", $absolutePath);
     $relativeParts = array_slice($parts, count($parts) - 2);
@@ -48,7 +48,10 @@ class Integration {
     $indexJsAbsolutePath = glob(__DIR__ . "/assets/index-*.js")[0];
     $indexCssAbsolutePath = glob(__DIR__ . "/assets/index-*.css")[0];
 
-    self::$javascriptFiles[] = self::parseAbsolutePath($indexJsAbsolutePath);
+    self::$javascriptFiles[] = [
+      'src' => self::parseAbsolutePath($indexJsAbsolutePath),
+      'type' => 'module',
+    ];
     self::$cssFiles[] = self::parseAbsolutePath($indexCssAbsolutePath);
   }
 }

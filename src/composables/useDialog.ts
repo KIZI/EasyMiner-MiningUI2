@@ -1,102 +1,96 @@
-import { onClickOutside } from '@vueuse/core';
-import type { Ref } from 'vue';
-import { onUnmounted, onMounted, watch, ref } from 'vue';
+import { onClickOutside } from '@vueuse/core'
+import type { Ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
-const openedDialogsCount = ref(0);
+export function useDialog(open: Ref<boolean>) {
+  const isClosing = ref(false)
+  const dialogRef = ref<HTMLDialogElement>()
+  const dialogPanelRef = ref<HTMLDialogElement>()
 
-export const useDialog = (open: Ref<boolean>) => {
-  const isClosing = ref(false);
-  const dialogRef = ref<HTMLDialogElement>();
-  const dialogPanelRef = ref<HTMLDialogElement>();
-
-  watch(() => open.value, updateModal);
+  watch(() => open.value, updateModal)
 
   onClickOutside(dialogPanelRef, () => {
-    if (!open.value) return;
-    open.value = false;
-  });
+    if (!open.value) return
+    open.value = false
+  })
 
   onMounted(() => {
-    updateModal();
-    dialogRef.value?.addEventListener('cancel', onCancel);
-  });
+    updateModal()
+    dialogRef.value?.addEventListener('cancel', onCancel)
+  })
 
   onUnmounted(() => {
-    removeAnimationEndEventListener();
-    dialogRef.value?.removeEventListener('cancel', onCancel);
-  });
+    removeOverflowHidden()
+    removeAnimationEndEventListener()
+    dialogRef.value?.removeEventListener('cancel', onCancel)
+    console.log('onUnmounted')
+  })
 
   function updateModal(value = open.value, oldValue = false) {
-    if (!dialogRef.value) return;
+    if (!dialogRef.value) return
 
-    if (open.value) return showModal();
+    if (open.value) return showModal()
 
     if (!value && oldValue && dialogRef.value.open) {
-      closeModal();
+      closeModal()
     }
   }
 
   function showModal() {
     if (!dialogRef.value) {
-      return;
+      return
     }
 
-    if (!openedDialogsCount.value) {
-      setOverflowHidden();
-    }
+    setOverflowHidden()
 
-    dialogRef.value?.showModal();
-    openedDialogsCount.value++;
+    dialogRef.value?.showModal()
   }
 
   function closeModal() {
-    dialogRef.value?.addEventListener('animationend', onModalClosed);
-    isClosing.value = true;
+    dialogRef.value?.addEventListener('animationend', onModalClosed)
+    isClosing.value = true
   }
 
   function onModalClosed() {
-    openedDialogsCount.value--;
-    isClosing.value = false;
-    dialogRef.value?.close();
-    removeAnimationEndEventListener();
-    open.value = false;
+    dialogRef.value?.close()
+    isClosing.value = false
+    open.value = false
 
-    if (!openedDialogsCount.value) {
-      removeOverflowHidden();
-    }
+    removeAnimationEndEventListener()
+    removeOverflowHidden()
   }
 
   function removeAnimationEndEventListener() {
-    dialogRef.value?.removeEventListener('animationend', onModalClosed);
+    dialogRef.value?.removeEventListener('animationend', onModalClosed)
   }
 
   function onCancel(e: Event) {
-    e.preventDefault();
-    closeModal();
+    e.preventDefault()
+    closeModal()
   }
 
   function setOverflowHidden() {
-    const bodyElement = document.querySelector('body');
+    const bodyElement = document.querySelector('body')
 
     if (!bodyElement) {
-      return;
+      return
     }
 
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
 
-    bodyElement.style.overflow = 'hidden';
-    bodyElement.style.paddingRight = `${scrollbarWidth}px`;
+    bodyElement.style.overflow = 'hidden'
+    bodyElement.style.paddingRight = `${scrollbarWidth}px`
   }
 
   function removeOverflowHidden() {
-    const bodyElement = document.querySelector('body');
+    const bodyElement = document.querySelector('body')
 
     if (!bodyElement) {
-      return;
+      return
     }
 
-    bodyElement.style.overflow = '';
-    bodyElement.style.paddingRight = '';
+    bodyElement.style.overflow = ''
+    bodyElement.style.paddingRight = ''
   }
 
   return {
@@ -104,5 +98,5 @@ export const useDialog = (open: Ref<boolean>) => {
     dialogPanelRef,
     dialogRef,
     isClosing,
-  };
-};
+  }
+}

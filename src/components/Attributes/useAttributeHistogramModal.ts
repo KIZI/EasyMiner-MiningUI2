@@ -1,19 +1,25 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const currentAttributeId = ref<number|null>();
+const currentAttribute = ref<{
+  id: number
+  source: 'datasource' | 'metasource'
+} | null>()
 
 export function useAttributeHistogramModal() {
-  function open(attributeId: number) {
-    currentAttributeId.value = attributeId;
+  function open(attributeId: number, source: 'datasource' | 'metasource') {
+    currentAttribute.value = {
+      id: attributeId,
+      source,
+    }
   }
 
   function close() {
-    currentAttributeId.value = null;
+    currentAttribute.value = null
   }
 
   return {
-    currentAttributeId,
+    currentAttribute,
     open,
     close,
-  };
+  }
 }

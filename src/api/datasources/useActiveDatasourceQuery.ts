@@ -1,7 +1,7 @@
-import { useDatasourceQuery } from '@/api/datasources/useDatasourceQuery';
-import { useActiveMinerQuery } from '@/api/miners/useActiveMinerQuery';
+import { useDatasourceQuery } from '@/api/datasources/useDatasourceQuery'
+import { useMinerQuery } from '@/api/miners/useMinerQuery'
 
 export function useActiveDatasourceQuery() {
-  const { datasourceId } = useActiveMinerQuery();
-  return useDatasourceQuery(datasourceId);
+  const { datasourceId } = useMinerQuery()
+  return useDatasourceQuery(datasourceId)
 }

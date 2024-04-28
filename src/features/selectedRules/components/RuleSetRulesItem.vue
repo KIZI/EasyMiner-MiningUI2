@@ -10,29 +10,29 @@
       <VIconButton
         title="Remove from selected rules"
         class="text-red-700"
-        :loading="removeRulesMutation.isLoading.value"
+        :loading="removeRulesMutation.isPending.value"
         @click="handleRemove(rule)"
       >
-        <icon-ph-x-circle class="h-5 w-5 text-red-700" />
+        <icon-ph-x-circle class="size-5 text-red-700" />
       </VIconButton>
       <div class="pl-3">
-        <icon-ph-list class="h-5 w-5 cursor-grab text-gray-700" />
+        <icon-ph-list class="size-5 cursor-grab text-gray-700" />
       </div>
     </template>
   </TaskRuleComponent>
 </template>
 
 <script setup lang="ts">
-import { useSelectedRules } from '@selectedRules/composables/useSelectedRules';
-import VIconButton from '@/components/VIconButton.vue';
-import TaskRuleComponent from '@/components/Task/TaskRule.vue';
-import type { TaskRule } from '@/api/tasks/types';
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
+import VIconButton from '@/components/VIconButton.vue'
+import TaskRuleComponent from '@/components/Task/TaskRule.vue'
+import type { TaskRule } from '@/api/tasks/types'
 
 defineProps<{
-  rule: TaskRule;
-  isOdd: boolean;
-}>();
+  rule: TaskRule
+  isOdd: boolean
+}>()
 
-const selected = defineModel<TaskRule[]>('selected');
-const { handleRemove, removeRulesMutation } = useSelectedRules();
+const selected = defineModel<TaskRule[]>('selected')
+const { handleRemove, removeRulesMutation } = useSelectedRules()
 </script>

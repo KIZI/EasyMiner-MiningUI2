@@ -10,7 +10,7 @@
   >
     <div class="mt-1 space-y-3 pb-2 text-xs">
       <VField
-        v-slot="{field}"
+        v-slot="{ field }"
         class="space-y-1"
         name="valueType"
         label="Value type"
@@ -18,8 +18,8 @@
         <VRadioGroup
           v-bind="field"
           :options="[
-            {label: 'Any', value: 'any'},
-            {label: 'Fixed', value: 'fixed'}
+            { label: 'Any', value: 'any' },
+            { label: 'Fixed', value: 'fixed' },
           ]"
         />
         <p class="pt-0.5 text-2xs leading-tight text-gray-900">
@@ -29,7 +29,7 @@
 
       <VField
         v-if="form.values.valueType === 'fixed'"
-        v-slot="{field}"
+        v-slot="{ field }"
         class="space-y-1"
         name="values"
         label="Fixed values"
@@ -46,7 +46,7 @@
       </VField>
 
       <VField
-        v-slot="{field}"
+        v-slot="{ field }"
         class="space-y-1 pt-1"
         name="isNegated"
         label="Negation"
@@ -66,27 +66,27 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
-import { watch } from 'vue';
-import type { CedentItem } from '@rulesMining/types/rulePattern.types';
-import { SwitchGroup, SwitchLabel } from '@headlessui/vue';
-import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore';
-import { yup } from '@/libs/yup';
-import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover';
-import { VField, VSwitch, VRadioGroup, VMultiSelect } from '@/components/Form';
+import { useForm } from 'vee-validate'
+import { watch } from 'vue'
+import type { CedentItem } from '@rulesMining/types/rulePattern.types'
+import { SwitchGroup, SwitchLabel } from '@headlessui/vue'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import { yup } from '@/libs/yup'
+import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover'
+import { VField, VMultiSelect, VRadioGroup, VSwitch } from '@/components/Form'
 
 const props = defineProps<{
-  item: CedentItem,
-}>();
-const emit = defineEmits(['remove', 'save']);
+  item: CedentItem
+}>()
+const emit = defineEmits(['remove', 'save'])
 
-const { isOpen } = useInjectPopoverState()!;
+const { isOpen } = useInjectPopoverState()!
 
 const options = [
   'amount',
   'District',
   'duration',
-];
+]
 
 const validationSchema = yup.object({
   attribute: yup.string().required(),
@@ -95,30 +95,30 @@ const validationSchema = yup.object({
     .of(yup.string())
     .when('valueType', ([valueType], schema) => {
       if (valueType === 'fixed') {
-        return schema.min(1).required();
+        return schema.min(1).required()
       }
 
-      return schema;
+      return schema
     }),
-});
+})
 const form = useForm({
   validationSchema,
   initialValues: {
     valueType: 'any',
     ...props.item,
   },
-});
+})
 
-watch(isOpen, () => form.resetForm());
+watch(isOpen, () => form.resetForm())
 
 const handleSubmit = form.handleSubmit((item) => {
-  emit('save', item);
-  isOpen.value = false;
-});
+  emit('save', item)
+  isOpen.value = false
+})
 
-const rulePatternStore = useRulePatternStore();
+const rulePatternStore = useRulePatternStore()
 function handleRemove() {
-  isOpen.value = false;
-  rulePatternStore.removeItemById(props.item.id);
+  isOpen.value = false
+  rulePatternStore.removeItemById(props.item.id)
 }
 </script>

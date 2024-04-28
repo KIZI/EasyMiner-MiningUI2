@@ -1,5 +1,6 @@
 <template>
   <button
+    v-if="!disableSelection"
     :disabled="isSelectionDisabled"
     @click="toggleSelection"
   >
@@ -14,19 +15,24 @@
   <button @click="toggleSearch">
     <icon-ph-magnifying-glass
       :width="22"
-      :class="{'text-primary-700': !!searchQuery}"
+      :class="{ 'text-primary-700': !!searchQuery }"
     />
   </button>
 </template>
 
 <script setup lang="ts">
-import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection';
+import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection'
+
+defineProps<{
+  noSelection?: boolean
+}>()
 
 const {
+  disableSelection,
   isSelectionDisabled,
   shouldShowSelection,
   searchQuery,
   toggleSearch,
   toggleSelection,
-} = useInjectAttributesList()!;
+} = useInjectAttributesList()!
 </script>

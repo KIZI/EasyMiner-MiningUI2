@@ -21,8 +21,9 @@ const draggable = useDraggable({
   payload: props.attribute,
 });
 
-const emit = defineEmits<{(e: 'dragStart', draggable: Draggable): void,
-  (e: 'dragEnd'): void,
+const emit = defineEmits<{
+  dragStart: [draggable: Draggable],
+  dragEnd: []
 }>();
 
 async function onDragStart(draggable: Draggable) {

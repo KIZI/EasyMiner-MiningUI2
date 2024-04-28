@@ -4,10 +4,14 @@
       Tasks history
     </SectionTitle>
 
-    <div class="mt-2">
+    <div class="relative mt-2 min-h-40">
+      <BlockSpinner
+        v-if="tasksQuery.isFetching.value"
+        :darken="tasksQuery.isRefetching.value"
+      />
       <TasksHistoryItem
         v-for="(task, i) in tasks"
-        :key="task.text"
+        :key="task.id"
         :task="task"
         :is-even="Boolean(i % 2)"
       />
@@ -22,14 +26,13 @@
           size="xs"
           class="gap-x-1 px-1"
         >
-          <icon-ph-trash class="h-5 w-5 text-red-700" />
+          <icon-ph-trash class="size-5 text-red-700" />
           Remove selected
         </VButton>
       </div>
 
       <VPagination
-        :total-pages="10"
-        :current-page="5"
+        v-bind="pagination.bind.value"
         class="mx-auto"
       />
     </div>
@@ -37,45 +40,17 @@
 </template>
 
 <script setup lang="ts">
-import SectionCard from '@/components/Layout/SectionCard.vue';
-import SectionTitle from '@/components/Layout/SectionTitle.vue';
-import SelectionButtons from '@/components/Selection/SelectionButtons.vue';
-import VButton from '@/components/VButton.vue';
-import VPagination from '@/components/VPagination.vue';
-import TasksHistoryItem from '@/features/tasksHistory/components/TasksHistoryItem.vue';
+import { useMinerTasksQuery } from '@/api/miners/useMinerTasksQuery'
+import { usePagination } from '@/api/pagination'
+import SectionCard from '@/components/Layout/SectionCard.vue'
+import SectionTitle from '@/components/Layout/SectionTitle.vue'
+import SelectionButtons from '@/components/Selection/SelectionButtons.vue'
+import VButton from '@/components/VButton.vue'
+import VPagination from '@/components/VPagination.vue'
+import BlockSpinner from '@/components/BlockSpinner.vue'
+import TasksHistoryItem from '@/features/tasksHistory/components/TasksHistoryItem.vue'
 
-const tasks = [
-  {
-    confidence: 0.8,
-    id: 26423,
-    lift: 1.2,
-    ruleLength: 5,
-    support: 0.5,
-    text: 'status(C) & District(Praha) & LongNameTest([123456;987654]) → Salary([11654.8;12541]) & Test(D)',
-  },
-  {
-    confidence: 0.8,
-    id: 26423,
-    lift: 1.2,
-    ruleLength: 5,
-    support: 0.5,
-    text: 'status(C) & District(Praha) & LongNameTest([123456;987654]) → Salary([11654.8;12541]) & Test(D)',
-  },
-  {
-    confidence: 0.8,
-    id: 26423,
-    lift: 1.2,
-    ruleLength: 5,
-    support: 0.5,
-    text: 'status(C) & District(Praha) & LongNameTest([123456;987654]) → Salary([11654.8;12541]) & Test(D)',
-  },
-  {
-    confidence: 0.8,
-    id: 26423,
-    lift: 1.2,
-    ruleLength: 5,
-    support: 0.5,
-    text: 'status(C) & District(Praha) & LongNameTest([123456;987654]) → Salary([11654.8;12541]) & Test(D)',
-  },
-];
+const pagination = usePagination()
+const tasksQuery = useMinerTasksQuery({ pagination: pagination.state })
+const { tasks } = tasksQuery
 </script>

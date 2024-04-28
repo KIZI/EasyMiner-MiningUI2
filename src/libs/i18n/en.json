@@ -1,0 +1,15 @@
+{
+  "common": {
+    "rules": "rule | rules"
+  },
+  "interestMeasures": {
+    "abbr": {
+      "CONF": "Confidence",
+      "SUPP": "Support",
+      "LIFT": "Lift",
+      "RULE_LENGTH": "Length",
+      "AUTO_CONF_SUPP": "AUTO conf & supp",
+      "CBA": "Pruning"
+    }
+  }
+}

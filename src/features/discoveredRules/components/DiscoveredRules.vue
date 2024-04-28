@@ -3,107 +3,137 @@
     <div class="flex items-start justify-between">
       <div>
         <div class="flex items-center gap-x-3">
-          <SectionTitle>Discovered {{ rules.length }} rule</SectionTitle>
+          <SectionTitle>
+            <template v-if="state && isTaskStateRunning(state)">
+              Task is in progress...
+            </template>
+
+            <template v-else-if="state === 'failed'">
+              Task failed
+            </template>
+
+            <template v-else-if="!rules.length">
+              No rules discovered
+            </template>
+
+            <template v-else>
+              Discovered {{ rules.length }} {{ $t('common.rules', rules.length) }}
+            </template>
+          </SectionTitle>
 
           <VButton
+            v-if="rules.length"
             size="xs"
             variant="ghost"
             class="gap-x-1.5 font-medium"
           >
             <template #icon>
-              <icon-ph-checks class="h-5 w-5 text-green-700" />
+              <icon-ph-checks class="size-5 text-green-700" />
             </template>
             Add all to Selected rules
           </VButton>
         </div>
 
-        <div class="text-lg text-primary-900">
-          {{ task?.name }}
+        <div>
+          <div class="text-lg text-primary-900">
+            {{ task?.name }}
+          </div>
         </div>
       </div>
 
       <div class="-mr-2 flex items-center gap-x-2">
         <VButton
+          v-if="state && !isTaskStateRunning(state)"
           variant="ghost"
           size="xs"
           class="shrink-0 gap-x-1.5"
-          @click="clearActiveTask"
+          @click="loadTaskToRulePattern"
         >
-          <icon-ph-arrow-up class="h-5 w-5" />
+          <icon-ph-arrow-up class="size-5" />
           Load task to rule pattern
         </VButton>
 
         <VButton
+          v-if="state && !isTaskStateRunning(state)"
           variant="ghost"
           size="xs"
           class="shrink-0 gap-x-1.5"
           @click="clearActiveTask"
         >
-          <icon-ph-clock-counter-clockwise class="h-5 w-5" />
+          <icon-ph-clock-counter-clockwise class="size-5" />
           Tasks history
         </VButton>
       </div>
     </div>
 
-    <RulesFilters class="mt-8" />
-
-    <div class="mt-3 divide-y divide-slate-100 border-y border-slate-200">
-      <DiscoveredTaskRule
-        v-for="(rule, i) in rules"
-        :key="rule.text"
-        v-model:selected="selection"
-        :rule="rule"
-        class="-mx-6 px-6"
-        :is-odd="i % 2 > 0"
-      />
-    </div>
-
-    <div class="mt-10">
-      <div class="grid grid-cols-[1fr_auto_1fr] items-center">
-        <RulesSelectionActions
-          v-model:selection="selection"
-          :rules="rules"
+    <template v-if="rules.length">
+      <RulesFilters class="mt-8" />
+      <div class="mt-3 divide-y divide-slate-100 border-y border-slate-200">
+        <DiscoveredTaskRule
+          v-for="(rule, i) in rules"
+          :key="rule.text"
+          v-model:selected="selection"
+          :rule="rule"
+          class="-mx-6 px-6"
+          :is-odd="i % 2 > 0"
         />
-
-        <div class="mx-auto">
-          <VPagination
-            :total-pages="10"
-            :current-page="1"
+      </div>
+      <div class="mt-10">
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center">
+          <RulesSelectionActions
+            v-model:selection="selection"
+            :rules="rules"
           />
-        </div>
-
-        <div class="ml-auto">
-          <div class="flex items-center space-x-3">
-            <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
-              <icon-ph-arrow-square-out class="h-4 w-4 text-gray-700" />
-              Task detail
-            </button>
-            <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
-              <icon-ph-export class="h-4 w-4 text-gray-700" />
-              Export task
-            </button>
+          <div class="mx-auto">
+            <VPagination
+              :total-pages="10"
+              :current-page="1"
+            />
+          </div>
+          <div class="ml-auto">
+            <div class="flex items-center space-x-3">
+              <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
+                <icon-ph-arrow-square-out class="size-4 text-gray-700" />
+                Task detail
+              </button>
+              <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
+                <icon-ph-export class="size-4 text-gray-700" />
+                Export task
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
   </SectionCard>
 </template>
 
 <script setup lang="ts">
-import DiscoveredTaskRule from '@discoveredRules/components/DiscoveredTaskRule.vue';
-import { ref } from 'vue';
-import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery';
-import SectionCard from '@/components/Layout/SectionCard.vue';
-import SectionTitle from '@/components/Layout/SectionTitle.vue';
-import RulesFilters from '@/components/Rules/RulesFilters.vue';
-import VButton from '@/components/VButton.vue';
-import { useTasksStore } from '@/stores/tasksStore';
-import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue';
-import VPagination from '@/components/VPagination.vue';
-import type { TaskRule } from '@/api/tasks/types';
+import DiscoveredTaskRule from '@discoveredRules/components/DiscoveredTaskRule.vue'
+import { computed, ref } from 'vue'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
+import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
+import SectionCard from '@/components/Layout/SectionCard.vue'
+import SectionTitle from '@/components/Layout/SectionTitle.vue'
+import RulesFilters from '@/components/Rules/RulesFilters.vue'
+import VButton from '@/components/VButton.vue'
+import { useTasksStore } from '@/stores/tasksStore'
+import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue'
+import VPagination from '@/components/VPagination.vue'
+import type { TaskRule } from '@/api/tasks/types'
+import { isTaskStateRunning } from '@/api/tasks/utils'
 
-const { rules, task } = useActiveTaskRulesQuery();
-const { clearActiveTask } = useTasksStore();
+const rulePatternStore = useRulePatternStore()
+const { rules, task, state } = useActiveTaskRulesQuery()
+const { task: taskDetail } = useActiveTaskDetailQuery()
+const { clearActiveTask } = useTasksStore()
 
-const selection = ref<TaskRule[]>([]);
+const selection = ref<TaskRule[]>([])
+
+function loadTaskToRulePattern() {
+  if (!taskDetail.value) return
+  rulePatternStore.loadTaskRule(taskDetail.value.settings.rule0)
+  document.getElementById('rulesMining')?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>

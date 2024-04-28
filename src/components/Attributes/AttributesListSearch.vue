@@ -9,13 +9,13 @@
 </template>
 
 <script setup lang="ts">
-import AttributesListSearchInput from '@/components/Attributes/AttributesListSearchInput.vue';
-import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection';
-import VExpandable from '@/components/VExpandable.vue';
+import AttributesListSearchInput from '@/components/Attributes/AttributesListSearchInput.vue'
+import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection'
+import VExpandable from '@/components/VExpandable.vue'
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
-const { shouldShowSearch } = useInjectAttributesList()!;
+const { shouldShowSearch } = useInjectAttributesList()!
 </script>

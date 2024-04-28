@@ -1,3 +1,3 @@
-import VSlider from '@vueform/slider';
+import VSlider from '@vueform/slider'
 
-export { VSlider };
+export { VSlider }

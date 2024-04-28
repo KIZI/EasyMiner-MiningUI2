@@ -1,1 +1,1 @@
-export { default as TaskHistory } from './components/TasksHistory.vue';
+export { default as TaskHistory } from './components/TasksHistory.vue'

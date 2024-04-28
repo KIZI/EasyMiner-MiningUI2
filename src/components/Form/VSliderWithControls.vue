@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { VSlider } from './VSlider';
-
-const modelValue = defineModel<number[]>({default: []});
+import { VSlider } from './VSlider'
 
 const props = defineProps<{
-  min: number,
-  max: number,
-  step?: number,
-}>();
+  min: number
+  max: number
+  step?: number
+}>()
+
+const modelValue = defineModel<number[]>({ default: [] })
 </script>

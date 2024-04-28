@@ -9,7 +9,7 @@
   >
     <div class="space-y-2 text-2xs">
       <VField
-        v-slot="{field}"
+        v-slot="{ field }"
         class="space-y-0.5"
         name="attribute"
         label="Attribute"
@@ -26,7 +26,7 @@
       </VField>
 
       <VField
-        v-slot="{field}"
+        v-slot="{ field }"
         class="space-y-0.5"
         name="valueType"
         label="Value type"
@@ -34,15 +34,15 @@
         <VRadioGroup
           v-bind="field"
           :options="[
-            {label: 'Any', value: 'any'},
-            {label: 'Fixed', value: 'fixed'}
+            { label: 'Any', value: 'any' },
+            { label: 'Fixed', value: 'fixed' },
           ]"
         />
       </VField>
 
       <VField
         v-if="form.values.valueType === 'fixed'"
-        v-slot="{field}"
+        v-slot="{ field }"
         class="space-y-0.5"
         name="values"
         label="Fixed values"
@@ -62,27 +62,27 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
-import { watch } from 'vue';
-import type { CedentFilterItem } from '@/components/Rules/types';
-import { VMultiSelect } from '@/components/Form/VMultiSelect';
-import VRadioGroup from '@/components/Form/VRadioGroup.vue';
-import { yup } from '@/libs/yup';
-import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover';
-import { VField } from '@/components/Form';
+import { useForm } from 'vee-validate'
+import { watch } from 'vue'
+import type { CedentFilterItem } from '@/components/Rules/types'
+import { VMultiSelect } from '@/components/Form/VMultiSelect'
+import VRadioGroup from '@/components/Form/VRadioGroup.vue'
+import { yup } from '@/libs/yup'
+import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover'
+import { VField } from '@/components/Form'
 
 const props = defineProps<{
-  item?: CedentFilterItem,
-}>();
-const emit = defineEmits(['remove', 'save']);
+  item?: CedentFilterItem
+}>()
+const emit = defineEmits(['remove', 'save'])
 
-const { isOpen } = useInjectPopoverState()!;
+const { isOpen } = useInjectPopoverState()!
 
 const options = [
   'amount',
   'District',
   'duration',
-];
+]
 
 const validationSchema = yup.object({
   attribute: yup.string().required(),
@@ -91,28 +91,28 @@ const validationSchema = yup.object({
     .of(yup.string())
     .when('valueType', ([valueType], schema) => {
       if (valueType === 'fixed') {
-        return schema.min(1).required();
+        return schema.min(1).required()
       }
 
-      return schema;
+      return schema
     }),
-});
+})
 const form = useForm({
   validationSchema,
   initialValues: {
     valueType: 'any',
     ...props.item,
   },
-});
+})
 
-watch(isOpen, () => form.resetForm());
+watch(isOpen, () => form.resetForm())
 
 const handleSubmit = form.handleSubmit((item) => {
-  emit('save', item);
-  isOpen.value = false;
-});
+  emit('save', item)
+  isOpen.value = false
+})
 function handleRemove() {
-  emit('remove');
-  isOpen.value = false;
+  emit('remove')
+  isOpen.value = false
 }
 </script>

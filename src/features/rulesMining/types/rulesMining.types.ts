@@ -1,4 +1,4 @@
-import type { TaskSimpleResponse } from '@/api/model';
+import type { TaskSimpleResponse } from '@/api/model'
 
 export type MiningState = TaskSimpleResponse['state'] | (
   'aborted' |
@@ -6,4 +6,4 @@ export type MiningState = TaskSimpleResponse['state'] | (
   'blocked_by_interest_measures' |
   'disabled' |
   'no_rules_found'
-);
+)

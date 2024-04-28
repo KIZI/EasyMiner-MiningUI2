@@ -1,28 +1,28 @@
 @layer twBase {
-    @tailwind base;
+  @tailwind base;
 
-    [type='text']:focus, 
-    [type='email']:focus, 
-    [type='url']:focus, 
-    [type='password']:focus, 
-    [type='number']:focus, 
-    [type='date']:focus, 
-    [type='datetime-local']:focus, 
-    [type='month']:focus, 
-    [type='search']:focus, 
-    [type='tel']:focus, 
-    [type='time']:focus, 
-    [type='week']:focus, 
-    [multiple]:focus, 
-    textarea:focus, 
-    select:focus {
-        box-shadow: none;
-        outline: none;
-    }
+  [type='text']:focus,
+  [type='email']:focus,
+  [type='url']:focus,
+  [type='password']:focus,
+  [type='number']:focus,
+  [type='date']:focus,
+  [type='datetime-local']:focus,
+  [type='month']:focus,
+  [type='search']:focus,
+  [type='tel']:focus,
+  [type='time']:focus,
+  [type='week']:focus,
+  [multiple]:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow: none;
+    outline: none;
+  }
 }
 @layer twComponents {
-    @tailwind components;
+  @tailwind components;
 }
 @layer twUtilities {
-    @tailwind utilities;
+  @tailwind utilities;
 }

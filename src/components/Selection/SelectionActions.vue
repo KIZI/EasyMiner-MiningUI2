@@ -22,21 +22,21 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { useSelectionModel } from '@/composables/useSelectionModel';
-import { toRefs } from 'vue';
+import { toRefs } from 'vue'
+import { useSelectionModel } from '@/composables/useSelectionModel'
 
 const props = defineProps<{
-  items: T[],
-}>();
-const { items } = toRefs(props);
+  items: T[]
+}>()
+const { items } = toRefs(props)
 
 const selection = defineModel<T[]>('selection', {
   default: [],
-});
+})
 
 const {
   selectAll,
   invertSelection,
   clearSelection,
-} = useSelectionModel({ items, modelValue: selection });
+} = useSelectionModel({ items, modelValue: selection })
 </script>

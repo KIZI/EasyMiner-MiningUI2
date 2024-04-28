@@ -1,14 +1,15 @@
 <template>
   <VModal
-    :open="open"
+    :open="isOpen"
     class="max-w-4xl px-5 pb-4 pt-3"
-    @close="handleClose"
+    keep-alive
+    @close="close"
   >
     <IframeWrapper class="mt-2 h-[600px]">
       <iframe
         ref="iframeRef"
-        class="h-full w-full"
-        :src="`/em/attributes/add-attribute?miner=${minerId}&${iframeQueryParam}&mode=iframe`"
+        class="size-full"
+        :src="iframeSrc"
         frameborder="0"
       />
     </IframeWrapper>
@@ -16,38 +17,43 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import VModal from '@/components/VModal.vue';
-import { useActiveMinerQuery } from '@/api/miners/useActiveMinerQuery';
-import IframeWrapper from '@/components/IframeWrapper.vue';
-import { useAttributesCreation, type AttributeCreationSource } from '@preprocessing/composables/useAttributesCreation';
+import { computed, ref, toRefs } from 'vue'
+import { type PreprocessingTask, useDataPreprocessingTask } from '@preprocessing/composables/useDataPreprocessing'
+import VModal from '@/components/VModal.vue'
+import { useMinerQuery } from '@/api/miners/useMinerQuery'
+import IframeWrapper from '@/components/IframeWrapper.vue'
 
 const props = defineProps<{
-  source: AttributeCreationSource,
-}>();
+  task: PreprocessingTask
+}>()
+const { task } = toRefs(props)
 
-const iframeRef = ref();
+const { minerId } = useMinerQuery()
 
-const { minerId } = useActiveMinerQuery();
-const attributesCreation = useAttributesCreation();
+const iframeRef = ref()
+const { isOpen, close } = useDataPreprocessingTask(task)
 
-const iframeQueryParam = computed(() => {
-  if (Array.isArray(props.source)) {
-    const namesString = props.source.map((source) => source.name).join(',');
-    return `columnNames=${namesString}`;
+const iframeSrc = computed(() => {
+  const { source } = task.value
+  const isSingle = source.length === 1
+
+  const action = isSingle ? 'add-attribute' : 'add-attributes'
+  const urlBase = `/easyminercenter/em/attributes/${action}`
+
+  const searchParams = new URLSearchParams()
+
+  if (isSingle) {
+    searchParams.append('column', String(source[0].id))
+  }
+  else {
+    const namesString = source.map(source => source.name).join(',')
+    searchParams.append('columnNames', namesString)
   }
 
-  return `column=${props.source.id}`;
-});
+  searchParams.append('miner', String(minerId))
+  searchParams.append('mode', 'iframe')
+  searchParams.append('returnPostMessage', '1')
 
-const state = computed(() => {
-  return attributesCreation.getState(props.source);
-});
-const open = computed(() => state.value === 'opened');
-
-function handleClose() {
-  attributesCreation.close(props.source);
-}
+  return `${urlBase}?${searchParams}`
+})
 </script>
-
-  <style scoped></style>

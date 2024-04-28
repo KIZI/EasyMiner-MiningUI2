@@ -8,7 +8,7 @@
     :class="[
       {
         'modal--closing': isClosing,
-      }
+      },
     ]"
   >
     <div ref="dialogPanelRef">
@@ -18,71 +18,78 @@
 </template>
 
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core';
-import { useDefaultTwClass } from '@/composables/useDefaultTwClass';
-import { useDialog } from '@/composables/useDialog';
+import { useVModel } from '@vueuse/core'
+import { useDefaultTwClass } from '@/composables/useDefaultTwClass'
+import { useDialog } from '@/composables/useDialog'
 
 const props = withDefaults(defineProps<{
-  modelValue: boolean,
+  modelValue: boolean
 }>(), {
   modelValue: false,
-});
+})
 
-const emit = defineEmits(['']);
+const emit = defineEmits([''])
 
-const open = useVModel(props, 'modelValue', emit);
+const open = useVModel(props, 'modelValue', emit)
 const {
   closeModal,
   dialogPanelRef,
   dialogRef,
   isClosing,
-} = useDialog(open);
+} = useDialog(open)
 
-const { defaultTwClass } = useDefaultTwClass();
+const { defaultTwClass } = useDefaultTwClass()
 </script>
 
 <style>
-.popup-modal, .popup-modal::backdrop {
-    --dialog-animation-duration-in: 0.2s;
-    --dialog-animation-duration-out: 0.1s;
+.popup-modal,
+.popup-modal::backdrop {
+  --dialog-animation-duration-in: 0.2s;
+  --dialog-animation-duration-out: 0.1s;
 }
 
 .popup-modal[open] {
-    animation: show-popup-dialog var(--dialog-animation-duration-in) ease-in;
+  animation: show-popup-dialog var(--dialog-animation-duration-in) ease-in;
 }
 .popup-modal[open].modal--closing {
-    animation: hide-popup-dialog var(--dialog-animation-duration-out) ease-in;
+  animation: hide-popup-dialog var(--dialog-animation-duration-out) ease-in;
 }
 
 .popup-modal[open]::backdrop {
-    animation: show-backdrop var(--dialog-animation-duration-in) ease-out;
+  animation: show-backdrop var(--dialog-animation-duration-in) ease-out;
 }
 .popup-modal[open].modal--closing::backdrop {
-    animation: hide-backdrop var(--dialog-animation-duration-out) ease-in;
+  animation: hide-backdrop var(--dialog-animation-duration-out) ease-in;
 }
 
 @keyframes show-popup-dialog {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes hide-popup-dialog {
-    to {
-        opacity: 0;
-        transform: scale(0.95);
-    }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 @keyframes show-backdrop {
-    from { opacity: 0 }
-    to { opacity: 1 }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes hide-backdrop {
-    to { opacity: 0 }
+  to {
+    opacity: 0;
+  }
 }
 </style>

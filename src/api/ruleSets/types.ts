@@ -1,30 +1,30 @@
-import type { TaskRule, TaskRuleRelation } from '@/api/tasks/types';
+import type { TaskRule, TaskRuleRelation } from '@/api/tasks/types'
 
-export interface RuleSet {
-  id: number;
-  name: string;
-  description: string;
-  rulesCount: number;
-  lastModified: string;
+export type RuleSet = {
+  id: number
+  name: string
+  description: string
+  rulesCount: number
+  lastModified: string
 }
 
-export interface RuleSetsRulesResponse {
-  ruleset: RuleSet;
-  rule: TaskRule[];
+export type RuleSetsRulesResponse = {
+  ruleset: RuleSet
+  rule: TaskRule[]
 }
 
-export interface AddRulesInput {
-  id: number;
-  rules: number[];
-  relation?: TaskRuleRelation;
+export type AddRulesInput = {
+  id: number
+  rules: number[]
+  relation?: TaskRuleRelation
 }
 
-export type RemoveRulesInput = Omit<AddRulesInput, 'relation'>;
+export type RemoveRulesInput = Omit<AddRulesInput, 'relation'>
 
-export interface CreateRuleSetInput {
-  name: string;
-  description?: string;
+export type CreateRuleSetInput = {
+  name: string
+  description?: string
 }
-export interface UpdateRuleSetInput extends CreateRuleSetInput {
-  id: number;
-}
+export type UpdateRuleSetInput = {
+  id: number
+} & CreateRuleSetInput

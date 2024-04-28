@@ -1,7 +1,7 @@
 <template>
   <SlideTransition
     direction="up"
-    :duration="{enter: 200, leave: 150}"
+    :duration="{ enter: 200, leave: 150 }"
   >
     <div
       v-if="isOpen"
@@ -20,7 +20,7 @@
         >
           <h2
             v-if="title"
-            class="mb-1 flex items-center gap-x-2 text-sm font-semibold"
+            class="mb-1 flex items-center gap-x-2 break-all text-sm font-semibold"
           >
             {{ title }}
           </h2>
@@ -79,7 +79,7 @@
             >
               <div class="flex h-full flex-col">
                 <div class="mt-2 flex gap-x-2 text-red-700">
-                  <icon-ph-warning class="mt-1 h-4 w-4 shrink-0" />
+                  <icon-ph-warning class="mt-1 size-4 shrink-0" />
                   <span class="text-sm font-medium">
                     {{ removeConfirmLabel }}
                   </span>
@@ -114,65 +114,65 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
-import { useInjectPopoverState } from './popoverInjectionState';
-import SlideTransition from '@/components/Transitions/SlideTransition.vue';
-import SwitchTransition from '@/components/Transitions/SwitchTransition.vue';
-import VButton from '@/components/VButton.vue';
-import { useBackdropModel } from '@/components/Backdrop';
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { useInjectPopoverState } from './popoverInjectionState'
+import SlideTransition from '@/components/Transitions/SlideTransition.vue'
+import SwitchTransition from '@/components/Transitions/SwitchTransition.vue'
+import VButton from '@/components/VButton.vue'
+import { useBackdropModel } from '@/components/Backdrop'
 
 const props = defineProps<{
-  isEdit?: boolean,
-  popoverClass?: string,
-  title?: string,
-  editLabel?: string,
-  removeConfirmLabel?: string,
-  createLabel?: string,
-  confirmRemove?: boolean,
-  isCreateLoading?: boolean,
-  isRemoveLoading?: boolean,
-  preserveHeight?: boolean,
-}>();
+  isEdit?: boolean
+  popoverClass?: string
+  title?: string
+  editLabel?: string
+  removeConfirmLabel?: string
+  createLabel?: string
+  confirmRemove?: boolean
+  isCreateLoading?: boolean
+  isRemoveLoading?: boolean
+  preserveHeight?: boolean
+}>()
+
+const emit = defineEmits(['remove', 'save', 'submit'])
 
 const {
   editLabel = 'Save',
   createLabel = 'Create',
-} = props;
+} = props
 
-const emit = defineEmits(['remove', 'save', 'submit']);
+const { isOpen } = useInjectPopoverState()!
+useBackdropModel({ vModel: isOpen })
 
-const { isOpen } = useInjectPopoverState()!;
-useBackdropModel({ vModel: isOpen });
-
-const showConfirmRemove = ref(false);
+const showConfirmRemove = ref(false)
 watchEffect(() => {
-  if (!isOpen.value) showConfirmRemove.value = false;
-});
+  if (!isOpen.value) showConfirmRemove.value = false
+})
 
 function handleSubmit() {
-  emit('submit');
+  emit('submit')
 }
 function handleRemove() {
   if (props.confirmRemove && !showConfirmRemove.value) {
-    showConfirmRemove.value = true;
-    return;
+    showConfirmRemove.value = true
+    return
   }
 
-  emit('remove');
+  emit('remove')
 }
 function handleCancel() {
-  isOpen.value = false;
+  isOpen.value = false
 }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape' && isOpen.value) {
-    handleCancel();
+    handleCancel()
   }
 }
 onMounted(() => {
-  document.addEventListener('keydown', onKeydown);
-});
+  document.addEventListener('keydown', onKeydown)
+})
 onUnmounted(() => {
-  document.removeEventListener('keydown', onKeydown);
-});
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>

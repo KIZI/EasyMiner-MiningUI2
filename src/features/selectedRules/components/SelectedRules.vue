@@ -9,24 +9,27 @@
           size="xs"
           class="shrink-0 gap-x-1.5"
         >
-          <icon-ph-lightning class="h-5 w-5" />
+          <icon-ph-lightning class="size-5" />
           Test model
         </VButton>
 
         <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline">
-          <icon-ph-note-pencil-light class="h-5 w-5" />
+          <icon-ph-note-pencil-light class="size-5" />
           Rules editor
         </button>
         <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline">
-          <icon-ph-lightbulb class="h-5 w-5" />
+          <icon-ph-lightbulb class="size-5" />
           Knowledge experiment
         </button>
       </div>
     </div>
 
     <div class="flex items-center">
-      <div class="mr-4 break-all text-lg text-primary-900">
-        {{ ruleSet?.name }}
+      <div class="mr-4 break-all font-medium text-primary-900">
+        <Truncate
+          :length="appConfig.truncateLength.ruleSet"
+          :text="ruleSet?.name"
+        />
       </div>
 
       <Popover>
@@ -35,7 +38,7 @@
           variant="ghost"
           class="p-1.5"
         >
-          <icon-ph-note-pencil-light class="h-5 w-5" />
+          <icon-ph-note-pencil-light class="size-5" />
         </PopoverButton>
         <EditRuleSetPopoverForm :rule-set="ruleSet" />
       </Popover>
@@ -45,7 +48,7 @@
           variant="ghost"
           class="gap-x-2 p-1.5 text-sm"
         >
-          <icon-ph-plus-square-light class="h-5 w-5" />
+          <icon-ph-plus-square-light class="size-5" />
         </PopoverButton>
         <EditRuleSetPopoverForm />
       </Popover>
@@ -58,7 +61,7 @@
       class="grid h-full place-items-center text-gray-600"
     >
       <div class="flex gap-x-3">
-        <icon-ph-info class="h-6 w-6" />
+        <icon-ph-info class="size-6" />
         Add interesting discovered rules
       </div>
     </div>
@@ -89,7 +92,7 @@
             @click="showSearch = !showSearch"
           >
             <template #icon>
-              <icon-ph-magnifying-glass class="h-4 w-4 text-slate-700" />
+              <icon-ph-magnifying-glass class="size-4 text-slate-700" />
             </template>
             <template v-if="!showSearch">
               Search rules
@@ -103,7 +106,7 @@
                 placeholder="Antecedent"
               />
               <button class="absolute right-2">
-                <icon-ph-x class="h-3.5 w-3.5 text-slate-700" />
+                <icon-ph-x class="size-3.5 text-slate-700" />
               </button>
             </div>
             <div class="mx-2.5 text-lg">
@@ -112,23 +115,24 @@
             <div class="relative flex w-full items-center">
               <VInput
                 class="h-7 pl-2 pr-6 text-xs"
-                placeholder="Consequent"
+                placeholder="Consequent"F
               />
               <button class="absolute right-2">
-                <icon-ph-x class="h-3.5 w-3.5 text-slate-700" />
+                <icon-ph-x class="size-3.5 text-slate-700" />
               </button>
             </div>
           </template>
         </div>
       </div>
 
-      <div class="mt-3">
+      <div class="mt-3 min-h-40">
+        <BlockSpinner v-if="ruleSetsRulesQuery.isFetching.value" />
         <RuleSetRules
+          v-else
           v-model:selection="selection"
           :rules="rules"
         />
       </div>
-
       <div class="mt-10">
         <div class="grid grid-cols-[1fr_auto_1fr] items-center">
           <RulesSelectionActions
@@ -144,7 +148,7 @@
           <div class="ml-auto">
             <div class="flex items-center space-x-3">
               <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
-                <icon-ph-export class="h-4 w-4 text-gray-700" />
+                <icon-ph-export class="size-4 text-gray-700" />
                 Export ruleset
               </button>
             </div>
@@ -156,32 +160,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref } from 'vue'
 
-import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery';
-import type { TaskRule } from '@/api/tasks/types';
+import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore'
+import EditRuleSetPopoverForm from '@selectedRules/components/EditRuleSetPopoverForm.vue'
+import ChangeRuleSetListbox from '@selectedRules/components/ChangeRuleSetListbox.vue'
+import RuleSetRules from '@selectedRules/components/RuleSetRules.vue'
+import type { TaskRule } from '@/api/tasks/types'
+import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
-import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore';
-import EditRuleSetPopoverForm from '@selectedRules/components/EditRuleSetPopoverForm.vue';
-import ChangeRuleSetListbox from '@selectedRules/components/ChangeRuleSetListbox.vue';
-import RuleSetRules from '@selectedRules/components/RuleSetRules.vue';
+import SectionCard from '@/components/Layout/SectionCard.vue'
+import SectionTitle from '@/components/Layout/SectionTitle.vue'
+import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue'
+import { Popover, PopoverButton } from '@/components/Popover'
+import VButton from '@/components/VButton.vue'
+import VPagination from '@/components/VPagination.vue'
+import VInput from '@/components/Form/VInput.vue'
+import Truncate from '@/components/Truncate.vue'
+import { appConfig } from '@/config/appConfig'
 
-import SectionCard from '@/components/Layout/SectionCard.vue';
-import SectionTitle from '@/components/Layout/SectionTitle.vue';
-import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue';
-import { Popover, PopoverButton } from '@/components/Popover';
-import VButton from '@/components/VButton.vue';
-import VPagination from '@/components/VPagination.vue';
-import VInput from '@/components/Form/VInput.vue';
+const { currentRuleSetId } = useSelectedRulesStoreRefs()
+const ruleSetsRulesQuery = useRuleSetRulesQuery(currentRuleSetId)
+const { rules, ruleSet } = ruleSetsRulesQuery
 
-const { currentRuleSetId } = useSelectedRulesStoreRefs();
-const { rules, ruleSet } = useRuleSetRulesQuery(currentRuleSetId);
+const hasRules = computed(() => Boolean(ruleSet.value?.rulesCount))
+const selection = ref<TaskRule[]>([])
 
-const hasRules = computed(() => Boolean(ruleSet.value?.rulesCount));
-const selection = ref<TaskRule[]>([]);
-
-const showSearch = ref(false);
-const order = ref('found');
+const showSearch = ref(false)
+const order = ref('found')
 const orderOptions = [
   {
     label: 'Found order',
@@ -199,5 +205,5 @@ const orderOptions = [
     label: 'Custom order',
     value: 'custom',
   },
-];
+]
 </script>

@@ -1,17 +1,17 @@
-import { defineStore } from 'pinia';
-import { ref, computed, readonly } from 'vue';
+import { defineStore } from 'pinia'
+import { computed, readonly, ref } from 'vue'
 
 export const useTasksStore = defineStore('tasks', () => {
-  const activeTaskId = ref<number|null>(27942);
+  const activeTaskId = ref<number | null>(null)
 
-  const isTaskSelected = computed(() => Boolean(activeTaskId.value));
+  const isTaskSelected = computed(() => Boolean(activeTaskId.value))
 
   function setActiveTaskId(id: number) {
-    activeTaskId.value = id;
+    activeTaskId.value = id
   }
 
   function clearActiveTask() {
-    activeTaskId.value = null;
+    activeTaskId.value = null
   }
 
   return {
@@ -19,5 +19,5 @@ export const useTasksStore = defineStore('tasks', () => {
     clearActiveTask,
     isTaskSelected,
     setActiveTaskId,
-  };
-});
+  }
+})

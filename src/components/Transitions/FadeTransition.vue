@@ -10,16 +10,16 @@
 </template>
 
 <script setup lang="ts">
-import { useTransition, type VueTransitionProps } from './useTransition';
+import { type VueTransitionProps, useTransition } from './useTransition'
 
-const props = defineProps<VueTransitionProps>();
-const { cssVars } = useTransition(props);
+const props = defineProps<VueTransitionProps>()
+const { cssVars } = useTransition(props)
 </script>
 
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity ease;
+  transition: opacity ease;
 }
 
 .fade-enter-active {
@@ -31,6 +31,6 @@ const { cssVars } = useTransition(props);
 
 .fade-enter-from,
 .fade-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 </style>

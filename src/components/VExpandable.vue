@@ -15,5 +15,5 @@
 <script setup lang="ts">
 defineProps({
   isExpanded: Boolean,
-});
+})
 </script>

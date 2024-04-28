@@ -6,17 +6,17 @@
 </template>
 
 <script setup lang="ts">
-import { useDraggable } from '@/components/DragAndDrop/useDraggable';
+import { useDraggable } from '@/components/DragAndDrop/useDraggable'
 
 const props = defineProps<{
-  payload: unknown,
-}>();
+  payload: unknown
+}>()
 
-const emit = defineEmits(['start', 'end']);
+const emit = defineEmits(['start', 'end'])
 
 const draggable = useDraggable({
   onDragEnd: () => emit('end'),
   onDragStart: () => emit('start'),
   payload: props.payload,
-});
+})
 </script>

@@ -13,7 +13,7 @@
 
         <div
           v-if="!editedItem"
-          class="min-w-[max-content]"
+          class="min-w-max"
         >
           <InterestMeasureItemForm v-if="isFormActive" />
           <button
@@ -40,7 +40,7 @@
       </SwitchGroup>
       <p
         class="text-xs leading-5"
-        :class="{ 'invisible': !isPruningEnabled }"
+        :class="{ invisible: !isPruningEnabled }"
       >
         Removes deductive rules
       </p>
@@ -49,11 +49,11 @@
 </template>
 
 <script lang="ts" setup>
-import { SwitchGroup, SwitchLabel } from '@headlessui/vue';
-import { storeToRefs } from 'pinia';
-import InterestMeasureItemForm from './InterestMeasureItemForm.vue';
-import { VSwitch } from '@/components/Form';
-import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore';
+import { SwitchGroup, SwitchLabel } from '@headlessui/vue'
+import { storeToRefs } from 'pinia'
+import InterestMeasureItemForm from './InterestMeasureItemForm.vue'
+import { VSwitch } from '@/components/Form'
+import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore'
 
 const {
   activeItems,
@@ -61,5 +61,5 @@ const {
   isPruningEnabled,
   isFormActive,
   editedItem,
-} = storeToRefs(useInterestMeasuresStore());
+} = storeToRefs(useInterestMeasuresStore())
 </script>

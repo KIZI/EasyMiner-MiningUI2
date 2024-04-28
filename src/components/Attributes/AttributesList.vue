@@ -39,9 +39,10 @@
       </div>
 
       <div
-        v-auto-animate
+        v-auto-animate="{ ...disableAnimation ? { duration: 0 } : {} }"
         class="divide-y divide-gray-50"
       >
+        <slot name="beforeItems" />
         <template
           v-for="(attribute, i) in filteredAttributes"
           :key="attribute.id"
@@ -57,7 +58,7 @@
               :is-even="i % 2 !== 0"
               :attribute="attribute"
               :spacing-class="spacingClass"
-              v-on="events"
+              v-on="dragSource ? events : {}"
             >
               <template #actions>
                 <slot
@@ -76,21 +77,23 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, type HTMLAttributes, computed } from 'vue';
-import AttributesListItem from '@/components/Attributes/AttributesListItem.vue';
-import HLDraggableAttribute from '@/components/Attributes/HLDraggableAttribute.vue';
-import VSpinner from '@/components/VSpinner.vue';
-import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection';
-import DraggedAttributes from '@/components/Attributes/DraggedAttributes.vue';
-import type { Draggable } from '@/components/DragAndDrop/useDraggable';
-
-const NoItemsMessage = h('i', 'No attributes found');
+import { type HTMLAttributes, h, ref } from 'vue'
+import AttributesListItem from '@/components/Attributes/AttributesListItem.vue'
+import HLDraggableAttribute from '@/components/Attributes/HLDraggableAttribute.vue'
+import VSpinner from '@/components/VSpinner.vue'
+import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection'
+import DraggedAttributes from '@/components/Attributes/DraggedAttributes.vue'
+import type { Draggable } from '@/components/DragAndDrop/useDraggable'
 
 const props = withDefaults(defineProps<{
-  spacingClass?: HTMLAttributes['class'],
+  spacingClass?: HTMLAttributes['class']
+  disableAnimation?: boolean
 }>(), {
   spacingClass: 'px-4',
-});
+  disableAnimation: false,
+})
+
+const NoItemsMessage = h('i', 'No attributes found')
 
 const {
   attributes,
@@ -98,14 +101,15 @@ const {
   isLoading,
   searchQuery,
   clearSearchQuery,
-} = useInjectAttributesList()!;
+  dragSource,
+} = useInjectAttributesList()!
 
-const activeDraggable = ref<Draggable>();
+const activeDraggable = ref<Draggable>()
 
 function onDragStart(draggable: Draggable) {
-  activeDraggable.value = draggable;
+  activeDraggable.value = draggable
 }
 function onDragEnd() {
-  activeDraggable.value = undefined;
+  activeDraggable.value = undefined
 }
 </script>

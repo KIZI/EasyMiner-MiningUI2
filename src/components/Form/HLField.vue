@@ -3,13 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import {useHLField} from './useHLField';
-import { toRefs } from 'vue';
+import { toRefs } from 'vue'
+import { useHLField } from './useHLField'
 
 const props = defineProps<{
-  name: string,
-}>();
+  name: string
+}>()
 
-const { name } = toRefs(props);
-const { slotData } = useHLField(name);
+const { name } = toRefs(props)
+const { slotData } = useHLField(name)
 </script>

@@ -61,36 +61,36 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
-import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore';
-import type { Cedent } from '@/features/rulesMining/types/rulePattern.types';
-import AttributesList from '@/components/Attributes/AttributesList.vue';
-import AttributesListActions from '@/components/Attributes/AttributesListActions.vue';
-import AttributesListSearch from '@/components/Attributes/AttributesListSearch.vue';
-import SectionCard from '@/components/Layout/SectionCard.vue';
-import SectionTitle from '@/components/Layout/SectionTitle.vue';
-import VButton from '@/components/VButton.vue';
-import { useMetasourceAttributes } from '@/composables/useMetasourceAttributes';
-import AttributesListSelectionActions from '@/components/Attributes/AttributesListSelectionActions.vue';
-import { useAttributesList } from '@/components/Attributes/useAttributesList';
-import { useProvideAttributesList } from '@/components/Attributes/attributesListInjection';
+import { useRouter } from 'vue-router'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import type { Cedent } from '@/features/rulesMining/types/rulePattern.types'
+import AttributesList from '@/components/Attributes/AttributesList.vue'
+import AttributesListActions from '@/components/Attributes/AttributesListActions.vue'
+import AttributesListSearch from '@/components/Attributes/AttributesListSearch.vue'
+import SectionCard from '@/components/Layout/SectionCard.vue'
+import SectionTitle from '@/components/Layout/SectionTitle.vue'
+import VButton from '@/components/VButton.vue'
+import { useMetasourceAttributes } from '@/composables/useMetasourceAttributes'
+import AttributesListSelectionActions from '@/components/Attributes/AttributesListSelectionActions.vue'
+import { useAttributesList } from '@/components/Attributes/useAttributesList'
+import { useProvideAttributesList } from '@/components/Attributes/attributesListInjection'
 
-const metasourceAttributes = useMetasourceAttributes();
-const rulePatternStore = useRulePatternStore();
+const metasourceAttributes = useMetasourceAttributes()
+const rulePatternStore = useRulePatternStore()
 
 const attributesList = useAttributesList({
   attributes: metasourceAttributes.attributes,
-  isLoading: metasourceAttributes.isLoading,
+  isLoading: metasourceAttributes.isPending,
   dragSource: 'metasource',
-});
-useProvideAttributesList(attributesList);
+})
+useProvideAttributesList(attributesList)
 
-const router = useRouter();
+const router = useRouter()
 function onEditAttributes() {
-  router.push('/preprocessing');
+  router.push('/preprocessing')
 }
 
 function addSelectionToCedent(cedent: Cedent) {
-  rulePatternStore.addItems(attributesList.selection.modelValue.value, cedent);
+  rulePatternStore.addItems(attributesList.selection.modelValue.value, cedent)
 }
 </script>

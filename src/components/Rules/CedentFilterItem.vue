@@ -30,23 +30,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import EditCedentFilterItemPopoverForm from '@/components/Rules/EditCedentFilterItemPopoverForm.vue';
-import type { CedentFilterItem } from '@/components/Rules/types';
-import { Popover, PopoverButton } from '@/components/Popover';
+import { computed } from 'vue'
+import EditCedentFilterItemPopoverForm from '@/components/Rules/EditCedentFilterItemPopoverForm.vue'
+import type { CedentFilterItem } from '@/components/Rules/types'
+import { Popover, PopoverButton } from '@/components/Popover'
 
 const props = defineProps<{
-  item: CedentFilterItem,
-}>();
-const emit = defineEmits(['remove', 'save']);
+  item: CedentFilterItem
+}>()
+const emit = defineEmits(['remove', 'save'])
 
-const itemValues = computed(() => (props.item.values?.length ? props.item.values : ['*']));
+const itemValues = computed(() => (props.item.values?.length ? props.item.values : ['*']))
 
 function handleRemove() {
-  emit('remove');
+  emit('remove')
 }
 function handleSave(item: CedentFilterItem) {
-  emit('save', item);
+  emit('save', item)
 }
 </script>
 

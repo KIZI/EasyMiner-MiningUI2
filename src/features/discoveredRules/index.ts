@@ -1,1 +1,1 @@
-export { default as DiscoveredRules } from './components/DiscoveredRules.vue';
+export { default as DiscoveredRules } from './components/DiscoveredRules.vue'

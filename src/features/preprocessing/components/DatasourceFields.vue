@@ -14,14 +14,14 @@
       class="grow overflow-y-auto border-t"
       spacing-class="px-6"
     >
-      <template #itemActions="{attribute}">
+      <template #itemActions="{ attribute }">
         <VButton
           variant="ghost"
-          class="h-8 w-8 hover:bg-primary-200 group-hover:hover:bg-primary-50"
-          @click.stop="attributesCreation.open(attribute)"
+          class="size-8 hover:bg-primary-200 group-hover:hover:bg-primary-50"
+          @click.stop="dataPreprocessing.open(attribute)"
           @mousedown.stop
         >
-          <icon-ph-arrow-right class="h-5 w-5 text-primary-700" />
+          <icon-ph-arrow-right class="size-5 text-primary-700" />
         </VButton>
       </template>
     </AttributesList>
@@ -35,10 +35,10 @@
           class="ml-3 gap-x-3 font-medium"
           variant="ghost"
           size="md"
-          @click="attributesCreation.open(attributesList.selection.modelValue.value)"
+          @click="handleAddSelected"
         >
           <template #icon>
-            <icon-ph-arrow-right class="h-5 w-5 text-primary-700" />
+            <icon-ph-arrow-right class="size-5 text-primary-700" />
           </template>
 
           Add selected to Attributes
@@ -47,7 +47,7 @@
         <label class="ml-auto flex cursor-pointer select-none items-center gap-x-2.5 text-sm font-medium">
           <VCheckbox
             v-model="shouldRemovePrefix"
-            class="h-5 w-5"
+            class="size-5"
           />
           <span>Remove prefix</span>
         </label>
@@ -55,61 +55,38 @@
     </div>
 
     <CreateAttributeModal
-      v-for="(source, i) in attributesCreation.creations.value"
+      v-for="(task, i) in dataPreprocessing.tasks.value"
       :key="i"
-      :source="source"
+      :task="task"
     />
   </SectionCard>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue'
+import CreateAttributeModal from '@preprocessing/components/CreateAttributeModal.vue'
+import { useDataPreprocessing } from '@preprocessing/composables/useDataPreprocessing'
+import { useDataSourceAttributesList } from '@preprocessing/composables/useDataSourceAttributesList'
+import AttributesList from '@/components/Attributes/AttributesList.vue'
+import AttributesListActions from '@/components/Attributes/AttributesListActions.vue'
+import AttributesListSearch from '@/components/Attributes/AttributesListSearch.vue'
+import AttributesListSelectionActions from '@/components/Attributes/AttributesListSelectionActions.vue'
+import { useProvideAttributesList } from '@/components/Attributes/attributesListInjection'
 
-import { useActiveDatasourceQuery } from '@/api/datasources/useActiveDatasourceQuery';
-import type { DatasourceColumn } from '@/api/datasources/types';
+import SectionCard from '@/components/Layout/SectionCard.vue'
+import SectionTitle from '@/components/Layout/SectionTitle.vue'
 
-import AttributesList from '@/components/Attributes/AttributesList.vue';
-import AttributesListActions from '@/components/Attributes/AttributesListActions.vue';
-import AttributesListSearch from '@/components/Attributes/AttributesListSearch.vue';
-import AttributesListSelectionActions from '@/components/Attributes/AttributesListSelectionActions.vue';
-import { useAttributesList } from '@/components/Attributes/useAttributesList';
-import { useProvideAttributesList } from '@/components/Attributes/attributesListInjection';
+import VButton from '@/components/VButton.vue'
+import VCheckbox from '@/components/Form/VCheckbox.vue'
 
-import SectionCard from '@/components/Layout/SectionCard.vue';
-import SectionTitle from '@/components/Layout/SectionTitle.vue';
+const { attributesList } = useDataSourceAttributesList()
+useProvideAttributesList(attributesList)
 
-import VButton from '@/components/VButton.vue';
-import VCheckbox from '@/components/Form/VCheckbox.vue';
+const dataPreprocessing = useDataPreprocessing()
+function handleAddSelected() {
+  dataPreprocessing.open(attributesList.selection.modelValue.value)
+  attributesList.selection.clearSelection()
+}
 
-import CreateAttributeModal from '@preprocessing/components/CreateAttributeModal.vue';
-import { useAttributesCreation } from '@preprocessing/composables/useAttributesCreation';
-
-const datasourceQuery = useActiveDatasourceQuery();
-
-type DatasourceListAttribute = DatasourceColumn & {
-  isAvailable: boolean,
-};
-
-const shouldRemovePrefix = ref(false);
-
-const attributes = computed<DatasourceListAttribute[]>(() => {
-  const columns = datasourceQuery.data.value?.column;
-  if (!columns) return [];
-
-  return columns.map((column) => {
-    return {
-      ...column,
-      isAvailable: true,
-    };
-  });
-});
-
-const attributesList = useAttributesList({
-  attributes,
-  dragSource: 'datasource',
-  isLoading: datasourceQuery.isLoading,
-});
-useProvideAttributesList(attributesList);
-
-const attributesCreation = useAttributesCreation();
+const shouldRemovePrefix = ref(false)
 </script>

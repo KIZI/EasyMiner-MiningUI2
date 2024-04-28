@@ -5,7 +5,7 @@
         <VCheckbox
           v-model="selected"
           :value="rule"
-          class="absolute left-0 mt-1.5 h-4 w-4"
+          class="absolute left-0 mt-1.5 size-4"
         />
 
         <span class="cursor-pointer">{{ rule.text }}</span>
@@ -42,14 +42,14 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskRule } from '@/api/tasks/types';
-import VCheckbox from '@/components/Form/VCheckbox.vue';
-import { formatDecimal } from '@/utils/format';
-import TaskRuleDetailsPopover from '@/components/Task/TaskRuleDetailsPopover.vue';
+import type { TaskRule } from '@/api/tasks/types'
+import VCheckbox from '@/components/Form/VCheckbox.vue'
+import { formatDecimal } from '@/utils/format'
+import TaskRuleDetailsPopover from '@/components/Task/TaskRuleDetailsPopover.vue'
 
 defineProps<{
-  rule: TaskRule,
-}>();
+  rule: TaskRule
+}>()
 
-const selected = defineModel<TaskRule[]>('selected');
+const selected = defineModel<TaskRule[]>('selected')
 </script>

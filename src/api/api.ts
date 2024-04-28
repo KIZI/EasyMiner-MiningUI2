@@ -1,8 +1,8 @@
-import metasources from './metasources';
-import miners from './miners';
-import tasks from './tasks';
-import ruleSets from './ruleSets';
-import datasources from './datasources';
+import metasources from './metasources'
+import miners from './miners'
+import tasks from './tasks'
+import ruleSets from './ruleSets'
+import datasources from './datasources'
 
 export const api = {
   metasources,
@@ -10,4 +10,4 @@ export const api = {
   tasks,
   ruleSets,
   datasources,
-};
+}

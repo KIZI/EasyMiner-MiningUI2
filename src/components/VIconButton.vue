@@ -6,15 +6,15 @@
     <slot />
     <VSpinner
       v-if="loading"
-      class="absolute inset-[-2px] h-[calc(100%+4px)] w-[calc(100%+4px)]"
+      class="absolute inset-[-2px] size-[calc(100%+4px)]"
     />
   </button>
 </template>
 
 <script setup lang="ts">
-import VSpinner from '@/components/VSpinner.vue';
+import VSpinner from '@/components/VSpinner.vue'
 
 defineProps<{
-  loading?: boolean;
-}>();
+  loading?: boolean
+}>()
 </script>

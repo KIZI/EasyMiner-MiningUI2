@@ -1,9 +1,9 @@
 @layer vueComponents {
-    .card {
-        @apply flex grow flex-col rounded bg-white py-4 shadow;
-    }
+  .card {
+    @apply flex grow flex-col rounded bg-white py-4 shadow;
+  }
 
-    .card-title {
-        @apply text-2xl font-medium text-gray-900;
-    }
+  .card-title {
+    @apply text-2xl font-medium text-gray-900;
+  }
 }

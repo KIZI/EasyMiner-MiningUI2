@@ -1,5 +1,5 @@
 <template>
-  <SectionCard class="[&>*]:px-6">
+  <SectionCard id="rulesMining" class="scroll-m-5 [&>*]:px-6">
     <div class="flex items-start justify-between pt-4">
       <SectionTitle>
         Association rule pattern
@@ -42,18 +42,18 @@
 </template>
 
 <script lang="ts" setup>
-import InterestMeasures from '@rulesMining/components/InterestMeasures/InterestMeasures.vue';
-import RulePattern from '@rulesMining/components/RulePattern/RulePattern.vue';
-import RulePatternTrash from '@rulesMining/components/RulePattern/RulePatternTrash.vue';
-import RulesMiningHint from '@rulesMining/components/RulesMiningHint.vue';
-import { useRulesMining } from '@rulesMining/composables/useRulesMining';
-import { computed } from 'vue';
-import SectionCard from '@/components/Layout/SectionCard.vue';
-import SectionTitle from '@/components/Layout/SectionTitle.vue';
-import VButton from '@/components/VButton.vue';
+import InterestMeasures from '@rulesMining/components/InterestMeasures/InterestMeasures.vue'
+import RulePattern from '@rulesMining/components/RulePattern/RulePattern.vue'
+import RulePatternTrash from '@rulesMining/components/RulePattern/RulePatternTrash.vue'
+import RulesMiningHint from '@rulesMining/components/RulesMiningHint.vue'
+import { useRulesMining } from '@rulesMining/composables/useRulesMining'
+import { computed } from 'vue'
+import SectionCard from '@/components/Layout/SectionCard.vue'
+import SectionTitle from '@/components/Layout/SectionTitle.vue'
+import VButton from '@/components/VButton.vue'
 
-const { isInProgress, miningState, startMining, abortMining } = useRulesMining();
+const { isInProgress, miningState, startMining, abortMining } = useRulesMining()
 
-const isButtonVisible = computed(() => miningState.value !== 'disabled');
-const isButtonDisabled = computed(() => isInProgress.value || miningState.value === 'blocked_by_interest_measures');
+const isButtonVisible = computed(() => miningState.value !== 'disabled')
+const isButtonDisabled = computed(() => isInProgress.value || miningState.value === 'blocked_by_interest_measures')
 </script>

@@ -10,15 +10,15 @@
 </template>
 
 <script setup lang="ts">
-import { useTransition, type VueTransitionProps } from './useTransition';
+import { type VueTransitionProps, useTransition } from './useTransition'
 
 type SlideTransitionProps = VueTransitionProps & {
-  direction?: 'left' | 'right' | 'up' | 'down',
-  distance?: string,
-};
+  direction?: 'left' | 'right' | 'up' | 'down'
+  distance?: string
+}
 
-const props = defineProps<SlideTransitionProps>();
-const { distance = '0.125rem' } = props;
+const props = defineProps<SlideTransitionProps>()
+const { distance = '0.125rem' } = props
 
 const { cssVars } = useTransition(props, {
   duration: {
@@ -28,23 +28,23 @@ const { cssVars } = useTransition(props, {
   cssVars: {
     distance,
   },
-});
+})
 </script>
 
 <style scoped>
-[class*="-enter-active"] {
-    transition: all var(--duration-enter) ease-out;
+[class*='-enter-active'] {
+  transition: all var(--duration-enter) ease-out;
 }
-[class*="-leave-active"] {
-    transition: all var(--duration-leave) ease-in;
+[class*='-leave-active'] {
+  transition: all var(--duration-leave) ease-in;
 }
 
-[class*="-enter-from"],
-[class*="-leave-to"] {
+[class*='-enter-from'],
+[class*='-leave-to'] {
   opacity: 0;
 }
-[class*="-enter-to"],
-[class*="-leave-from"] {
+[class*='-enter-to'],
+[class*='-leave-from'] {
   opacity: 100;
 }
 

@@ -1,24 +1,24 @@
-import { interestMeasureTypes, interestMeasures } from '@rulesMining/types/interestMeasure.types';
-import { interestMeasureToIMSimpleInput } from '@rulesMining/utils/rulesMining';
-import { defineStore, storeToRefs } from 'pinia';
-import { computed, ref } from 'vue';
-import type { InteresetMeasureActiveItem, InterestMeasure, InterestMeasureItem } from '@rulesMining/types/interestMeasure.types';
+import { interestMeasureTypes, interestMeasures } from '@rulesMining/types/interestMeasure.types'
+import { interestMeasureToIMSimpleInput } from '@rulesMining/utils/rulesMining'
+import { defineStore, storeToRefs } from 'pinia'
+import { computed, ref } from 'vue'
+import type { InteresetMeasureActiveItem, InterestMeasure, InterestMeasureItem } from '@rulesMining/types/interestMeasure.types'
 
 export const useInterestMeasuresStore = defineStore('interestMeasures', () => {
-  const isFormActive = ref(false);
-  const editedItem = ref<InterestMeasure|null>(null);
+  const isFormActive = ref(false)
+  const editedItem = ref<InterestMeasure | null>(null)
 
   function openItemForm(name: InterestMeasure) {
-    editedItem.value = name;
-    isFormActive.value = true;
+    editedItem.value = name
+    isFormActive.value = true
   }
 
   function closeItemForm() {
-    editedItem.value = null;
-    isFormActive.value = false;
+    editedItem.value = null
+    isFormActive.value = false
   }
 
-  const isPruningEnabled = ref(false);
+  const isPruningEnabled = ref(false)
 
   const itemsMap = ref(new Map<InterestMeasure, InterestMeasureItem>([
     [interestMeasures.Conf, {
@@ -69,31 +69,31 @@ export const useInterestMeasuresStore = defineStore('interestMeasures', () => {
       },
       type: interestMeasureTypes.Integer,
     }],
-  ]));
+  ]))
 
-  const items = computed(() => Array.from(itemsMap.value.values()));
+  const items = computed(() => Array.from(itemsMap.value.values()))
   const activeItems = computed(() => (
-    items.value.filter((item) => item.value) as InteresetMeasureActiveItem[]
-  ));
+    items.value.filter(item => item.value) as InteresetMeasureActiveItem[]
+  ))
 
-  const unusedItems = computed(() => items.value.filter((item) => !item.value));
+  const unusedItems = computed(() => items.value.filter(item => !item.value))
 
   const interestMeasuresInput = computed(() => (
     activeItems.value.map(interestMeasureToIMSimpleInput)
-  ));
+  ))
 
   function getItem(name: InterestMeasure) {
-    return itemsMap.value.get(name);
+    return itemsMap.value.get(name)
   }
 
-  function setItemValue(name: InterestMeasure, value: number|null) {
-    const measure = itemsMap.value.get(name);
-    if (!measure) return;
-    measure.value = value;
+  function setItemValue(name: InterestMeasure, value: number | null) {
+    const measure = itemsMap.value.get(name)
+    if (!measure) return
+    measure.value = value
   }
 
   function clearItemValue(name: InterestMeasure) {
-    setItemValue(name, null);
+    setItemValue(name, null)
   }
 
   return {
@@ -109,7 +109,7 @@ export const useInterestMeasuresStore = defineStore('interestMeasures', () => {
     editedItem,
     closeItemForm,
     openItemForm,
-  };
-});
+  }
+})
 
-export const useInterestMeasuresStoreRefs = () => storeToRefs(useInterestMeasuresStore());
+export const useInterestMeasuresStoreRefs = () => storeToRefs(useInterestMeasuresStore())

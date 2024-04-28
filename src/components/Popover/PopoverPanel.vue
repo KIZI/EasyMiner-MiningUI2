@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { useInjectPopoverState } from './popoverInjectionState';
+import { useInjectPopoverState } from './popoverInjectionState'
 
-const { isVisible } = useInjectPopoverState()!;
+const { isVisible } = useInjectPopoverState()!
 </script>

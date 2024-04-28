@@ -10,7 +10,7 @@
 
     <template v-if="isEdited">
       <form
-        class="flex min-w-[max-content] items-center"
+        class="flex min-w-max items-center"
         @submit="handleSave"
       >
         <InteresetMeasureItemTemplate :item="item">
@@ -19,7 +19,7 @@
             #label
           >
             <Field
-              v-slot="{field}"
+              v-slot="{ field }"
               name="name"
             >
               <select
@@ -39,7 +39,7 @@
 
           <template #value>
             <HLField
-              v-slot="{field, meta}"
+              v-slot="{ field, meta }"
               name="value"
             >
               <input
@@ -72,15 +72,15 @@
                 size="md"
                 class="p-1"
                 :class="{
-                  'shake': showInvalidSubmission,
+                  shake: showInvalidSubmission,
                 }"
               >
-                <icon-ph-check class="h-5 w-5" />
+                <icon-ph-check class="size-5" />
               </VButton>
             </template>
 
-            <div class="flex w-[max-content] gap-x-2 rounded border border-red-100 bg-red-50 px-1.5 py-1 text-xs font-medium leading-none text-red-800 shadow-md">
-              <icon-ph-warning class="h-3.5 w-3.5" />
+            <div class="flex w-max gap-x-2 rounded border border-red-100 bg-red-50 px-1.5 py-1 text-xs font-medium leading-none text-red-800 shadow-md">
+              <icon-ph-warning class="size-3.5" />
               Incorrect input
             </div>
           </HLFloating>
@@ -92,7 +92,7 @@
             size="md"
             @click="handleClose"
           >
-            <icon-ph-x class="h-5 w-5" />
+            <icon-ph-x class="size-5" />
           </VButton>
           <VButton
             v-if="item && !currentItem.isRequired"
@@ -103,7 +103,7 @@
             class="p-1"
             @click="handleRemove"
           >
-            <icon-ph-trash class="h-5 w-5" />
+            <icon-ph-trash class="size-5" />
           </VButton>
         </div>
       </form>
@@ -124,10 +124,10 @@
 </template>
 
 <script setup lang="ts">
-import { formatInterestMeasureRange } from '@rulesMining/utils/format';
-import { vMaska } from 'maska';
-import { storeToRefs } from 'pinia';
-import { Field, useForm } from 'vee-validate';
+import { formatInterestMeasureRange } from '@rulesMining/utils/format'
+import { vMaska } from 'maska'
+import { storeToRefs } from 'pinia'
+import { Field, useForm } from 'vee-validate'
 import {
   computed,
   nextTick,
@@ -135,53 +135,53 @@ import {
   ref,
   watch,
   watchEffect,
-} from 'vue';
-import * as yup from 'yup';
-import InteresetMeasureItemTemplate from './InterestMeasureItemTemplate.vue';
-import type { InterestMeasure, InterestMeasureItem } from '@/features/rulesMining/types/interestMeasure.types';
-import { HLField, HLFloating } from '@/components/Form';
-import VButton from '@/components/VButton.vue';
-import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore';
+} from 'vue'
+import * as yup from 'yup'
+import InteresetMeasureItemTemplate from './InterestMeasureItemTemplate.vue'
+import type { InterestMeasure, InterestMeasureItem } from '@/features/rulesMining/types/interestMeasure.types'
+import { HLField, HLFloating } from '@/components/Form'
+import VButton from '@/components/VButton.vue'
+import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore'
 
 const props = defineProps<{
-  item?: InterestMeasureItem,
-}>();
+  item?: InterestMeasureItem
+}>()
 
-const interestMeasuresStore = useInterestMeasuresStore();
-const { unusedItems, editedItem, isFormActive } = storeToRefs(useInterestMeasuresStore());
+const interestMeasuresStore = useInterestMeasuresStore()
+const { unusedItems, editedItem, isFormActive } = storeToRefs(useInterestMeasuresStore())
 
 const isEdited = computed(() => (
   !props.item || editedItem.value === props.item?.name
-));
+))
 
-const valueInputRef = ref<HTMLInputElement>();
+const valueInputRef = ref<HTMLInputElement>()
 
 const availableItems = computed<InterestMeasureItem[]>(() => [
   ...unusedItems.value,
   ...props.item ? [props.item] : [],
-]);
+])
 
-const initialItem = computed(() => props.item ?? availableItems.value[0]);
+const initialItem = computed(() => props.item ?? availableItems.value[0])
 
 const initialValues = computed(() => ({
   name: initialItem.value.name,
   value: initialItem.value.value ?? initialItem.value.defaultValue,
-}));
+}))
 
-const validationSchema = ref(yup.object());
-const form = useForm<{name: InterestMeasure, value: number}>({
+const validationSchema = ref(yup.object())
+const form = useForm<{ name: InterestMeasure, value: number }>({
   validationSchema,
   initialValues,
-});
+})
 
 const currentItem = computed(() => (
   interestMeasuresStore.getItem(form.values.name) ?? initialItem.value
-));
+))
 
 watchEffect(() => {
-  const { range } = currentItem.value;
-  const min = range.from.value + (range.from.closed ? 0 : 0.01);
-  const max = range.to.value - (range.to.closed ? 0 : 0.01);
+  const { range } = currentItem.value
+  const min = range.from.value + (range.from.closed ? 0 : 0.01)
+  const max = range.to.value - (range.to.closed ? 0 : 0.01)
 
   validationSchema.value = yup.object({
     name: yup.string().required(),
@@ -189,63 +189,63 @@ watchEffect(() => {
       .required()
       .min(min)
       .max(max),
-  });
-});
+  })
+})
 
 watch(() => form.values.name, () => {
-  if (!currentItem.value?.defaultValue) return;
-  form.setFieldValue('value', currentItem.value.defaultValue);
-});
+  if (!currentItem.value?.defaultValue) return
+  form.setFieldValue('value', currentItem.value.defaultValue)
+})
 
 watch(isEdited, () => {
-  form.resetForm();
-});
+  form.resetForm()
+})
 
 const maska = computed(() => {
-  const { range, type } = currentItem.value;
+  const { range, type } = currentItem.value
 
-  const afterPoint = type === 'Double' ? '.00' : '';
-  const wholeNumbers = new Array(String(range.to.value).length).fill('0').join('');
+  const afterPoint = type === 'Double' ? '.00' : ''
+  const wholeNumbers = Array.from({ length: String(range.to.value).length }).fill('0').join('')
 
-  return `${wholeNumbers}${afterPoint}`;
-});
+  return `${wholeNumbers}${afterPoint}`
+})
 
-const showInvalidSubmission = ref(false);
-const showInvalidSubmissionTimeout = ref<number>();
+const showInvalidSubmission = ref(false)
+const showInvalidSubmissionTimeout = ref<number>()
 
 const handleSave = form.handleSubmit((values) => {
-  interestMeasuresStore.setItemValue(values.name, values.value);
-  interestMeasuresStore.closeItemForm();
+  interestMeasuresStore.setItemValue(values.name, values.value)
+  interestMeasuresStore.closeItemForm()
 }, () => {
-  clearTimeout(showInvalidSubmissionTimeout.value);
-  showInvalidSubmission.value = true;
+  clearTimeout(showInvalidSubmissionTimeout.value)
+  showInvalidSubmission.value = true
   showInvalidSubmissionTimeout.value = setTimeout(() => {
-    showInvalidSubmission.value = false;
-  }, 2000);
-});
+    showInvalidSubmission.value = false
+  }, 2000)
+})
 
 function handleEdit() {
-  if (!props.item?.name || isFormActive.value) return;
-  interestMeasuresStore.openItemForm(props.item.name);
+  if (!props.item?.name || isFormActive.value) return
+  interestMeasuresStore.openItemForm(props.item.name)
 }
 
 function handleClose() {
-  interestMeasuresStore.closeItemForm();
+  interestMeasuresStore.closeItemForm()
 }
 
 function handleRemove() {
-  if (!props.item?.name) return;
-  interestMeasuresStore.clearItemValue(props.item.name);
-  interestMeasuresStore.closeItemForm();
+  if (!props.item?.name) return
+  interestMeasuresStore.clearItemValue(props.item.name)
+  interestMeasuresStore.closeItemForm()
 }
 
 watch(isEdited, async () => {
-  if (!isEdited.value) return;
-  await nextTick();
-  valueInputRef.value?.focus();
-});
+  if (!isEdited.value) return
+  await nextTick()
+  valueInputRef.value?.focus()
+})
 
 onMounted(() => {
-  valueInputRef.value?.focus();
-});
+  valueInputRef.value?.focus()
+})
 </script>

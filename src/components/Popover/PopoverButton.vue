@@ -10,16 +10,16 @@
 </template>
 
 <script setup lang="ts">
-import { useInjectPopoverState } from './popoverInjectionState';
+import { useInjectPopoverState } from './popoverInjectionState'
 
 defineProps<{
-  as?: string|object,
-}>();
+  as?: string | object
+}>()
 
-const { isOpen, isMouseOver } = useInjectPopoverState()!;
+const { isOpen, isMouseOver } = useInjectPopoverState()!
 
 function handleClick() {
-  isOpen.value = !isOpen.value;
+  isOpen.value = !isOpen.value
 }
 </script>
 

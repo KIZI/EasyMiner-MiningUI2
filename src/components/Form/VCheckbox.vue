@@ -12,17 +12,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps<{
-  value?: unknown,
-}>();
+  value?: unknown
+}>()
 
-const modelValue = defineModel();
+const modelValue = defineModel()
 
 const isChecked = computed(() => {
-  if (Array.isArray(modelValue.value)) return modelValue.value.includes(props.value);
+  if (Array.isArray(modelValue.value)) return modelValue.value.includes(props.value)
 
-  return modelValue.value;
-});
+  return modelValue.value
+})
 </script>

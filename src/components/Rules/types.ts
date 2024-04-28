@@ -1,7 +1,7 @@
-export type CedentFilter = Map<string, CedentFilterItem>;
+export type CedentFilter = Map<string, CedentFilterItem>
 
-export interface CedentFilterItem {
-  attribute: string,
-  values: string[],
-  valueType: 'any' | 'fixed',
+export type CedentFilterItem = {
+  attribute: string
+  values: string[]
+  valueType: 'any' | 'fixed'
 }

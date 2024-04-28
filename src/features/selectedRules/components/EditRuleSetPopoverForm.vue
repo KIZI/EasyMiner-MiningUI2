@@ -6,13 +6,13 @@
     popover-class="w-64"
     confirm-remove
     preserve-height
-    :is-create-loading="currentMutation.isLoading.value"
-    :is-remove-loading="removeMutation.isLoading.value"
+    :is-create-loading="currentMutation.isPending.value"
+    :is-remove-loading="removeMutation.isPending.value"
     @submit="handleSubmit"
     @remove="handleRemove"
   >
     <VField
-      v-slot="{field}"
+      v-slot="{ field }"
       name="name"
       label="Name"
       class="text-xs"
@@ -32,106 +32,106 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, toRefs, watch } from 'vue';
-import { useMutation } from '@tanstack/vue-query';
-import { yup } from '@/libs/yup';
-import { api } from '@/api/api';
-import type { RuleSet } from '@/api/ruleSets/types';
-import { useRuleSetsQuery } from '@/api/ruleSets/useRuleSetsQuery';
-import { useSelectedRules } from '@selectedRules/composables/useSelectedRules';
-import { useSelectedRulesStore } from '@selectedRules/stores/selectedRulesStore';
-import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover';
-import { VField, MutationErrorMessage, useHLForm, VInput } from '@/components/Form';
-import { useErrorHandler } from '@/composables/useErrorHandler';
+import { computed, nextTick, ref, toRefs, watch } from 'vue'
+import { useMutation } from '@tanstack/vue-query'
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
+import { useSelectedRulesStore } from '@selectedRules/stores/selectedRulesStore'
+import { yup } from '@/libs/yup'
+import { api } from '@/api/api'
+import type { RuleSet } from '@/api/ruleSets/types'
+import { useRuleSetsQuery } from '@/api/ruleSets/useRuleSetsQuery'
+import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover'
+import { MutationErrorMessage, VField, VInput, useHLForm } from '@/components/Form'
+import { useErrorHandler } from '@/composables/useErrorHandler'
 
 const props = defineProps<{
-  ruleSet?: RuleSet;
-}>();
-const { ruleSet } = toRefs(props);
+  ruleSet?: RuleSet
+}>()
+const { ruleSet } = toRefs(props)
 
-const { handleError } = useErrorHandler();
-const { setCurrentRuleSetId } = useSelectedRulesStore();
-const { invalidateCurrentRuleSet } = useSelectedRules();
-const { isOpen } = useInjectPopoverState()!;
+const { handleError } = useErrorHandler()
+const { setCurrentRuleSetId } = useSelectedRulesStore()
+const { invalidateCurrentRuleSet } = useSelectedRules()
+const { isOpen } = useInjectPopoverState()!
 
-const ruleSetsQuery = useRuleSetsQuery();
+const ruleSetsQuery = useRuleSetsQuery()
 
-const inputRef = ref<{$el: HTMLInputElement}>();
+const inputRef = ref<{ $el: HTMLInputElement }>()
 
-const isEdit = computed(() => Boolean(ruleSet));
+const isEdit = computed(() => Boolean(ruleSet))
 
 const validationSchema = yup.object({
   name: yup.string().trim()
     .required()
     .min(3)
     .max(100),
-});
-const initialValues = computed(() => ({ name: ruleSet.value?.name ?? '' }));
+})
+const initialValues = computed(() => ({ name: ruleSet.value?.name ?? '' }))
 
 const form = useHLForm<yup.InferType<typeof validationSchema>>({
   validationSchema,
   initialValues,
   keepValuesOnUnmount: true,
-});
+})
 
 const updateMutation = useMutation({
   mutationFn: api.ruleSets.update,
   onSuccess: () => {
-    invalidateCurrentRuleSet();
-    isOpen.value = false;
+    invalidateCurrentRuleSet()
+    isOpen.value = false
   },
-});
+})
 const createMutation = useMutation({
   mutationFn: api.ruleSets.create,
   onSuccess: (newRuleset) => {
-    setCurrentRuleSetId(newRuleset.id);
-    ruleSetsQuery.refetch();
-    isOpen.value = false;
+    setCurrentRuleSetId(newRuleset.id)
+    ruleSetsQuery.refetch()
+    isOpen.value = false
   },
-});
+})
 const removeMutation = useMutation({
   mutationFn: api.ruleSets.remove,
   onSuccess: async () => {
-    await ruleSetsQuery.refetch();
-    setCurrentRuleSetId(ruleSetsQuery.ruleSets.value[0]?.id);
-    isOpen.value = false;
+    await ruleSetsQuery.refetch()
+    setCurrentRuleSetId(ruleSetsQuery.ruleSets.value[0]?.id)
+    isOpen.value = false
   },
   onError: handleError,
-});
+})
 
-const currentMutation = computed(() => (isEdit.value ? updateMutation : createMutation));
+const currentMutation = computed(() => (isEdit.value ? updateMutation : createMutation))
 
 const handleSubmit = form.handleSubmit(({ name }) => {
   if (!ruleSet.value) {
     createMutation.mutate({
       name,
-    });
-    return;
+    })
+    return
   }
 
   updateMutation.mutate({
     id: ruleSet.value.id,
     name,
-  });
-});
+  })
+})
 
 function handleRemove() {
-  if (!ruleSet.value) return;
-  removeMutation.mutate(ruleSet.value.id);
+  if (!ruleSet.value) return
+  removeMutation.mutate(ruleSet.value.id)
 }
 
 watch(isOpen, async (value) => {
-  form.resetForm();
+  form.resetForm()
 
   if (value) {
-    await nextTick();
-    inputRef.value?.$el?.focus();
+    await nextTick()
+    inputRef.value?.$el?.focus()
   }
 
   if (!value) {
-    createMutation.reset();
-    updateMutation.reset();
-    removeMutation.reset();
+    createMutation.reset()
+    updateMutation.reset()
+    removeMutation.reset()
   }
-});
+})
 </script>

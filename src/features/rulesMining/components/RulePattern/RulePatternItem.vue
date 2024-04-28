@@ -16,17 +16,17 @@
 </template>
 
 <script lang="ts" setup>
-import EditRulePatternItemPopoverForm from '@rulesMining/components/RulePattern/EditRulePatternItemPopoverForm.vue';
-import RulePatternItemTemplate from '@/features/rulesMining/components/RulePattern/RulePatternItemTemplate.vue';
-import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore';
-import type { CedentItem } from '@/features/rulesMining/types/rulePattern.types';
-import { Popover, PopoverButton } from '@/components/Popover';
+import EditRulePatternItemPopoverForm from '@rulesMining/components/RulePattern/EditRulePatternItemPopoverForm.vue'
+import RulePatternItemTemplate from '@/features/rulesMining/components/RulePattern/RulePatternItemTemplate.vue'
+import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
+import type { CedentItem } from '@/features/rulesMining/types/rulePattern.types'
+import { Popover, PopoverButton } from '@/components/Popover'
 
 const props = defineProps<{
-  item: CedentItem,
-}>();
+  item: CedentItem
+}>()
 
-const { openItemOptions } = useRulePatternStore();
+const { openItemOptions } = useRulePatternStore()
 
 // const { createDraggableEvents } = useDraggable(DRAG_SOURCE.RulePatternItemSet, {
 //   onDragStart: ({ dataTransfer, payload }) => {

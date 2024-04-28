@@ -14,15 +14,15 @@
 </template>
 
 <script setup lang="ts">
-import RuleSetRulesItem from '@selectedRules/components/RuleSetRulesItem.vue';
-import ListTransitionGroup from '@/components/Transitions/ListTransitionGroup.vue';
-import type { TaskRule } from '@/api/tasks/types';
+import RuleSetRulesItem from '@selectedRules/components/RuleSetRulesItem.vue'
+import ListTransitionGroup from '@/components/Transitions/ListTransitionGroup.vue'
+import type { TaskRule } from '@/api/tasks/types'
 
 defineProps<{
-  rules: TaskRule[];
-}>();
+  rules: TaskRule[]
+}>()
 
-const selection = defineModel<TaskRule[]>('selection');
+const selection = defineModel<TaskRule[]>('selection')
 // const { handleRemove, removeRulesMutation } = useSelectedRules();
 // const selection = ref<TaskRule[]>([]);
 

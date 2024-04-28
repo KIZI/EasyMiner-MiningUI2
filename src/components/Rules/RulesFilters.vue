@@ -53,12 +53,12 @@
                   v-if="isFilteringActive"
                   @click.stop="resetFilters"
                 >
-                  <icon-ph-x class="h-3.5 w-3.5 text-gray-700" />
+                  <icon-ph-x class="size-3.5 text-gray-700" />
                 </button>
                 <span class="text-gray-500">
                   <component
                     :is="expanded ? IconPhCaretUpBold : IconPhCaretDownBold"
-                    class="h-3.5 w-3.5"
+                    class="size-3.5"
                   />
                 </span>
               </div>
@@ -76,7 +76,7 @@
             <span class="text-xs font-medium">Confidence:</span>
             <VSliderWithControls
               v-model="filters.confidence"
-              class="w-full max-w-[15rem]"
+              class="w-full max-w-60"
               :min="0"
               :max="100"
               :step="5"
@@ -89,7 +89,7 @@
               :min="0"
               :max="100"
               :step="5"
-              class="w-full max-w-[15rem]"
+              class="w-full max-w-60"
             />
           </div>
           <div class="flex items-center gap-x-2">
@@ -98,7 +98,7 @@
               v-model="filters.lift"
               :min="0"
               :max="5"
-              class="w-full max-w-[15rem]"
+              class="w-full max-w-60"
             />
           </div>
 
@@ -123,17 +123,17 @@
 </template>
 
 <script setup lang="ts">
-import { isEqual } from 'lodash-es';
-import { ref, reactive, computed } from 'vue';
-import CedentFilter from '@/components/Rules/CedentFilter.vue';
-import VSliderWithControls from '@/components/Form/VSliderWithControls.vue';
-import IconPhCaretDownBold from '~icons/ph/caret-down-bold';
-import IconPhCaretUpBold from '~icons/ph/caret-up-bold';
-import IconPhFunnel from '~icons/ph/funnel';
-import IconPhFunnelFill from '~icons/ph/funnel-fill';
+import { isEqual } from 'lodash-es'
+import { computed, reactive, ref } from 'vue'
+import CedentFilter from '@/components/Rules/CedentFilter.vue'
+import VSliderWithControls from '@/components/Form/VSliderWithControls.vue'
+import IconPhCaretDownBold from '~icons/ph/caret-down-bold'
+import IconPhCaretUpBold from '~icons/ph/caret-up-bold'
+import IconPhFunnel from '~icons/ph/funnel'
+import IconPhFunnelFill from '~icons/ph/funnel-fill'
 
-const expanded = ref(false);
-const order = ref('found');
+const expanded = ref(false)
+const order = ref('found')
 
 function createFilters() {
   return {
@@ -143,27 +143,27 @@ function createFilters() {
     confidence: [0, 100],
     lift: [0, 5],
     support: [0, 100],
-  };
+  }
 }
 
-const defaultFilters = createFilters();
-const filters = reactive(createFilters());
+const defaultFilters = createFilters()
+const filters = reactive(createFilters())
 
 function resetFilters() {
-  Object.assign(filters, createFilters());
+  Object.assign(filters, createFilters())
 }
 
-type FilterKey = keyof typeof filters;
-type FilterValue = typeof filters[FilterKey];
+type FilterKey = keyof typeof filters
+type FilterValue = typeof filters[FilterKey]
 
 const isFilteringActive = computed(() => {
-  const filtersEntries = Object.entries(filters) as [FilterKey, FilterValue][];
+  const filtersEntries = Object.entries(filters) as [FilterKey, FilterValue][]
 
   return filtersEntries.some(([key, filter]) => {
-    const defaultFilter = defaultFilters[key];
-    return !isEqual(filter, defaultFilter);
-  });
-});
+    const defaultFilter = defaultFilters[key]
+    return !isEqual(filter, defaultFilter)
+  })
+})
 
 const orderOptions = [
   {
@@ -182,7 +182,7 @@ const orderOptions = [
     label: 'Custom order',
     value: 'custom',
   },
-];
+]
 </script>
 
 <style scoped>

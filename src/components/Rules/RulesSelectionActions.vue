@@ -1,6 +1,6 @@
 <template>
-  <div class="flex min-h-[2rem] items-center gap-x-2">
-    <SelectionButtons v-on="{ selectAll, invertSelection, clearSelection, }" />
+  <div class="flex min-h-8 items-center gap-x-2">
+    <SelectionButtons v-on="{ selectAll, invertSelection, clearSelection }" />
 
     <div
       v-if="bulkSelection.length"
@@ -11,12 +11,12 @@
         variant="ghost"
         size="xs"
         class="gap-x-1.5 px-1"
-        :loading="selectedRules.addRulesMutation.isLoading.value"
-        :disabled="selectedRules.removeRulesMutation.isLoading.value"
+        :loading="selectedRules.addRulesMutation.isPending.value"
+        :disabled="selectedRules.removeRulesMutation.isPending.value"
         @click="handleAdd"
       >
         <template #icon>
-          <icon-ph-check-circle class="h-5 w-5 text-green-700" />
+          <icon-ph-check-circle class="size-5 text-green-700" />
         </template>
 
         Add selected
@@ -27,12 +27,12 @@
         variant="ghost"
         size="xs"
         class="gap-x-1 px-1"
-        :loading="selectedRules.removeRulesMutation.isLoading.value"
-        :disabled="selectedRules.addRulesMutation.isLoading.value"
+        :loading="selectedRules.removeRulesMutation.isPending.value"
+        :disabled="selectedRules.addRulesMutation.isPending.value"
         @click="handleRemove"
       >
         <template #icon>
-          <icon-ph-x-circle class="h-5 w-5 text-red-700" />
+          <icon-ph-x-circle class="size-5 text-red-700" />
         </template>
 
         Remove selected
@@ -42,45 +42,45 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from 'vue';
-import { cloneDeep } from 'lodash-es';
-import type { TaskRule } from '@/api/tasks/types';
-import { useSelectedRules } from '@selectedRules/composables/useSelectedRules';
-import SelectionButtons from '@/components/Selection/SelectionButtons.vue';
-import VButton from '@/components/VButton.vue';
+import { computed } from 'vue'
+import { cloneDeep } from 'lodash-es'
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
+import type { TaskRule } from '@/api/tasks/types'
+import SelectionButtons from '@/components/Selection/SelectionButtons.vue'
+import VButton from '@/components/VButton.vue'
 
 const props = defineProps<{
-  rules: TaskRule[];
-}>();
+  rules: TaskRule[]
+}>()
 const rules = computed(() => {
-  return cloneDeep(props.rules);
-});
+  return cloneDeep(props.rules)
+})
 
 const selectedRules = useSelectedRules({
   onMutationSuccess: () => {
-    clearSelection();
+    clearSelection()
   },
-});
-const { isRuleSelected } = selectedRules;
+})
+const { isRuleSelected } = selectedRules
 
-const bulkSelection = defineModel<TaskRule[]>('selection', { required: true });
-const isAnyInSelectedRules = computed(() => bulkSelection.value.some((rule) => isRuleSelected(rule)));
-const isAnyNotInSelectedRules = computed(() => bulkSelection.value.some((rule) => !isRuleSelected(rule)));
+const bulkSelection = defineModel<TaskRule[]>('selection', { required: true })
+const isAnyInSelectedRules = computed(() => bulkSelection.value.some(rule => isRuleSelected(rule)))
+const isAnyNotInSelectedRules = computed(() => bulkSelection.value.some(rule => !isRuleSelected(rule)))
 
 function selectAll() {
-  bulkSelection.value = rules.value;
+  bulkSelection.value = rules.value
 }
 function invertSelection() {
-  bulkSelection.value = rules.value.filter((rule) => !bulkSelection.value.includes(rule));
+  bulkSelection.value = rules.value.filter(rule => !bulkSelection.value.includes(rule))
 }
 function clearSelection() {
-  bulkSelection.value = [];
+  bulkSelection.value = []
 }
 
 function handleAdd() {
-  selectedRules.handleAdd(bulkSelection.value);
+  selectedRules.handleAdd(bulkSelection.value)
 }
 function handleRemove() {
-  selectedRules.handleRemove(bulkSelection.value);
+  selectedRules.handleRemove(bulkSelection.value)
 }
 </script>

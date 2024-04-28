@@ -15,17 +15,17 @@
 </template>
 
 <script setup lang="ts">
-import { ErrorMessage } from 'vee-validate';
-import { useHLField } from './useHLField';
-import { toRefs } from 'vue';
+import { ErrorMessage } from 'vee-validate'
+import { toRefs } from 'vue'
+import { useHLField } from './useHLField'
 
 const props = defineProps<{
-  name: string,
-  label?: string,
-}>();
+  name: string
+  label?: string
+}>()
 
-const { name, label } = toRefs(props);
-const { slotData, field } = useHLField(name);
+const { name, label } = toRefs(props)
+const { slotData, field } = useHLField(name)
 </script>
 
 <style>

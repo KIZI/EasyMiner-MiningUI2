@@ -1,6 +1,6 @@
-const colors = require('tailwindcss/colors');
+import colors from 'tailwindcss/colors'
+import type { Config } from 'tailwindcss'
 
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   plugins: [require('@tailwindcss/forms')],
@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         primary: colors.sky,
+        brand: '#075783',
       },
       fontSize: {
         '2xs': '0.75rem',
@@ -15,12 +16,12 @@ module.exports = {
         'md': '15px',
       },
       fontFamily: {
-        sans: ['Open Sans', 'sans-serif'],
+        sans: ['"Open Sans"', 'sans-serif'],
       },
       keyframes: {
         'pulse-subtle': {
-          '0%, 100%': { opacity: 1 },
-          '50%': { opacity: 0.75 },
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.75' },
         },
       },
       animation: {
@@ -28,4 +29,4 @@ module.exports = {
       },
     },
   },
-};
+} satisfies Config

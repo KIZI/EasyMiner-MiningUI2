@@ -1,8 +1,8 @@
-import type { Metasource } from './types';
-import { createRequest } from '@/libs/axios';
+import type { Metasource } from './types'
+import { createRequest } from '@/libs/axios'
 
 export default {
   detail: createRequest<number, Metasource>(
-    (id) => ({ url: `/metasources/${id}` }),
+    id => ({ url: `/metasources/${id}` }),
   ),
-};
+}

@@ -1,21 +1,26 @@
-import type { StatusResponse } from '@/api/types';
 import type {
-  AddRulesInput, CreateRuleSetInput, RemoveRulesInput, RuleSet, RuleSetsRulesResponse, UpdateRuleSetInput,
-} from './types';
-import { createRequest } from '@/libs/axios';
+  AddRulesInput,
+  CreateRuleSetInput,
+  RemoveRulesInput,
+  RuleSet,
+  RuleSetsRulesResponse,
+  UpdateRuleSetInput,
+} from './types'
+import type { StatusResponse } from '@/api/types'
+import { createRequest } from '@/libs/axios'
 
 export default {
   list: createRequest<void, RuleSet[]>(
     () => ({ url: '/rule-sets/' }),
   ),
   detail: createRequest<number, RuleSet>(
-    (id) => ({ url: `/rule-sets/${id}` }),
+    id => ({ url: `/rule-sets/${id}` }),
   ),
   rules: createRequest<number, RuleSetsRulesResponse>(
-    (id) => ({ url: `/rule-sets/${id}/rules` }),
+    id => ({ url: `/rule-sets/${id}/rules` }),
   ),
   create: createRequest<CreateRuleSetInput, RuleSet>(
-    (data) => ({
+    data => ({
       url: '/rule-sets/',
       method: 'POST',
       data,
@@ -29,7 +34,7 @@ export default {
     }),
   ),
   remove: createRequest<number, StatusResponse>(
-    (id) => ({
+    id => ({
       url: `/rule-sets/${id}`,
       method: 'DELETE',
     }),
@@ -51,4 +56,4 @@ export default {
       params: { rules: rules.join(',') },
     }),
   ),
-};
+}

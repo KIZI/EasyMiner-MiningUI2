@@ -4,7 +4,7 @@
     class="inline-flex items-center"
   >
     <PopoverButton>
-      <icon-ph-info class="h-5 w-5 text-gray-700" />
+      <icon-ph-info class="size-5 text-gray-700" />
     </PopoverButton>
 
     <SlideTransition direction="left">
@@ -45,13 +45,12 @@
 </template>
 
 <script setup lang="ts">
-import { Popover, PopoverButton, PopoverPanel } from '@/components/Popover';
-import SlideTransition from '@/components/Transitions/SlideTransition.vue';
-import type { TaskRule } from '@/api/tasks/types';
-import { formatDecimal } from '@/utils/format';
+import { Popover, PopoverButton, PopoverPanel } from '@/components/Popover'
+import SlideTransition from '@/components/Transitions/SlideTransition.vue'
+import type { TaskRule } from '@/api/tasks/types'
+import { formatDecimal } from '@/utils/format'
 
 defineProps<{
-  rule: TaskRule,
-}>();
-
+  rule: TaskRule
+}>()
 </script>

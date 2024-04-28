@@ -1,9 +1,10 @@
-import type { MaybeRef } from '@vueuse/core';
-import type { Optional } from '@/libs/vueQuery';
+import type { MaybeRef } from '@vueuse/core'
+import type { Optional } from '@/libs/vueQuery'
 
 export const queryKeys = {
   miner: {
     active: () => ['activeMiner'],
+    tasks: () => ['minerTasks'],
   },
   ruleSets: {
     list: () => ['ruleSetsList'],
@@ -16,4 +17,7 @@ export const queryKeys = {
   datasources: {
     detail: (id: MaybeRef<Optional<number>>) => ['datasourcesDetail', id],
   },
-};
+  metasources: {
+    active: () => ['activeMetasource'],
+  },
+}

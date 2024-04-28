@@ -6,6 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import RulePatternItemSet from '@/features/rulesMining/components/RulePattern/RulePatternItemSet.vue';
-import { CEDENT } from '@/features/rulesMining/types/rulePattern.types';
+import RulePatternItemSet from '@/features/rulesMining/components/RulePattern/RulePatternItemSet.vue'
+import { CEDENT } from '@/features/rulesMining/types/rulePattern.types'
 </script>

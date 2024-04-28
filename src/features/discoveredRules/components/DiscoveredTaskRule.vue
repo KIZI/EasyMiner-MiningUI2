@@ -15,7 +15,7 @@
       >
         <component
           :is="isSelected ? IconPhCheckCircleFill : IconPhCheckCircle"
-          class="h-5 w-5"
+          class="size-5"
         />
       </VIconButton>
     </template>
@@ -23,24 +23,24 @@
 </template>
 
 <script setup lang="ts">
-import { useSelectedRules } from '@selectedRules/composables/useSelectedRules';
-import { computed, toRefs } from 'vue';
-import IconPhCheckCircle from '~icons/ph/check-circle.vue';
-import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue';
-import TaskRuleComponent from '@/components/Task/TaskRule.vue';
-import type { TaskRule } from '@/api/tasks/types';
-import VIconButton from '@/components/VIconButton.vue';
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
+import { computed, toRefs } from 'vue'
+import IconPhCheckCircle from '~icons/ph/check-circle.vue'
+import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
+import TaskRuleComponent from '@/components/Task/TaskRule.vue'
+import type { TaskRule } from '@/api/tasks/types'
+import VIconButton from '@/components/VIconButton.vue'
 
 const props = defineProps<{
-  rule: TaskRule;
-  isOdd: boolean;
-}>();
-const { rule } = toRefs(props);
+  rule: TaskRule
+  isOdd: boolean
+}>()
+const { rule } = toRefs(props)
 
-const selected = defineModel<TaskRule[]>('selected');
+const selected = defineModel<TaskRule[]>('selected')
 
-const { handleToggle, isRuleSelected, isToggleLoading } = useSelectedRules();
-const isSelected = computed(() => isRuleSelected(rule.value));
+const { handleToggle, isRuleSelected, isToggleLoading } = useSelectedRules()
+const isSelected = computed(() => isRuleSelected(rule.value))
 </script>
 
 <style scoped>

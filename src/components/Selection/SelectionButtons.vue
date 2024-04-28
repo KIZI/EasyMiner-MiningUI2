@@ -22,5 +22,5 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(['selectAll', 'clearSelection', 'invertSelection']);
+defineEmits(['selectAll', 'clearSelection', 'invertSelection'])
 </script>

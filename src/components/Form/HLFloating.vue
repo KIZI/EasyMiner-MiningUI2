@@ -17,16 +17,16 @@
 </template>
 
 <script setup lang="ts">
-import { useFloating, offset } from '@floating-ui/vue';
-import { ref } from 'vue';
-import ScaleTransition from '@/components/Transitions/ScaleTransition.vue';
+import { offset, useFloating } from '@floating-ui/vue'
+import { ref } from 'vue'
+import ScaleTransition from '@/components/Transitions/ScaleTransition.vue'
 
 defineProps<{
-  show?: boolean,
-}>();
+  show?: boolean
+}>()
 
-const referenceRef = ref();
-const floatingRef = ref();
+const referenceRef = ref()
+const floatingRef = ref()
 
 const { floatingStyles } = useFloating(referenceRef, floatingRef, {
   placement: 'top',
@@ -34,7 +34,7 @@ const { floatingStyles } = useFloating(referenceRef, floatingRef, {
   middleware: [
     offset(10),
   ],
-});
+})
 </script>
 
 <style scoped>

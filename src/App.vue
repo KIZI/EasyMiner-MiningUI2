@@ -8,8 +8,9 @@
     <AttributeHistogramModal />
   </div>
 </template>
+
 <script setup lang="ts">
-import AppHeader from '@/components/Layout/AppHeader.vue';
-import { TheBackdrop } from '@/components/Backdrop';
-import AttributeHistogramModal from '@/components/Attributes/AttributeHistogramModal.vue';
+import AppHeader from '@/components/Layout/AppHeader.vue'
+import { TheBackdrop } from '@/components/Backdrop'
+import AttributeHistogramModal from '@/components/Attributes/AttributeHistogramModal.vue'
 </script>

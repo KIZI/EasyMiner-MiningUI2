@@ -1,1 +1,1 @@
-export { default as InterestMeasures } from './components/InterestMeasures/InterestMeasureItemForm.vue';
+export { default as InterestMeasures } from './components/InterestMeasures/InterestMeasureItemForm.vue'

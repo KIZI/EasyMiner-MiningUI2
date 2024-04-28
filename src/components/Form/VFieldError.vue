@@ -7,13 +7,13 @@
 </template>
 
 <script setup lang="ts">
-import { useHLField } from './useHLField';
-import { toRefs } from 'vue';
+import { toRefs } from 'vue'
+import { useHLField } from './useHLField'
 
 const props = defineProps<{
-  name: string,
-}>();
-const { name } = toRefs(props);
+  name: string
+}>()
+const { name } = toRefs(props)
 
-const { field } = useHLField(name);
+const { field } = useHLField(name)
 </script>

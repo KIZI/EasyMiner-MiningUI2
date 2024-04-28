@@ -1,3 +1,3 @@
-import VMultiSelect from '@vueform/multiselect';
+import VMultiSelect from '@vueform/multiselect'
 
-export { VMultiSelect };
+export { VMultiSelect }

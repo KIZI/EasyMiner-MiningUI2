@@ -8,9 +8,12 @@
   >
     <span
       v-if="isNegated"
-      class="text-2xl leading-[1rem]"
+      class="text-2xl leading-4"
     >¬</span>
-    {{ name }}
+    <Truncate
+      :length="appConfig.truncateLength.attribute"
+      :text="name"
+    />
     <span
       v-if="fixedValue !== false"
       class="text-primary-700"
@@ -33,17 +36,19 @@
 </template>
 
 <script lang="ts" setup>
-import { formatFixedValue } from '@/features/rulesMining/utils/format';
-import { formatDecimal } from '@/utils/format';
+import Truncate from '@/components/Truncate.vue'
+import { appConfig } from '@/config/appConfig'
+import { formatFixedValue } from '@/features/rulesMining/utils/format'
+import { formatDecimal } from '@/utils/format'
 
 withDefaults(defineProps<{
-  name: string,
-  fixedValue?: string | number | [number, number] | false,
-  isNegated?: boolean,
-  sm?: boolean,
+  name: string
+  fixedValue?: string | number | [number, number] | false
+  isNegated?: boolean
+  sm?: boolean
 }>(), {
   fixedValue: false,
   isNegated: false,
   sm: false,
-});
+})
 </script>

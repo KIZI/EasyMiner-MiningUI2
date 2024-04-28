@@ -13,5 +13,5 @@
 </template>
 
 <script setup lang="ts">
-const modelValue = defineModel<string>();
+const modelValue = defineModel<string>()
 </script>

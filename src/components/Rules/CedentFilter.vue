@@ -22,7 +22,7 @@
           variant="basic"
           class="gap-x-1.5 px-1 py-px text-2xs font-medium"
         >
-          <icon-ph-plus-bold class="h-3 w-3" />
+          <icon-ph-plus-bold class="size-3" />
           Add
         </PopoverButton>
 
@@ -35,28 +35,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import CedentFilterItemComponent from '@/components/Rules/CedentFilterItem.vue';
-import EditCedentFilterItemPopoverForm from '@/components/Rules/EditCedentFilterItemPopoverForm.vue';
-import VButton from '@/components/VButton.vue';
-import type { CedentFilter, CedentFilterItem } from '@/components/Rules/types';
-import { Popover, PopoverButton } from '@/components/Popover';
+import { computed } from 'vue'
+import CedentFilterItemComponent from '@/components/Rules/CedentFilterItem.vue'
+import EditCedentFilterItemPopoverForm from '@/components/Rules/EditCedentFilterItemPopoverForm.vue'
+import VButton from '@/components/VButton.vue'
+import type { CedentFilter, CedentFilterItem } from '@/components/Rules/types'
+import { Popover, PopoverButton } from '@/components/Popover'
 
 defineProps<{
-  label: string,
-}>();
+  label: string
+}>()
 const modelValue = defineModel<CedentFilter>({
   required: true,
-});
+})
 
-const items = computed(() => [...modelValue.value.values()]);
+const items = computed(() => [...modelValue.value.values()])
 
 function handleRemove(item: CedentFilterItem) {
-  modelValue.value.delete(item.attribute);
+  modelValue.value.delete(item.attribute)
 }
 
 function handleSave(item: CedentFilterItem) {
-  modelValue.value.set(item.attribute, item);
+  modelValue.value.set(item.attribute, item)
 }
 </script>
 

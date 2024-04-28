@@ -19,7 +19,10 @@
           top: `${i * 1.8}rem`,
         }"
       >
-        {{ attribute.name }}
+        <Truncate
+          :length="appConfig.truncateLength.attribute"
+          :text="attribute.name"
+        />
       </div>
     </div>
   </Teleport>
@@ -27,50 +30,56 @@
 
 <script setup lang="ts">
 import {
-  ref, computed, watch, nextTick, toRef,
-} from 'vue';
-import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore';
-import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection';
-import type { Draggable } from '@/components/DragAndDrop/useDraggable';
+  computed,
+  nextTick,
+  ref,
+  toRef,
+  watch,
+} from 'vue'
+import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore'
+import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection'
+import type { Draggable } from '@/components/DragAndDrop/useDraggable'
+import Truncate from '@/components/Truncate.vue'
+import { appConfig } from '@/config/appConfig'
 
 const props = defineProps<{
-  draggable?: Draggable,
-}>();
+  draggable?: Draggable
+}>()
 
-const attributeList = useInjectAttributesList()!;
+const attributeList = useInjectAttributesList()!
 
-const dragAndDropStore = useDragAndDropStore();
+const dragAndDropStore = useDragAndDropStore()
 
 const draggedAttributes = computed(() => {
-  if (!props.draggable) return [];
+  if (!props.draggable) return []
 
   if (attributeList.selection.hasItems.value) {
     if (attributeList.selection.isItemSelected(props.draggable.payload)) {
-      return attributeList.selection.modelValue.value;
+      return attributeList.selection.modelValue.value
     }
   }
 
-  return [props.draggable.payload];
-});
+  return [props.draggable.payload]
+})
 
 watch(() => props.draggable, async (draggable) => {
-  await nextTick();
-  if (!draggable || !draggedItemRef.value || !attributeList.dragSource) return;
+  await nextTick()
+  if (!draggable || !draggedItemRef.value || !attributeList.dragSource) return
 
   dragAndDropStore.setDraggedItem({
     elementRef: draggedItemRef.value,
     payload: draggedAttributes.value,
     position: toRef(draggable, 'dragPosition'),
     source: attributeList.dragSource,
-  });
-});
+  })
+})
 
-const draggedItemRef = ref<HTMLElement>();
+const draggedItemRef = ref<HTMLElement>()
 function retrieveFirstItemRef(i: number) {
-  if (i > 0) return;
+  if (i > 0) return
 
   return (el: HTMLElement) => {
-    draggedItemRef.value = el;
-  };
+    draggedItemRef.value = el
+  }
 }
 </script>

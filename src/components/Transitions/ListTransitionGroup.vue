@@ -10,17 +10,19 @@
 </template>
 
 <script setup lang="ts">
-import { useTransition, type VueTransitionProps } from './useTransition';
+import { type VueTransitionProps, useTransition } from './useTransition'
 
-const props = defineProps<VueTransitionProps>();
-const { cssVars } = useTransition(props);
+const props = defineProps<VueTransitionProps>()
+const { cssVars } = useTransition(props)
 </script>
 
 <style>
 .list-move,
 .list-enter-active,
 .list-leave-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .list-enter-from,

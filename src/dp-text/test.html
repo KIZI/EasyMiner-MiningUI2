@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    Count is:
+    <span id="count"></span>
+    <button id="increment">+</button>
+
+    <script>
+      const $count = document.getElementById('count')
+      const $increment = document.getElementById('increment')
+
+      let count = 1
+
+      $count.textContent = value
+      $increment.addEventListener('click', () => {
+        count++
+        $count.textContent = value
+      })
+    </script>
+    <script>
+      const $count = document.getElementById('count')
+      const $increment = document.getElementById('increment')
+
+      let count = 1
+      let multiplier = 2
+      let value = count * multiplier
+
+      $count.textContent = value
+      $increment.addEventListener('click', () => {
+        count++
+        value = count * multiplier
+        $count.textContent = value
+      })
+    </script>
+  </body>
+</html>

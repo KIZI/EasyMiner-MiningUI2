@@ -7,26 +7,26 @@
       {
         'border-gray-300 focus:border-primary-500 focus:ring-primary-500': isValid,
         'border-red-300 focus:border-red-500 focus:ring-red-500': !isValid,
-      }
+      },
     ])"
     type="text"
   >
 </template>
 
 <script setup lang="ts">
-import { useAttrsExcludingClass } from '@/composables/useAttrsExcludingClass';
-import { useDefaultTwClass } from '@/composables/useDefaultTwClass';
+import { useAttrsExcludingClass } from '@/composables/useAttrsExcludingClass'
+import { useDefaultTwClass } from '@/composables/useDefaultTwClass'
 
-defineOptions({ inheritAttrs: false });
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<{
-  isValid?: boolean;
+  isValid?: boolean
 }>(), {
- isValid: true,
-});
+  isValid: true,
+})
 
-const modelValue = defineModel<string>();
+const modelValue = defineModel<string>()
 
-const { attrsExcludingClass } = useAttrsExcludingClass();
-const { defaultTwClass } = useDefaultTwClass();
+const { attrsExcludingClass } = useAttrsExcludingClass()
+const { defaultTwClass } = useDefaultTwClass()
 </script>
