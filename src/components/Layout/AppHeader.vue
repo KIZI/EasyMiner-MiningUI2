@@ -50,7 +50,9 @@
                   :style="`background-image: url(${imageUser})`"
                   class="size-12"
                 />
-                <span class="text-xs">John Doe</span>
+                <span class="text-xs">
+                  <Truncate class="inline-block h-[1em]" :text="user?.name" :length="20" />
+                </span>
               </MenuButton>
             </UserMenu>
           </div>
@@ -65,6 +67,7 @@ import { MenuButton } from '@headlessui/vue'
 import { useMinerQuery } from '@/api/miners/useMinerQuery'
 import { appConfig } from '@/config/appConfig'
 import Truncate from '@/components/Truncate.vue'
+import { useUserQuery } from '@/api/auth/useUserQuery'
 
 import imageUser from '@/assets/user.png'
 import imageMiner from '@/assets/new-miner.png'
@@ -75,4 +78,5 @@ import PopoverPanel from '@/components/Popover/PopoverPanel.vue'
 import UserMenu from '@/components/Layout/UserMenu.vue'
 
 const { data: miner } = useMinerQuery()
+const { data: user } = useUserQuery()
 </script>

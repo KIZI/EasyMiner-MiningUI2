@@ -20,4 +20,7 @@ export const queryKeys = {
   metasources: {
     active: () => ['activeMetasource'],
   },
+  auth: {
+    user: () => ['user'],
+  },
 }

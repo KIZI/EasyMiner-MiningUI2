@@ -26,7 +26,7 @@
     </div>
 
     <div class="flex items-center">
-      <div class="mr-4 break-all font-medium text-primary-900">
+      <div class="mr-4 break-all text-lg font-medium text-primary-900">
         <Truncate
           :length="appConfig.truncateLength.ruleSet"
           :text="ruleSet?.name"
