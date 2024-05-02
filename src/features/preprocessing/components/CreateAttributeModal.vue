@@ -5,10 +5,10 @@
     keep-alive
     @close="close"
   >
-    <IframeWrapper class="mt-2 h-[600px]">
+    <IframeWrapper class="mt-2">
       <iframe
         ref="iframeRef"
-        class="size-full"
+        class="h-dvh max-h-[600px] w-full"
         :src="iframeSrc"
         frameborder="0"
       />

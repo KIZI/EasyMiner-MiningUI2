@@ -1,4 +1,4 @@
-import type { InteresetMeasureActiveItem } from '@rulesMining/types/interestMeasure.types'
+import type { InterestMeasureActiveItem } from '@rulesMining/types/interestMeasure.types'
 import type { AttributeSimpleInput, IMSimpleInput } from '@/api/model'
 import type { CedentItem } from '@/features/rulesMining/types/rulePattern.types'
 import { formatFixedValue } from '@/features/rulesMining/utils/format'
@@ -7,13 +7,14 @@ import type { Task } from '@/api/tasks/types'
 export function patternItemToAttributeSimpleInput(item: CedentItem) {
   return {
     attribute: item.name,
+    ...(item.fixedValue ? { fixedValue: item.fixedValue } : {}),
   } satisfies AttributeSimpleInput
 }
 
-export function interestMeasureToIMSimpleInput(item: InteresetMeasureActiveItem) {
+export function interestMeasureToIMSimpleInput(item: InterestMeasureActiveItem) {
   return {
     name: item.name,
-    value: item.value,
+    ...(item.type !== 'Boolean' && { value: item.value }),
   } satisfies IMSimpleInput
 }
 

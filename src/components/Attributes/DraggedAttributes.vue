@@ -62,6 +62,8 @@ const draggedAttributes = computed(() => {
   return [props.draggable.payload]
 })
 
+const draggedItemRef = ref<HTMLElement>()
+
 watch(() => props.draggable, async (draggable) => {
   await nextTick()
   if (!draggable || !draggedItemRef.value || !attributeList.dragSource) return
@@ -74,7 +76,6 @@ watch(() => props.draggable, async (draggable) => {
   })
 })
 
-const draggedItemRef = ref<HTMLElement>()
 function retrieveFirstItemRef(i: number) {
   if (i > 0) return
 

@@ -13,7 +13,7 @@
     <IframeWrapper class="mt-5">
       <iframe
         ref="iframe"
-        class="h-[500px] w-full"
+        class="h-dvh max-h-[500px] w-full"
         :src="iframeSource"
         frameborder="0"
       />

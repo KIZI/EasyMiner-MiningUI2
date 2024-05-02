@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/vue-query'
+import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { type MaybeRef, computed, toValue } from 'vue'
 import { api } from '@/api/api'
 import { queryKeys } from '@/api/queryKeys'
@@ -9,7 +9,7 @@ export function useRuleSetRulesQuery(id: MaybeRef<Optional<number>>) {
     enabled: computed(() => Boolean(toValue(id))),
     queryFn: () => api.ruleSets.rules(toValue(id)!),
     queryKey: queryKeys.ruleSets.rules(id),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   })
 
   const ruleSet = computed(() => query.data.value?.ruleset)

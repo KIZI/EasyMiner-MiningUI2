@@ -39,10 +39,10 @@ export type DraggedItem<TPayload = any> = {
   }>
 }
 
-export const DRAG_SOURCE = {
+export const DragSources = {
   antecedent: 'antecedent',
   consequent: 'consequent',
   metasource: 'metasource',
   datasource: 'datasource',
 } as const
-export type DragSource = ValueOf<typeof DRAG_SOURCE>
+export type DragSource = ValueOf<typeof DragSources>

@@ -24,7 +24,7 @@
         <VButton
           variant="ghost"
           size="xs"
-          class="gap-x-1 px-1"
+          class="gap-x-1 px-1 hover:bg-red-50"
         >
           <icon-ph-trash class="size-5 text-red-700" />
           Remove selected

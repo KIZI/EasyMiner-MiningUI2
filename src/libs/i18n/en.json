@@ -3,13 +3,33 @@
     "rules": "rule | rules"
   },
   "interestMeasures": {
-    "abbr": {
-      "CONF": "Confidence",
-      "SUPP": "Support",
-      "LIFT": "Lift",
-      "RULE_LENGTH": "Length",
-      "AUTO_CONF_SUPP": "AUTO conf & supp",
-      "CBA": "Pruning"
+    "CONF": {
+      "name": "Confidence",
+      "description": "How likely is consequent to be present given that antecedent is present"
+    },
+    "SUPP": {
+      "name": "Support",
+      "description": "How frequent is antecedent in dataset"
+    },
+    "LIFT": {
+      "name": "Lift",
+      "description": "Ratio of consequent presence when antecedent is present"
+    },
+    "RULE_LENGTH": {
+      "name": "Length",
+      "description": "Length of searched rules"
+    },
+    "AUTO_CONF_SUPP": {
+      "name": "AUTO conf & supp",
+      "description": ""
+    },
+    "CBA": {
+      "name": "Rule pruning",
+      "description": ""
+    },
+    "AAD": {
+      "name": "AAD",
+      "description": ""
     }
   }
 }

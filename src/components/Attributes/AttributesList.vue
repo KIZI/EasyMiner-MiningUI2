@@ -58,6 +58,7 @@
               :is-even="i % 2 !== 0"
               :attribute="attribute"
               :spacing-class="spacingClass"
+              :show-icon="showIcon"
               v-on="dragSource ? events : {}"
             >
               <template #actions>
@@ -88,9 +89,11 @@ import type { Draggable } from '@/components/DragAndDrop/useDraggable'
 const props = withDefaults(defineProps<{
   spacingClass?: HTMLAttributes['class']
   disableAnimation?: boolean
+  showIcon?: boolean
 }>(), {
   spacingClass: 'px-4',
   disableAnimation: false,
+  showIcon: false,
 })
 
 const NoItemsMessage = h('i', 'No attributes found')

@@ -2,8 +2,9 @@ import type { AxiosError } from 'axios'
 
 export function useErrorHandler() {
   function handleError(error: AxiosError<{ message: string }>) {
-    console.log(error.response)
+    if (error.code === 'ERR_CANCELED') return
 
+    console.log({ error }, error.response)
     alert(error.response?.data.message)
   }
 

@@ -1,7 +1,11 @@
 <template>
   <Switch
     v-model="enabled"
-    class="group relative inline-flex h-5 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+    class="group relative inline-flex h-5 w-10 shrink-0 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+    :class="{
+      'cursor-pointer': !props.disabled,
+    }"
+    :disabled="props.disabled"
   >
     <span class="sr-only">Use setting</span>
     <span
@@ -10,11 +14,11 @@
     />
     <span
       aria-hidden="true"
-      class="pointer-events-none absolute mx-auto h-4 w-9 rounded-full transition-colors duration-200 ease-in-out" :class="[enabled ? 'bg-primary-600' : 'bg-slate-200']"
+      class="pointer-events-none absolute mx-auto h-4 w-9 rounded-full transition-colors duration-200 ease-in-out" :class="[isSwitchedOn ? 'bg-primary-600' : 'bg-slate-200']"
     />
     <span
       aria-hidden="true"
-      class="pointer-events-none absolute left-0 inline-block size-5 rounded-full border border-gray-200 bg-white shadow ring-0 transition-transform duration-200 ease-in-out" :class="[enabled ? 'translate-x-5' : 'translate-x-0']"
+      class="pointer-events-none absolute left-0 inline-block size-5 rounded-full border border-gray-200 bg-white shadow ring-0 transition-transform duration-200 ease-in-out" :class="[isSwitchedOn ? 'translate-x-5' : 'translate-x-0']"
     />
   </Switch>
 </template>
@@ -22,10 +26,17 @@
 <script setup lang="ts">
 import { Switch } from '@headlessui/vue'
 import { useVModel } from '@vueuse/core'
+import { computed } from 'vue'
 
 const props = defineProps<{
   modelValue: any
+  disabled?: boolean
 }>()
 const emit = defineEmits(['update:modelValue'])
 const enabled = useVModel(props, 'modelValue', emit)
+
+const isSwitchedOn = computed(() => {
+  if (props.disabled) return false
+  return enabled.value
+})
 </script>

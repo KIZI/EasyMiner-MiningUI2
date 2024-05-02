@@ -32,25 +32,27 @@
               />
               <span class="hidden text-xs group-hover:inline-block">Help</span>
             </button>
-            <button
+            <a
               class="group ml-6 inline-flex flex-col items-center gap-y-1.5 bg-cover opacity-70 hover:opacity-100"
               title="Create new miner or open existing one..."
+              href="/easyminercenter/em/data"
             >
               <span
                 :style="`background-image: url(${imageMiner})`"
                 class="size-12"
               />
               <span class="hidden text-xs group-hover:inline-block">Miners</span>
-            </button>
-            <button
-              class="ml-8 inline-flex flex-col items-center gap-y-1.5 bg-cover"
-            >
-              <span
-                :style="`background-image: url(${imageUser})`"
-                class="size-12"
-              />
-              <span class="text-xs">John Doe</span>
-            </button>
+            </a>
+
+            <UserMenu>
+              <MenuButton class="ml-8 inline-flex flex-col items-center gap-y-1.5 bg-cover">
+                <span
+                  :style="`background-image: url(${imageUser})`"
+                  class="size-12"
+                />
+                <span class="text-xs">John Doe</span>
+              </MenuButton>
+            </UserMenu>
           </div>
         </div>
       </div>
@@ -59,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import { MenuButton } from '@headlessui/vue'
 import { useMinerQuery } from '@/api/miners/useMinerQuery'
 import { appConfig } from '@/config/appConfig'
 import Truncate from '@/components/Truncate.vue'
@@ -66,6 +69,10 @@ import Truncate from '@/components/Truncate.vue'
 import imageUser from '@/assets/user.png'
 import imageMiner from '@/assets/new-miner.png'
 import imageHelp from '@/assets/help.png'
+import PopoverButton from '@/components/Popover/PopoverButton.vue'
+import Popover from '@/components/Popover/Popover.vue'
+import PopoverPanel from '@/components/Popover/PopoverPanel.vue'
+import UserMenu from '@/components/Layout/UserMenu.vue'
 
 const { data: miner } = useMinerQuery()
 </script>

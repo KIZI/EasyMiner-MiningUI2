@@ -28,7 +28,7 @@ const { cssVars } = useTransition(props)
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(0.5rem);
 }
 
 .list-leave-active {

@@ -6,31 +6,30 @@
 </template>
 
 <script setup lang="ts">
-import { useDraggable, type Draggable } from '@/components/DragAndDrop/useDraggable';
-import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore';
-import type { ListAttribute } from '@/components/Attributes/useAttributesList';
+import { type DragEndFlags, type Draggable, useDraggable } from '@/components/DragAndDrop/useDraggable'
+import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore'
+import type { ListAttribute } from '@/components/Attributes/useAttributesList'
 
 const props = defineProps<{
-  attribute: ListAttribute,
-}>();
+  attribute: ListAttribute
+}>()
 
-const dragAndDropStore = useDragAndDropStore();
+const emit = defineEmits<{
+  dragStart: [draggable: Draggable]
+  dragEnd: []
+}>()
+const dragAndDropStore = useDragAndDropStore()
 const draggable = useDraggable({
   onDragEnd,
   onDragStart,
   payload: props.attribute,
-});
-
-const emit = defineEmits<{
-  dragStart: [draggable: Draggable],
-  dragEnd: []
-}>();
+})
 
 async function onDragStart(draggable: Draggable) {
-  emit('dragStart', draggable);
+  emit('dragStart', draggable)
 }
-function onDragEnd() {
-  dragAndDropStore.dropItem();
-  emit('dragEnd');
+function onDragEnd(flags: DragEndFlags) {
+  dragAndDropStore.dropItem(flags)
+  emit('dragEnd')
 }
 </script>

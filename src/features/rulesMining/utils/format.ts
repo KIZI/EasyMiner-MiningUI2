@@ -7,6 +7,6 @@ export function formatInterestMeasureRange(range: InterestMeasureRange) {
   return `${openingBracket}${range.from.value}; ${range.to.value}${closingBracket}`
 }
 
-export function formatFixedValue(value: string | number) {
+export function formatFixedValue(value?: string | number) {
   return value ?? '*'
 }

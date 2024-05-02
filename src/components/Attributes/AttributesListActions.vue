@@ -1,5 +1,5 @@
 <template>
-  <button
+  <VIconButton
     v-if="!disableSelection"
     :disabled="isSelectionDisabled"
     @click="toggleSelection"
@@ -11,17 +11,18 @@
         'text-gray-300': isSelectionDisabled,
       }"
     />
-  </button>
-  <button @click="toggleSearch">
+  </VIconButton>
+  <VIconButton @click="toggleSearch">
     <icon-ph-magnifying-glass
       :width="22"
       :class="{ 'text-primary-700': !!searchQuery }"
     />
-  </button>
+  </VIconButton>
 </template>
 
 <script setup lang="ts">
 import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection'
+import VIconButton from '@/components/VIconButton.vue'
 
 defineProps<{
   noSelection?: boolean

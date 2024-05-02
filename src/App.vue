@@ -7,9 +7,11 @@
     </main>
     <AttributeHistogramModal />
   </div>
+  <VueQueryDevtools />
 </template>
 
 <script setup lang="ts">
+import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 import AppHeader from '@/components/Layout/AppHeader.vue'
 import { TheBackdrop } from '@/components/Backdrop'
 import AttributeHistogramModal from '@/components/Attributes/AttributeHistogramModal.vue'

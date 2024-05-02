@@ -18,6 +18,7 @@ export function useDropZone<TPayload>(options: {
   const isMouseInDropZone = computed(() => !isMouseOutside.value)
 
   dragAndDropStore.$onAction((action) => {
+    console.log({ action })
     if (action.name === 'dropItem') {
       if (action.args[0]?.cancelled) return
       onDraggedItemDrop()

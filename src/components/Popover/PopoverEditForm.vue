@@ -32,12 +32,13 @@
             >
               <form @submit.prevent="handleSubmit">
                 <slot />
-                <div class="mt-5 flex gap-x-2">
+                <div class="mt-6 flex gap-x-2">
                   <VButton
                     v-if="isEdit"
                     type="button"
                     size="xs"
-                    :variant="confirmRemove ? 'danger-outline-light' : 'danger-light'"
+                    variant="ghost"
+                    class="text-red-700 hover:bg-red-50"
                     :loading="isRemoveLoading"
                     :disabled="isCreateLoading"
                     @click="handleRemove"
@@ -46,7 +47,6 @@
                   </VButton>
 
                   <div class="ml-auto" />
-
                   <VButton
                     type="button"
                     size="xs"
@@ -55,7 +55,6 @@
                   >
                     Cancel
                   </VButton>
-
                   <VButton
                     size="xs"
                     variant="primary-light"
@@ -115,6 +114,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { useEventListener } from '@vueuse/core'
 import { useInjectPopoverState } from './popoverInjectionState'
 import SlideTransition from '@/components/Transitions/SlideTransition.vue'
 import SwitchTransition from '@/components/Transitions/SwitchTransition.vue'
@@ -169,10 +169,6 @@ function onKeydown(e: KeyboardEvent) {
     handleCancel()
   }
 }
-onMounted(() => {
-  document.addEventListener('keydown', onKeydown)
-})
-onUnmounted(() => {
-  document.removeEventListener('keydown', onKeydown)
-})
+
+useEventListener(document, 'keydown', onKeydown)
 </script>

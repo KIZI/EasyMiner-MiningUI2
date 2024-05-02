@@ -26,7 +26,7 @@
         v-if="isAnyInSelectedRules"
         variant="ghost"
         size="xs"
-        class="gap-x-1 px-1"
+        class="gap-x-1 px-1 hover:bg-red-50"
         :loading="selectedRules.removeRulesMutation.isPending.value"
         :disabled="selectedRules.addRulesMutation.isPending.value"
         @click="handleRemove"

@@ -17,35 +17,26 @@
       >
         <VRadioGroup
           v-bind="field"
-          :options="[
-            { label: 'Any', value: 'any' },
-            { label: 'Fixed', value: 'fixed' },
-          ]"
+          :options="typeOptions"
         />
-        <p class="pt-0.5 text-2xs leading-tight text-gray-900">
+        <p v-if="form.values.valueType === 'any'" class="pt-0.5 text-2xs leading-tight text-gray-900">
           The system will try to use all individual attribute values.
         </p>
       </VField>
 
-      <VField
-        v-if="form.values.valueType === 'fixed'"
-        v-slot="{ field }"
-        class="space-y-1"
-        name="values"
-        label="Fixed values"
-      >
-        <VMultiSelect
-          v-bind="field"
-          :options="['[10,20]', '[20,30]', '[30, 40]', '[40,50]', '[50,60]']"
-          :close-on-select="false"
-          class="multiselect-sm"
-          mode="tags"
-          searchable
-          placeholder="Select"
-        />
-      </VField>
+      <template v-if="form.values.valueType === 'fixed'">
+        <VField
+          v-slot="{ field }"
+          class="space-y-1"
+          name="fixedValue"
+          label="Fixed value"
+        >
+          <VInput v-bind="field" />
+        </VField>
+      </template>
 
       <VField
+        v-if="false"
         v-slot="{ field }"
         class="space-y-1 pt-1"
         name="isNegated"
@@ -67,58 +58,81 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import type { CedentItem } from '@rulesMining/types/rulePattern.types'
 import { SwitchGroup, SwitchLabel } from '@headlessui/vue'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import { yup } from '@/libs/yup'
 import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover'
-import { VField, VMultiSelect, VRadioGroup, VSwitch } from '@/components/Form'
+import { VField, VInput, VRadioGroup, VSwitch } from '@/components/Form'
 
 const props = defineProps<{
   item: CedentItem
 }>()
-const emit = defineEmits(['remove', 'save'])
 
 const { isOpen } = useInjectPopoverState()!
 
-const options = [
-  'amount',
-  'District',
-  'duration',
+const ValueType = {
+  Any: 'any',
+  Fixed: 'fixed',
+} as const
+
+const typeOptions = [
+  { label: 'Any', value: ValueType.Any },
+  { label: 'Fixed', value: ValueType.Fixed },
 ]
 
 const validationSchema = yup.object({
-  attribute: yup.string().required(),
   valueType: yup.string().required(),
-  values: yup.array()
-    .of(yup.string())
-    .when('valueType', ([valueType], schema) => {
-      if (valueType === 'fixed') {
-        return schema.min(1).required()
-      }
+  fixedValue: yup.string().label('Fixed value').when('valueType', ([valueType], schema) => {
+    if (valueType === ValueType.Fixed) {
+      return schema.required()
+    }
+    return schema
+  }),
+  // values: yup.string().when('valueType', (([valueType], schema) => {
+  //     if (valueType === 'fixed') {
+  //       return schema.required()
+  //     }
+  //     return schema
+  //   }),
+  // values: yup.array()
+  //   .of(yup.string())
+  //   .when('valueType', ([valueType], schema) => {
+  //     if (valueType === 'fixed') {
+  //       return schema.min(1).required()
+  //     }
 
-      return schema
-    }),
+  //     return schema
+  //   }),
 })
+
+const initialValues = computed(() => {
+  return {
+    valueType: props.item.fixedValue ? ValueType.Fixed : ValueType.Any,
+    fixedValue: props.item.fixedValue,
+  }
+})
+
 const form = useForm({
   validationSchema,
-  initialValues: {
-    valueType: 'any',
-    ...props.item,
-  },
+  initialValues: initialValues.value,
 })
 
-watch(isOpen, () => form.resetForm())
-
-const handleSubmit = form.handleSubmit((item) => {
-  emit('save', item)
-  isOpen.value = false
-})
+watch(isOpen, () => form.resetForm({ values: initialValues.value }))
 
 const rulePatternStore = useRulePatternStore()
+
+const handleSubmit = form.handleSubmit((values) => {
+  isOpen.value = false
+  rulePatternStore.setItemOptions({
+    id: props.item.id,
+    fixedValue: values.fixedValue,
+  })
+})
+
 function handleRemove() {
   isOpen.value = false
-  rulePatternStore.removeItemById(props.item.id)
+  rulePatternStore.removeMeasureById(props.item.id)
 }
 </script>

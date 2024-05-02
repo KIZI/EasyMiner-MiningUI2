@@ -3,12 +3,12 @@
     as-tooltip
     class="inline-flex items-center"
   >
-    <PopoverButton>
+    <PopoverButton :as="VIconButton">
       <icon-ph-info class="size-5 text-gray-700" />
     </PopoverButton>
 
     <SlideTransition direction="left">
-      <PopoverPanel class="absolute right-8 z-10">
+      <PopoverPanel class="absolute right-10 z-10">
         <div class="rounded-md bg-white py-1 pl-3.5 pr-5 shadow-lg ring-1 ring-black/5">
           <div class="grid w-max grid-cols-3 text-right text-2xs leading-4">
             <div class="col-start-2 pr-2">
@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import VIconButton from '@/components/VIconButton.vue'
 import { Popover, PopoverButton, PopoverPanel } from '@/components/Popover'
 import SlideTransition from '@/components/Transitions/SlideTransition.vue'
 import type { TaskRule } from '@/api/tasks/types'

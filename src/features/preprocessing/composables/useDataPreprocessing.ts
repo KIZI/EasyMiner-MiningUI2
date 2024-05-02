@@ -57,11 +57,20 @@ export function useDataPreprocessing() {
     return preprocessingTasks.value.filter(task => activeStates.includes(task.state))
   })
 
+  const tasksInProgress = computed(() => {
+    return preprocessingTasks.value.filter(task => task.state === 'in_progress')
+  })
+
+  const isLoading = computed(() => {
+    return tasksInProgress.value.length > 0
+  })
+
   return {
     open,
     removeTask,
     reopenTask,
     activeTasks,
+    isLoading,
     tasks: preprocessingTasks,
   }
 }
@@ -133,7 +142,7 @@ type PreprocessingAttribute = {
   columnId: number
   columnName: string
 }
-export type PreprocessingSource = DatasourceColumn[]
+export type PreprocessingSource = Partial<DatasourceColumn>[]
 
 function constructId(source: PreprocessingAttribute[]) {
   return source.map(column => column.id).join('-')

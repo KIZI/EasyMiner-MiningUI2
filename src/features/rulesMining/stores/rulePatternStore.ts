@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { sortBy } from 'lodash-es'
+import { useInterestMeasuresStore } from '@rulesMining/stores/interestMeasuresStore'
+import { type InterestMeasure, SpecialInterestMeasures } from '@rulesMining/types/interestMeasure.types'
 import type { Cedent, CedentItem } from '@/features/rulesMining/types/rulePattern.types'
 import { CEDENT } from '@/features/rulesMining/types/rulePattern.types'
 import { patternItemToAttributeSimpleInput } from '@/features/rulesMining/utils/rulesMining'
@@ -10,9 +12,10 @@ import type { TaskCedent, TaskSettingsRule } from '@/api/tasks/types'
 
 export const useRulePatternStore = defineStore('rulePattern', () => {
   const activeMetasourceQuery = useActiveMetasourceQuery()
+  const interestMeasuresStore = useInterestMeasuresStore()
 
   const itemsMap = ref<Map<MetasourceAttribute['id'], CedentItem>>(new Map())
-  const editedItem = ref<CedentItem | null>()
+  const editedMeasure = ref<CedentItem | null>()
 
   const items = computed(() => Array.from(itemsMap.value.values()))
 
@@ -51,11 +54,17 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     )
   }
 
+  function setItemOptions({ id, fixedValue }: { id: number, fixedValue: string }) {
+    const item = itemsMap.value.get(id)
+    if (!item) return
+    item.fixedValue = fixedValue
+  }
+
   function hasItem(id: number) {
     return itemsMap.value.has(id)
   }
 
-  function removeItemById(id: number) {
+  function removeMeasureById(id: number) {
     itemsMap.value.delete(id)
   }
 
@@ -67,14 +76,14 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
   }
 
   function openItemOptions(id: number) {
-    editedItem.value = itemsMap.value.get(id)
+    editedMeasure.value = itemsMap.value.get(id)
   }
 
   function closeItemOptions() {
-    editedItem.value = null
+    editedMeasure.value = null
   }
 
-  function setItemOptions(id: number, {
+  function setMeasureOptions(id: number, {
     fixedValue,
     isNegated = false,
   }: {
@@ -116,6 +125,14 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     clearCedents()
     loadTaskCedent(antecedent, 'Antecedent')
     loadTaskCedent(succedent, 'Consequent')
+
+    interestMeasuresStore.removeAll()
+    for (const iM of iMs) {
+      const threshold = typeof iM.threshold === 'string' ? Number.parseFloat(iM.threshold) : iM.threshold
+      interestMeasuresStore.setMeasure(iM.name as InterestMeasure, threshold)
+    }
+    const isPruned = specialIMs.some(iM => iM.name === SpecialInterestMeasures.CBA)
+    interestMeasuresStore.pruning = isPruned
   }
 
   return {
@@ -125,15 +142,16 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     antecedent,
     closeItemOptions,
     consequent,
-    editedItem,
+    editedMeasure,
     getCedentItems,
     hasItem,
     itemsMap,
     openItemOptions,
-    removeItemById,
+    removeMeasureById,
     rulePatternInput,
-    setItemOptions,
+    setMeasureOptions,
     clearItems,
     loadTaskRule,
+    setItemOptions,
   }
 })

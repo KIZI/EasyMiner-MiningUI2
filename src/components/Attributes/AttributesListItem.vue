@@ -1,12 +1,12 @@
 <template>
   <div
-    class="relative z-20 flex items-center gap-2 py-1.5 duration-100"
+    class="relative flex items-center gap-2 py-1.5 pr-2 duration-100"
     :class="[
       spacingClass,
       colorSchemaClass,
       {
         'group hover:bg-primary-200': attribute.isAvailable,
-        'cursor-pointer': isListInteractive,
+        'cursor-pointer': attribute.isAvailable && isListInteractive,
       },
     ]"
     @click="toggleSelection"
@@ -17,7 +17,7 @@
         class="w-5"
       >
         <VCheckbox
-          v-if="attribute.isAvailable"
+          v-if="shouldShowSelection && attribute.isAvailable"
           v-model="modelValue"
           class="size-4"
           :value="attribute"
@@ -33,7 +33,7 @@
       </div>
 
       <label
-        class="inline-flex min-w-0 select-none items-center gap-2 py-2 pr-3 text-sm font-medium"
+        class="inline-flex min-w-0 select-none items-center gap-2 py-2 text-sm font-medium"
         :class="{
           'text-gray-500': !attribute.isAvailable,
           'cursor-pointer': isListInteractive,
@@ -44,7 +44,7 @@
       </label>
     </div>
 
-    <div class="ml-auto flex items-center gap-x-1">
+    <div class="ml-auto flex items-center gap-x-0.5">
       <VButton
         variant="ghost"
         class="size-8 hover:bg-slate-200 group-hover:hover:bg-primary-50"

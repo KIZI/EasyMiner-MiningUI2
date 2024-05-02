@@ -13,13 +13,13 @@
 
       <hr class="-mx-6 mt-5 border-gray-200">
 
-      <div class="flex min-h-[4.5rem] items-center justify-between py-2.5">
+      <div class="flex h-16 items-center justify-between py-2.5">
         <RulesMiningHint :state="miningState" />
 
         <div class="flex items-center gap-x-8">
           <button
             v-if="isInProgress"
-            class="text-sm font-medium text-red-700"
+            class="text-sm font-medium text-red-700 underline hover:no-underline"
             @click="abortMining"
           >
             Stop mining

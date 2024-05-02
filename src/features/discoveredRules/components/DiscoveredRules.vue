@@ -22,13 +22,16 @@
           </SectionTitle>
 
           <VButton
-            v-if="rules.length"
+            v-if="rules.length && isAnyUnselected"
             size="xs"
             variant="ghost"
             class="gap-x-1.5 font-medium"
+            icon-class="text-green-700"
+            :loading="addRulesMutation.isPending.value"
+            @click="addAllToSelectedRules"
           >
             <template #icon>
-              <icon-ph-checks class="size-5 text-green-700" />
+              <icon-ph-checks class="size-5" />
             </template>
             Add all to Selected rules
           </VButton>
@@ -43,7 +46,7 @@
 
       <div class="-mr-2 flex items-center gap-x-2">
         <VButton
-          v-if="state && !isTaskStateRunning(state)"
+          v-if="state && !isTaskStateRunning(state) && rules.length"
           variant="ghost"
           size="xs"
           class="shrink-0 gap-x-1.5"
@@ -66,7 +69,7 @@
       </div>
     </div>
 
-    <template v-if="rules.length">
+    <template v-if="taskDetail && rules.length">
       <RulesFilters class="mt-8" />
       <div class="mt-3 divide-y divide-slate-100 border-y border-slate-200">
         <DiscoveredTaskRule
@@ -74,6 +77,7 @@
           :key="rule.text"
           v-model:selected="selection"
           :rule="rule"
+          :task="taskDetail"
           class="-mx-6 px-6"
           :is-odd="i % 2 > 0"
         />
@@ -112,6 +116,7 @@
 import DiscoveredTaskRule from '@discoveredRules/components/DiscoveredTaskRule.vue'
 import { computed, ref } from 'vue'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
 import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -135,5 +140,14 @@ function loadTaskToRulePattern() {
   if (!taskDetail.value) return
   rulePatternStore.loadTaskRule(taskDetail.value.settings.rule0)
   document.getElementById('rulesMining')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+const { isRuleSelected, addRulesMutation, handleAdd } = useSelectedRules()
+
+const isAnyUnselected = computed(() => {
+  return rules.value.some(rule => !isRuleSelected(rule))
+})
+function addAllToSelectedRules() {
+  handleAdd(rules.value.filter(rule => !isRuleSelected(rule)))
 }
 </script>

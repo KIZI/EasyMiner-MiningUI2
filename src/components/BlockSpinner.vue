@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute inset-0 flex">
+  <div class="absolute inset-0 z-10 flex">
     <div v-if="darken" class="absolute inset-0 animate-pulse bg-slate-900/15" />
     <VSpinner class="m-auto size-8 text-brand" />
   </div>
@@ -10,5 +10,5 @@ import VSpinner from '@/components/VSpinner.vue'
 
 defineProps<{
   darken?: boolean
-}>();
+}>()
 </script>

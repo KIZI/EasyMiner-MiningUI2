@@ -1,4 +1,5 @@
-import { useMutation } from '@tanstack/vue-query'
+import { SpecialInterestMeasures } from '@rulesMining/types/interestMeasure.types'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { createSharedComposable } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { api } from '@/api/api'
@@ -11,11 +12,13 @@ import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interest
 import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
 import {
   constructMinerLabel,
+  interestMeasureToIMSimpleInput,
   isTaskRunning,
 } from '@/features/rulesMining/utils/rulesMining'
 import { useTasksStore } from '@/stores/tasksStore'
 import type { CreateTaskInput } from '@/api/tasks/types'
 import { useErrorHandler } from '@/composables/useErrorHandler'
+import { queryKeys } from '@/api/queryKeys'
 
 export const useRulesMining = createSharedComposable(() => {
   const { minerId } = useMinerQuery()
@@ -69,7 +72,7 @@ export const useRulesMining = createSharedComposable(() => {
 
   const isMiningAvailable = computed(() => {
     const isPatternValid = rulePatternStore.consequent.length > 0
-    const isInterestMesuresValid = interestMeasuresStore.activeItems.length > 0
+    const isInterestMesuresValid = interestMeasuresStore.activeMeasures.length > 0
 
     return isPatternValid && isInterestMesuresValid
   })
@@ -98,11 +101,27 @@ export const useRulesMining = createSharedComposable(() => {
     return 'disabled'
   })
 
+  const queryClient = useQueryClient()
+  watch(miningState, () => {
+    if (miningState.value === 'solved') {
+      console.log('invalidateQueries', { queryKey: queryKeys.miner.tasks() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.miner.tasks() })
+    }
+  })
+
   const isInProgress = computed(() => miningState.value === 'in_progress')
+
+  const interestMeasuresInput = computed(() => (
+    interestMeasuresStore.activeMeasures.map(interestMeasureToIMSimpleInput)
+  ))
+  const specialInterestMeasuresInput = computed(() => ([
+    ...(interestMeasuresStore.isPruningEnabled ? [{ name: SpecialInterestMeasures.CBA }] : []),
+  ]))
 
   function startMining() {
     const { antecedent, consequent } = rulePatternStore.rulePatternInput
-    const IMs = interestMeasuresStore.interestMeasuresInput
+    const IMs = interestMeasuresInput.value
+    const specialIMs = specialInterestMeasuresInput.value
 
     const name = constructMinerLabel(
       rulePatternStore.antecedent,
@@ -114,6 +133,7 @@ export const useRulesMining = createSharedComposable(() => {
 
     createTaskMutation.mutate({
       IMs,
+      specialIMs,
       antecedent,
       consequent,
       miner: minerId,
@@ -140,7 +160,8 @@ export const useRulesMining = createSharedComposable(() => {
   watch(
     [
       () => rulePatternStore.rulePatternInput,
-      () => interestMeasuresStore.interestMeasuresInput,
+      interestMeasuresInput,
+      specialInterestMeasuresInput,
     ],
     () => {
       if (isInProgress.value) return

@@ -15,22 +15,13 @@
       :text="name"
     />
     <span
-      v-if="fixedValue !== false"
       class="text-primary-700"
       :class="{
         'text-2xs': sm,
         'text-xs': !sm,
       }"
     >
-      <template v-if="Array.isArray(fixedValue)">
-        ([
-        <span class="font-medium">{{ formatDecimal(fixedValue[0]) }}</span>;
-        <span class="font-medium">{{ formatDecimal(fixedValue[1]) }}</span>
-        ])
-      </template>
-      <template v-else>
-        (<span class="font-medium">{{ formatFixedValue(fixedValue) }}</span>)
-      </template>
+      (<span class="font-medium">{{ formatFixedValue(fixedValue) }}</span>)
     </span>
   </span>
 </template>
@@ -39,15 +30,14 @@
 import Truncate from '@/components/Truncate.vue'
 import { appConfig } from '@/config/appConfig'
 import { formatFixedValue } from '@/features/rulesMining/utils/format'
-import { formatDecimal } from '@/utils/format'
 
 withDefaults(defineProps<{
   name: string
-  fixedValue?: string | number | [number, number] | false
+  fixedValue?: string | number
   isNegated?: boolean
   sm?: boolean
 }>(), {
-  fixedValue: false,
+  fixedValue: undefined,
   isNegated: false,
   sm: false,
 })

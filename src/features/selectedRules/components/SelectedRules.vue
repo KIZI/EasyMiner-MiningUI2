@@ -8,16 +8,17 @@
           variant="ghost"
           size="xs"
           class="shrink-0 gap-x-1.5"
+          @click="ruleSetScorerModal.open"
         >
           <icon-ph-lightning class="size-5" />
           Test model
         </VButton>
 
-        <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline">
+        <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline" @click="openRulesEditor">
           <icon-ph-note-pencil-light class="size-5" />
           Rules editor
         </button>
-        <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline">
+        <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline" @click="openKnowledgeExperiment">
           <icon-ph-lightbulb class="size-5" />
           Knowledge experiment
         </button>
@@ -115,7 +116,7 @@
             <div class="relative flex w-full items-center">
               <VInput
                 class="h-7 pl-2 pr-6 text-xs"
-                placeholder="Consequent"F
+                placeholder="Consequent"
               />
               <button class="absolute right-2">
                 <icon-ph-x class="size-3.5 text-slate-700" />
@@ -126,7 +127,7 @@
       </div>
 
       <div class="mt-3 min-h-40">
-        <BlockSpinner v-if="ruleSetsRulesQuery.isFetching.value" />
+        <BlockSpinner v-if="ruleSetsRulesQuery.isLoading.value" />
         <RuleSetRules
           v-else
           v-model:selection="selection"
@@ -147,7 +148,7 @@
           </div>
           <div class="ml-auto">
             <div class="flex items-center space-x-3">
-              <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
+              <button class="inline-flex items-center gap-x-2 text-xs hover:underline" @click="exportRuleSet">
                 <icon-ph-export class="size-4 text-gray-700" />
                 Export ruleset
               </button>
@@ -157,6 +158,8 @@
       </div>
     </div>
   </SectionCard>
+
+  <RuleSetScorerModal />
 </template>
 
 <script setup lang="ts">
@@ -166,6 +169,8 @@ import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesSt
 import EditRuleSetPopoverForm from '@selectedRules/components/EditRuleSetPopoverForm.vue'
 import ChangeRuleSetListbox from '@selectedRules/components/ChangeRuleSetListbox.vue'
 import RuleSetRules from '@selectedRules/components/RuleSetRules.vue'
+import { useRuleSetScorerModal } from '@selectedRules/components/useRuleSetScorerModal'
+import RuleSetScorerModal from '@selectedRules/components/RuleSetScorerModal.vue'
 import type { TaskRule } from '@/api/tasks/types'
 import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
@@ -178,8 +183,11 @@ import VPagination from '@/components/VPagination.vue'
 import VInput from '@/components/Form/VInput.vue'
 import Truncate from '@/components/Truncate.vue'
 import { appConfig } from '@/config/appConfig'
+import BlockSpinner from '@/components/BlockSpinner.vue'
+import { externalUrls } from '@/utils/externalUrls'
 
 const { currentRuleSetId } = useSelectedRulesStoreRefs()
+const ruleSetScorerModal = useRuleSetScorerModal()
 const ruleSetsRulesQuery = useRuleSetRulesQuery(currentRuleSetId)
 const { rules, ruleSet } = ruleSetsRulesQuery
 
@@ -206,4 +214,23 @@ const orderOptions = [
     value: 'custom',
   },
 ]
+
+function openRulesEditor() {
+  if (!currentRuleSetId.value) return
+  if (confirm('Rule editor will be opened in new window. After finishing the work in editor, don´t forget to reload this miner window.')) {
+    window.open(externalUrls.rulesEditor(currentRuleSetId.value), '_blank')
+  }
+}
+
+function openKnowledgeExperiment() {
+  if (!currentRuleSetId.value) return
+  if (confirm('Are you sure you want to use this rule set as the basis of a knowledge experiment?')) {
+    window.open(externalUrls.knowledgeExperiment(currentRuleSetId.value), '_blank')
+  }
+}
+
+function exportRuleSet() {
+  if (!currentRuleSetId.value) return
+  window.open(externalUrls.exportRuleSet(currentRuleSetId.value), '_blank')
+}
 </script>

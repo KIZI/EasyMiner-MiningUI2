@@ -11,12 +11,17 @@ export function useMetasourceAttributes() {
     isAvailable: !rulePatternStore.hasItem(attribute.id),
   })))
 
+  const unusedAttributes = computed(() => {
+    return attributes.value.filter(attribute => attribute.isAvailable)
+  })
+
   function getById(id: number) {
     return attributes.value.find(attribute => attribute.id === id)
   }
 
   return {
     attributes,
+    unusedAttributes,
     getById,
     isPending,
   }

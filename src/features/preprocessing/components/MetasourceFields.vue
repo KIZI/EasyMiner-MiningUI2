@@ -139,6 +139,7 @@
           variant="primary"
           size="xl"
           :disabled="!isReadyForMining"
+          :loading="dataPreprocessing.isLoading.value"
           @click="goToMining"
         >
           Let's mine
@@ -204,9 +205,9 @@ const { dropZoneRef, isAvailable, isDraggedOver } = useDropZone<DatasourceColumn
   },
 })
 
-const isReadyForMining = computed(() => {
-  return metasourceQuery.attributes.value.length > 0
-})
+const isReadyForMining = computed(() => (
+  metasourceQuery.attributes.value.length > 0
+))
 
 function goToMining() {
   router.push('/')

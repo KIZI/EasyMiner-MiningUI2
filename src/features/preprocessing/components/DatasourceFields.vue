@@ -13,12 +13,13 @@
     <AttributesList
       class="grow overflow-y-auto border-t"
       spacing-class="px-6"
+      show-icon
     >
       <template #itemActions="{ attribute }">
         <VButton
           variant="ghost"
           class="size-8 hover:bg-primary-200 group-hover:hover:bg-primary-50"
-          @click.stop="dataPreprocessing.open(attribute)"
+          @click.stop="dataPreprocessing.open([attribute])"
           @mousedown.stop
         >
           <icon-ph-arrow-right class="size-5 text-primary-700" />
@@ -44,13 +45,13 @@
           Add selected to Attributes
         </VButton>
 
-        <label class="ml-auto flex cursor-pointer select-none items-center gap-x-2.5 text-sm font-medium">
+        <!-- <label class="ml-auto flex cursor-pointer select-none items-center gap-x-2.5 text-sm font-medium">
           <VCheckbox
             v-model="shouldRemovePrefix"
             class="size-5"
           />
           <span>Remove prefix</span>
-        </label>
+        </label> -->
       </div>
     </div>
 

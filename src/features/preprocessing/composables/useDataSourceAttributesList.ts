@@ -6,7 +6,7 @@ import { type ListAttribute, useAttributesList } from '@/components/Attributes/u
 export const useDataSourceAttributesList = createSharedComposable(() => {
   const datasourceQuery = useActiveDatasourceQuery()
 
-  const attributes = computed<ListAttribute[]>(() => {
+  const attributes = computed(() => {
     const columns = datasourceQuery.data.value?.column
     if (!columns) return []
 
@@ -15,7 +15,7 @@ export const useDataSourceAttributesList = createSharedComposable(() => {
         ...column,
         isAvailable: true,
         source: 'datasource',
-      }
+      } as const
     })
   })
 

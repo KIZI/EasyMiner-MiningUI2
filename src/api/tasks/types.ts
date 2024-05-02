@@ -1,3 +1,5 @@
+import type { InterestMeasure, SpecialInterestMeasure } from '@rulesMining/types/interestMeasure.types'
+
 export type Task = {
   id: number
   miner: number
@@ -65,7 +67,7 @@ export type TaskInterestMeasure = {
   thresholdType: string
   compareType: string
   fields: TaskField[]
-  threshold: number
+  threshold: number | string
   alpha: number
 }
 
@@ -101,6 +103,7 @@ export type CreateTaskInput = {
   antecedent: CedentInput
   consequent: CedentInput
   IMs: IMInput[]
+  specialIMs: SpecialIMInput[]
   limitHits?: number
 }
 export type CedentInput = AttributeInput[]
@@ -109,6 +112,9 @@ export type AttributeInput = {
   fixedValue?: string
 }
 export type IMInput = {
-  name: string
-  value: number
+  name: InterestMeasure
+  value?: number
+}
+export type SpecialIMInput = {
+  name: SpecialInterestMeasure
 }

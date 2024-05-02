@@ -9,15 +9,15 @@
     <template #actions>
       <VIconButton
         title="Remove from selected rules"
-        class="text-red-700"
+        class="text-red-700 hover:bg-red-50"
         :loading="removeRulesMutation.isPending.value"
         @click="handleRemove(rule)"
       >
-        <icon-ph-x-circle class="size-5 text-red-700" />
+        <icon-ph-x-circle class="size-5" />
       </VIconButton>
-      <div class="pl-3">
+      <!-- <div class="pl-3">
         <icon-ph-list class="size-5 cursor-grab text-gray-700" />
-      </div>
+      </div> -->
     </template>
   </TaskRuleComponent>
 </template>

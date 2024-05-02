@@ -1,114 +1,100 @@
-import { interestMeasureTypes, interestMeasures } from '@rulesMining/types/interestMeasure.types'
-import { interestMeasureToIMSimpleInput } from '@rulesMining/utils/rulesMining'
+import { InterestMeasureTypes, InterestMeasures } from '@rulesMining/types/interestMeasure.types'
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import type { InteresetMeasureActiveItem, InterestMeasure, InterestMeasureItem } from '@rulesMining/types/interestMeasure.types'
+import type { InterestMeasure, InterestMeasureActiveItem } from '@rulesMining/types/interestMeasure.types'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import { appConfig } from '@/config/appConfig'
+
+const interestMeasuresOptionsByName = appConfig.interestMeasures
+const interestMeasuresOptions = Object.values(appConfig.interestMeasures)
+
+const defaultMeasuresOptions = interestMeasuresOptions
+  .filter(item => item.hasInitialValue)
+  .map(item => [item.name, Number(item.defaultValue)] as const)
 
 export const useInterestMeasuresStore = defineStore('interestMeasures', () => {
-  const isFormActive = ref(false)
-  const editedItem = ref<InterestMeasure | null>(null)
+  const rulePatternStore = useRulePatternStore()
 
-  function openItemForm(name: InterestMeasure) {
-    editedItem.value = name
+  const pruning = ref(false)
+  const isPruningAvailable = computed(() => {
+    const isConsequentSingle = rulePatternStore.consequent.length === 1
+    const hasAttributeAnyValue = !rulePatternStore.consequent[0]?.fixedValue
+
+    return isConsequentSingle && hasAttributeAnyValue
+  })
+
+  const isPruningEnabled = computed(() => {
+    return isPruningAvailable.value && pruning.value
+  })
+
+  const autoConfAndSupp = ref(false)
+
+  const measuresMap = ref(new Map<InterestMeasure, number>(defaultMeasuresOptions))
+
+  const activeMeasures = computed<InterestMeasureActiveItem[]>(() => {
+    return [...measuresMap.value.keys()].map(measure => getMeasure(measure))
+  })
+
+  const availableMeasures = computed(() => {
+    if (measuresMap.value.has(InterestMeasures.AutoConfSupp)) return []
+
+    return interestMeasuresOptions.filter((item) => {
+      if (item.name === InterestMeasures.AutoConfSupp) return !activeMeasures.value.length
+      return !measuresMap.value.has(item.name)
+    })
+  })
+
+  const canAddMeasure = computed(() => !autoConfAndSupp.value)
+
+  function getMeasure(name: InterestMeasure) {
+    return {
+      ...interestMeasuresOptionsByName[name],
+      value: measuresMap.value.get(name),
+    } as InterestMeasureActiveItem
+  }
+
+  function setMeasure(name: InterestMeasure, value: number) {
+    measuresMap.value.set(name, value)
+  }
+
+  function removeMeasure(name: InterestMeasure) {
+    measuresMap.value.delete(name)
+  }
+
+  function removeAll() {
+    measuresMap.value.clear()
+    autoConfAndSupp.value = false
+    pruning.value = false
+  }
+
+  const isFormActive = ref(false)
+  const editedMeasure = ref<InterestMeasure | null>(null)
+
+  function openForm(name: InterestMeasure) {
+    editedMeasure.value = name
     isFormActive.value = true
   }
 
-  function closeItemForm() {
-    editedItem.value = null
+  function closeForm() {
+    editedMeasure.value = null
     isFormActive.value = false
   }
 
-  const isPruningEnabled = ref(false)
-
-  const itemsMap = ref(new Map<InterestMeasure, InterestMeasureItem>([
-    [interestMeasures.Conf, {
-      description: 'How likely is consequent to be present given that antecedent is present',
-      isRequired: false,
-      label: 'Confidence',
-      name: interestMeasures.Conf,
-      range: {
-        from: { value: 0 },
-        to: { closed: true, value: 1 },
-      },
-      type: interestMeasureTypes.Double,
-      defaultValue: 0.7,
-      value: 0.7,
-    }],
-    [interestMeasures.Support, {
-      description: 'How frequent is antecedent in dataset',
-      isRequired: false,
-      label: 'Support',
-      name: interestMeasures.Support,
-      range: {
-        from: { value: 0 },
-        to: { closed: true, value: 1 },
-      },
-      type: interestMeasureTypes.Double,
-      defaultValue: 0.05,
-      value: 0.05,
-    }],
-    [interestMeasures.Lift, {
-      defaultValue: 1.1,
-      description: 'Ratio of consequent presence when antecedent is present',
-      label: 'Lift',
-      name: interestMeasures.Lift,
-      range: {
-        from: { value: 0 },
-        to: { value: 5 },
-      },
-      type: interestMeasureTypes.Double,
-    }],
-    [interestMeasures.Length, {
-      defaultValue: 5,
-      description: 'Length of searched rules',
-      label: 'Rule length',
-      name: interestMeasures.Length,
-      range: {
-        from: { closed: true, value: 1 },
-        to: { closed: true, value: 10 },
-      },
-      type: interestMeasureTypes.Integer,
-    }],
-  ]))
-
-  const items = computed(() => Array.from(itemsMap.value.values()))
-  const activeItems = computed(() => (
-    items.value.filter(item => item.value) as InteresetMeasureActiveItem[]
-  ))
-
-  const unusedItems = computed(() => items.value.filter(item => !item.value))
-
-  const interestMeasuresInput = computed(() => (
-    activeItems.value.map(interestMeasureToIMSimpleInput)
-  ))
-
-  function getItem(name: InterestMeasure) {
-    return itemsMap.value.get(name)
-  }
-
-  function setItemValue(name: InterestMeasure, value: number | null) {
-    const measure = itemsMap.value.get(name)
-    if (!measure) return
-    measure.value = value
-  }
-
-  function clearItemValue(name: InterestMeasure) {
-    setItemValue(name, null)
-  }
-
   return {
-    unusedItems,
-    isPruningEnabled,
-    activeItems,
-    items,
-    getItem,
-    setItemValue,
-    clearItemValue,
-    interestMeasuresInput,
+    activeMeasures,
+    availableMeasures,
+    canAddMeasure,
     isFormActive,
-    editedItem,
-    closeItemForm,
-    openItemForm,
+    editedMeasure,
+    pruning,
+    isPruningAvailable,
+    isPruningEnabled,
+    getMeasure,
+    setMeasure,
+    removeMeasure,
+    removeAll,
+    closeForm,
+    openForm,
   }
 })
 

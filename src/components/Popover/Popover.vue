@@ -17,10 +17,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['close'])
+
+const isOpen = defineModel<boolean>('open', { default: false })
+
 const { asTooltip } = toRefs(props)
-const { isOpen } = useProvidePopoverState({ asTooltip })
+useProvidePopoverState({ asTooltip, isOpen })
 
 const popoverRef = ref()
+
 onClickOutside(popoverRef, () => {
   if (!isOpen.value) return
   isOpen.value = false

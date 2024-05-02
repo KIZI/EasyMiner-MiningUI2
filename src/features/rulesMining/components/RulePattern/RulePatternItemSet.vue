@@ -59,7 +59,7 @@ import { useDropZone } from '@/components/DragAndDrop/useDropZone'
 import RulePatternItem from '@/features/rulesMining/components/RulePattern/RulePatternItem.vue'
 import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
 import { CEDENT, type Cedent } from '@/features/rulesMining/types/rulePattern.types'
-import { DRAG_SOURCE } from '@/components/DragAndDrop/dragAndDropStore'
+import { DragSources } from '@/components/DragAndDrop/dragAndDropStore'
 import { autoAnimateKeyframeEffect } from '@/utils/autoAnimate'
 import VButton from '@/components/VButton.vue'
 import type { MetasourceAttribute } from '@/api/metasources/types'
@@ -73,17 +73,17 @@ const rulePatternStore = useRulePatternStore()
 const itemSet = computed(() => rulePatternStore.getCedentItems(props.cedent))
 
 const dragSource = computed(() => {
-  if (props.cedent === CEDENT.Antecedent) return DRAG_SOURCE.antecedent
-  return DRAG_SOURCE.consequent
+  if (props.cedent === CEDENT.Antecedent) return DragSources.antecedent
+  return DragSources.consequent
 })
 
 const otherCedentDragSource = computed(() => {
-  if (props.cedent === CEDENT.Antecedent) return DRAG_SOURCE.consequent
-  return DRAG_SOURCE.antecedent
+  if (props.cedent === CEDENT.Antecedent) return DragSources.consequent
+  return DragSources.antecedent
 })
 
 const dropZone = useDropZone<MetasourceAttribute[] | MetasourceAttribute>({
-  accepts: [DRAG_SOURCE.metasource, otherCedentDragSource.value],
+  accepts: [DragSources.metasource, otherCedentDragSource.value],
   onDrop: (payload) => {
     const attributes = Array.isArray(payload) ? payload : [payload]
     attributes.forEach((attribute) => {

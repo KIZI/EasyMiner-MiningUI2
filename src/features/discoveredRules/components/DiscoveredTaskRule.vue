@@ -1,6 +1,7 @@
 <template>
   <TaskRuleComponent
     v-model:selected="selected"
+    :task="task"
     :rule="rule"
     :class="{
       'bg-slate-50': isOdd,
@@ -28,11 +29,12 @@ import { computed, toRefs } from 'vue'
 import IconPhCheckCircle from '~icons/ph/check-circle.vue'
 import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
 import TaskRuleComponent from '@/components/Task/TaskRule.vue'
-import type { TaskRule } from '@/api/tasks/types'
+import type { TaskRule, TaskWithSettings } from '@/api/tasks/types'
 import VIconButton from '@/components/VIconButton.vue'
 
 const props = defineProps<{
   rule: TaskRule
+  task: TaskWithSettings
   isOdd: boolean
 }>()
 const { rule } = toRefs(props)
@@ -42,7 +44,3 @@ const selected = defineModel<TaskRule[]>('selected')
 const { handleToggle, isRuleSelected, isToggleLoading } = useSelectedRules()
 const isSelected = computed(() => isRuleSelected(rule.value))
 </script>
-
-<style scoped>
-
-</style>

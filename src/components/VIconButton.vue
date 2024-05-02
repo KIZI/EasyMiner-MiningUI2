@@ -1,6 +1,7 @@
 <template>
-  <button
-    class="relative"
+  <VButton
+    class="relative p-1"
+    variant="ghost"
     :disabled="loading"
   >
     <slot />
@@ -8,11 +9,12 @@
       v-if="loading"
       class="absolute inset-[-2px] size-[calc(100%+4px)]"
     />
-  </button>
+  </VButton>
 </template>
 
 <script setup lang="ts">
 import VSpinner from '@/components/VSpinner.vue'
+import VButton from '@/components/VButton.vue'
 
 defineProps<{
   loading?: boolean

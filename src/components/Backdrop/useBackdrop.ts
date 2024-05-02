@@ -1,4 +1,4 @@
-import { type Ref, ref, watch } from 'vue'
+import { type Ref, onUnmounted, ref, watch } from 'vue'
 
 const DEFAULT_OPACITY = 0.1
 
@@ -38,6 +38,10 @@ export function useBackdropModel({ vModel, opacity }: UseBackdropModelOptions) {
 
   watch(vModel, (value) => {
     if (value) return show({ opacity })
+    hide()
+  })
+
+  onUnmounted(() => {
     hide()
   })
 }
