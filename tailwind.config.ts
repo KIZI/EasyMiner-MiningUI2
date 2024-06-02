@@ -1,14 +1,32 @@
 import colors from 'tailwindcss/colors'
+import formsPlugin from '@tailwindcss/forms'
 import type { Config } from 'tailwindcss'
 
 module.exports = {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [formsPlugin, {
+    handler: ({ addUtilities, matchUtilities, theme }) => {
+      matchUtilities(
+        {
+          'group-px': value => ({
+            '--peer-px': value,
+          }),
+        },
+        { values: theme('spacing') },
+      )
+      addUtilities({
+        '.peer-px': {
+          paddingInline: 'var(--peer-px)',
+        },
+      })
+    },
+  }],
   theme: {
     extend: {
       colors: {
-        primary: colors.sky,
-        brand: '#075783',
+        'primary': colors.sky,
+        'brand': '#075783',
+        'subtle-white': '#FEFEFE',
       },
       fontSize: {
         '2xs': '0.75rem',

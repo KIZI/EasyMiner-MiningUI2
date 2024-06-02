@@ -21,20 +21,20 @@
             <div class="">
               ant.
             </div>
-            <div class="pr-2 font-medium">
+            <div class="pr-2 font-semibold">
               {{ formatDecimal(rule.a) }}
             </div>
-            <div class="font-medium">
+            <div class="font-semibold">
               {{ formatDecimal(rule.b) }}
             </div>
             <div class="flex justify-end gap-x-0.5">
               <span class="inline-flex h-4 items-center text-base">¬</span>
               ant.
             </div>
-            <div class="pr-2 font-medium">
+            <div class="pr-2 font-semibold">
               {{ formatDecimal(rule.c) }}
             </div>
-            <div class="font-medium">
+            <div class="font-semibold">
               {{ formatDecimal(rule.d) }}
             </div>
           </div>

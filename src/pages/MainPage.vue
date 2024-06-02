@@ -1,15 +1,18 @@
 <template>
   <VContainer class="pb-20">
-    <div class="grid grid-cols-[auto_20rem] grid-rows-[600px_auto] gap-2">
+    <div class="grid grid-cols-[auto_20rem] grid-rows-[600px_600px] gap-2">
       <RulesMining />
       <MetasourceAttributes />
 
-      <div class="flex flex-col items-stretch gap-y-2">
-        <DiscoveredRules v-if="shouldShowDiscoveredRules" />
-        <TasksHistory v-else />
-
-        <SelectedRules />
+      <div class="relative flex flex-col gap-x-20 gap-y-2 overflow-hidden">
+        <SectionTransitionGroup>
+          <DiscoveredRules v-if="activeBottomSection === 'discoveredRules'" />
+          <TasksHistory v-if="activeBottomSection === 'tasksHistory'" />
+          <SelectedRules v-if="activeBottomSection === 'selectedRules'" />
+        </SectionTransitionGroup>
       </div>
+
+      <SideNav />
     </div>
   </VContainer>
 </template>
@@ -20,28 +23,22 @@ import MetasourceAttributes from '@rulesMining/components/MetasourceAttributes.v
 import RulesMining from '@rulesMining/components/RulesMining.vue'
 import SelectedRules from '@selectedRules/components/SelectedRules.vue'
 import TasksHistory from '@tasksHistory/components/TasksHistory.vue'
-import { computed, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
-import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
-import { useActiveTaskStateQuery } from '@/api/tasks/useActiveTaskStateQuery'
 import VContainer from '@/components/Layout/VContainer.vue'
 import { useActiveMetasourceQuery } from '@/api/metasources/useActiveMetasourceQuery'
-import { useTasksStore } from '@/stores/tasksStore'
-import { isTaskStateRunning } from '@/api/tasks/utils'
+import SideNav from '@/components/Layout/SideNav.vue'
+import { activeBottomSection, useInitLayout } from '@/components/Layout'
+import SectionTransitionGroup from '@/components/Transitions/SectionTransitionGroup.vue'
 
 const router = useRouter()
-const activeTaskStateQuery = useActiveTaskStateQuery()
-const activeTaskRulesQuery = useActiveTaskRulesQuery()
-const { isSuccess, attributes } = useActiveMetasourceQuery()
+const activeMetasourceQuery = useActiveMetasourceQuery()
 
-const shouldShowDiscoveredRules = computed(() => {
-  const state = activeTaskStateQuery.state.value
-  if (!state || isTaskStateRunning(state)) return false
-  return !activeTaskRulesQuery.isFetching.value
-})
+useInitLayout()
 
 watchEffect(() => {
-  if (isSuccess.value && !attributes.value.length) {
+  const noAttributes = activeMetasourceQuery.isSuccess.value && !activeMetasourceQuery.attributes.value.length
+  if (noAttributes) {
     router.push({ name: 'Preprocessing' })
   }
 })

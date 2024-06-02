@@ -1,6 +1,7 @@
 import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore'
 import { useMutation } from '@tanstack/vue-query'
 import { computed } from 'vue'
+import { createSharedComposable } from '@vueuse/core'
 import { queryClient } from '@/libs/vueQuery'
 import { queryKeys } from '@/api/queryKeys'
 import type { TaskRule } from '@/api/tasks/types'
@@ -72,6 +73,16 @@ export function useSelectedRules(options: {
     queryClient.invalidateQueries({ queryKey: queryKeys.ruleSets.rules(currentRuleSetId) })
   }
 
+  function isRuleMutationLoading(rule: TaskRule) {
+    const removedRules = removeRulesMutation.variables.value?.rules ?? []
+    const addedRules = addRulesMutation.variables.value?.rules ?? []
+
+    const isRemoveLoading = removeRulesMutation.isPending.value && removedRules.includes(rule.id)
+    const isAddLoading = addRulesMutation.isPending.value && addedRules.includes(rule.id)
+
+    return isRemoveLoading || isAddLoading
+  }
+
   return {
     addRulesMutation,
     removeRulesMutation,
@@ -81,5 +92,6 @@ export function useSelectedRules(options: {
     handleToggle,
     isRuleSelected,
     invalidateCurrentRuleSet,
+    isRuleMutationLoading,
   }
 }

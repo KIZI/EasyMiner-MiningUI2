@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { type Ref, computed, reactive } from 'vue'
 
 export type PaginationInput = {
   page: number
@@ -12,13 +12,22 @@ export function getPaginationParams(pagination: PaginationInput) {
   }
 }
 
-export const PAGE_SIZES = [8, 16, 32, 64]
+export const PAGE_SIZES = [10, 20, 50, 100]
 
-export function usePagination() {
-  const state = reactive({
+export function createPaginationState() {
+  return {
     page: 1,
     pageSize: PAGE_SIZES[0],
-  })
+  }
+}
+
+export function usePagination(options: {
+  state?: {
+    page: number
+    pageSize: number
+  }
+} = {}) {
+  const state = reactive(options.state ?? createPaginationState())
 
   function setPage(value: number) {
     state.page = value
@@ -28,7 +37,7 @@ export function usePagination() {
     state.pageSize = value
   }
 
-  const bind = computed(() => ({
+  const bindings = computed(() => ({
     'onUpdate:page': setPage,
     'onUpdate:pageSize': setPageSize,
     'page': state.page,
@@ -36,8 +45,8 @@ export function usePagination() {
     'totalPages': 10,
   }))
 
-  return {
-    bind,
+  return reactive({
+    bindings,
     state,
-  }
+  })
 }

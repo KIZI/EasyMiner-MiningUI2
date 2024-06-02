@@ -2,7 +2,7 @@
   <input
     v-model="modelValue"
     type="checkbox"
-    class="rounded text-primary-600 focus:ring-primary-500"
+    class="cursor-pointer rounded text-primary-600 focus:ring-primary-500"
     :class="{
       'border-gray-300': !isChecked,
       'border-primary-600': isChecked,

@@ -17,16 +17,6 @@ export const appConfig = {
     attribute: 30,
     ruleSet: 50,
   },
-  externalUrls: {
-    base: '/easyminercenter/em',
-    logout: '/user/logout',
-    dashboard: '/user/details',
-    histogram: '/attributes/attribute-histogram/',
-    createAttribute: '/attributes/',
-    ruleSetScorer: '/rule-sets/scorer/',
-    rulesEditor: '/bre?miner=2974&ruleset=3381',
-    knowledgeExperiment: '/bre-tester/new-test?miner=2974&ruleset=3381',
-  },
   interestMeasures: {
     [InterestMeasures.Conf]: {
       name: InterestMeasures.Conf,

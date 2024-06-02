@@ -1,4 +1,4 @@
-import { reactive, readonly, ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 const isOpen = ref(false)
 

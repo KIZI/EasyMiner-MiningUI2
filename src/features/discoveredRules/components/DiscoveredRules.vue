@@ -1,6 +1,6 @@
 <template>
-  <SectionCard class="pb-5 pt-4 [&>*]:px-6">
-    <div class="flex items-start justify-between">
+  <SectionCard class="py-4 group-px-6">
+    <div class="flex min-h-16 items-start justify-between peer-px">
       <div>
         <div class="flex items-center gap-x-3">
           <SectionTitle>
@@ -27,7 +27,7 @@
             variant="ghost"
             class="gap-x-1.5 font-medium"
             icon-class="text-green-700"
-            :loading="addRulesMutation.isPending.value"
+            :loading="isAddAllLoading"
             @click="addAllToSelectedRules"
           >
             <template #icon>
@@ -37,16 +37,14 @@
           </VButton>
         </div>
 
-        <div>
-          <div class="text-lg text-primary-900">
-            {{ task?.name }}
-          </div>
+        <div class="mt-1 text-lg font-medium text-primary-900">
+          {{ task?.name }}
         </div>
       </div>
 
       <div class="-mr-2 flex items-center gap-x-2">
         <VButton
-          v-if="state && !isTaskStateRunning(state) && rules.length"
+          v-if="state && !isTaskStateRunning(state)"
           variant="ghost"
           size="xs"
           class="shrink-0 gap-x-1.5"
@@ -55,65 +53,53 @@
           <icon-ph-arrow-up class="size-5" />
           Load task to rule pattern
         </VButton>
-
-        <VButton
-          v-if="state && !isTaskStateRunning(state)"
-          variant="ghost"
-          size="xs"
-          class="shrink-0 gap-x-1.5"
-          @click="clearActiveTask"
-        >
-          <icon-ph-clock-counter-clockwise class="size-5" />
-          Tasks history
-        </VButton>
       </div>
     </div>
 
-    <template v-if="taskDetail && rules.length">
-      <RulesFilters class="mt-8" />
-      <div class="mt-3 divide-y divide-slate-100 border-y border-slate-200">
-        <DiscoveredTaskRule
-          v-for="(rule, i) in rules"
-          :key="rule.text"
-          v-model:selected="selection"
-          :rule="rule"
-          :task="taskDetail"
-          class="-mx-6 px-6"
-          :is-odd="i % 2 > 0"
-        />
-      </div>
-      <div class="mt-10">
-        <div class="grid grid-cols-[1fr_auto_1fr] items-center">
-          <RulesSelectionActions
-            v-model:selection="selection"
-            :rules="rules"
-          />
-          <div class="mx-auto">
-            <VPagination
-              :total-pages="10"
-              :current-page="1"
-            />
-          </div>
-          <div class="ml-auto">
-            <div class="flex items-center space-x-3">
-              <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
-                <icon-ph-arrow-square-out class="size-4 text-gray-700" />
-                Task detail
-              </button>
-              <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
-                <icon-ph-export class="size-4 text-gray-700" />
-                Export task
-              </button>
-            </div>
-          </div>
+    <RulesGrid
+      v-model:filters="filters"
+      :rules="rules"
+      :is-loading="isRulesLoading"
+      :is-refetching="isRulesFetching"
+    >
+      <template #empty>
+        <div class="flex gap-x-3">
+          <icon-ph-info class="size-6" />
+          No rules were discovered.
         </div>
-      </div>
-    </template>
+      </template>
+
+      <template #ruleActions="{ rule }">
+        <VIconButton
+          :title="selectedRules.isRuleSelected(rule) ? 'Remove from selected rules' : 'Add to selected rules'"
+          :loading="selectedRules.isRuleMutationLoading(rule)"
+          class="text-green-700 hover:bg-subtle-white"
+          @click="selectedRules.handleToggle(rule)"
+        >
+          <component
+            :is="selectedRules.isRuleSelected(rule) ? IconPhCheckCircleFill : IconPhCheckCircle"
+            class="size-5"
+          />
+        </VIconButton>
+      </template>
+
+      <template #actions>
+        <div class="flex items-center gap-x-5">
+          <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
+            <icon-ph-arrow-square-out class="size-4 text-gray-700" />
+            Task detail
+          </button>
+          <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
+            <icon-ph-export class="size-4 text-gray-700" />
+            Export task
+          </button>
+        </div>
+      </template>
+    </RulesGrid>
   </SectionCard>
 </template>
 
 <script setup lang="ts">
-import DiscoveredTaskRule from '@discoveredRules/components/DiscoveredTaskRule.vue'
 import { computed, ref } from 'vue'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
@@ -121,20 +107,26 @@ import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
 import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
 import SectionCard from '@/components/Layout/SectionCard.vue'
 import SectionTitle from '@/components/Layout/SectionTitle.vue'
-import RulesFilters from '@/components/Rules/RulesFilters.vue'
 import VButton from '@/components/VButton.vue'
-import { useTasksStore } from '@/stores/tasksStore'
-import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue'
-import VPagination from '@/components/VPagination.vue'
-import type { TaskRule } from '@/api/tasks/types'
 import { isTaskStateRunning } from '@/api/tasks/utils'
+import VIconButton from '@/components/VIconButton.vue'
+import IconPhCheckCircle from '~icons/ph/check-circle.vue'
+import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
+import RulesGrid from '@/components/Rules/RulesGrid.vue'
+import { createTaskRulesFilters } from '@/components/Task/taskRulesFilters'
 
+const filters = createTaskRulesFilters()
 const rulePatternStore = useRulePatternStore()
-const { rules, task, state } = useActiveTaskRulesQuery()
-const { task: taskDetail } = useActiveTaskDetailQuery()
-const { clearActiveTask } = useTasksStore()
 
-const selection = ref<TaskRule[]>([])
+const {
+  rules,
+  task,
+  state,
+  isLoading: isRulesLoading,
+  isFetching: isRulesFetching,
+} = useActiveTaskRulesQuery()
+
+const { task: taskDetail } = useActiveTaskDetailQuery()
 
 function loadTaskToRulePattern() {
   if (!taskDetail.value) return
@@ -142,12 +134,26 @@ function loadTaskToRulePattern() {
   document.getElementById('rulesMining')?.scrollIntoView({ behavior: 'smooth' })
 }
 
-const { isRuleSelected, addRulesMutation, handleAdd } = useSelectedRules()
+const selectedRules = useSelectedRules()
+
+const rulesNotInSelectedRules = computed(() => {
+  return rules.value.filter(rule => !selectedRules.isRuleSelected(rule))
+})
+
+const isAddAllLoading = computed(() => {
+  const { addRulesMutation } = selectedRules
+
+  const addedRulesLength = addRulesMutation.variables.value?.rules.length
+  const rulesNotInSelectedRulesLength = rulesNotInSelectedRules.value.length
+
+  return addedRulesLength === rulesNotInSelectedRulesLength
+})
 
 const isAnyUnselected = computed(() => {
-  return rules.value.some(rule => !isRuleSelected(rule))
+  return !!rulesNotInSelectedRules.value.length
 })
+
 function addAllToSelectedRules() {
-  handleAdd(rules.value.filter(rule => !isRuleSelected(rule)))
+  selectedRules.handleAdd(rulesNotInSelectedRules.value)
 }
 </script>

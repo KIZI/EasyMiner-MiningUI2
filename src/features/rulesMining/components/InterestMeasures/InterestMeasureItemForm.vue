@@ -99,7 +99,7 @@
             size="md"
             @click="handleClose"
           >
-            <icon-ph-x class="size-5 text-gray-700" />
+            <icon-ph-x class="size-5" />
           </VButton>
           <VButton
             v-if="item && !currentMeasure.isRequired"
@@ -110,7 +110,7 @@
             class="p-1"
             @click="handleRemove"
           >
-            <icon-ph-trash class="size-5 text-gray-700" />
+            <icon-ph-trash class="size-5" />
           </VButton>
         </div>
       </form>

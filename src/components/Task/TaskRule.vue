@@ -1,16 +1,21 @@
 <template>
-  <div class="flex items-start pb-3.5 pt-2.5">
-    <div class="relative space-y-0.5 pl-7">
-      <label class="text-sm font-medium leading-relaxed tracking-wide">
+  <div
+    class="flex cursor-pointer items-start border-l-4 pb-3.5 pt-2.5 peer-px hover:bg-primary-100" :class="{
+      'border-l-transparent': !isSelected,
+      'border-l-primary-500': isSelected,
+      'bg-slate-50': isOdd,
+    }"
+    @click="selectionModel.toggleItem(rule)"
+  >
+    <div class="relative pl-7">
+      <label class="pointer-events-none inline-block pb-0.5 text-sm font-medium leading-relaxed tracking-wide">
         <VCheckbox
-          v-model="selected"
+          v-model="selection"
           :value="rule"
-          class="absolute left-0 mt-1.5 size-4"
+          class="absolute left-0 mt-1 size-4"
         />
-
-        <span class="cursor-pointer">{{ rule.text }}</span>
+        <span>{{ rule.text }}</span>
       </label>
-
       <div class="space-x-4 text-xs leading-none">
         <span v-for="[measureKey, measureName] in presentMeasures" :key="measureKey">
           {{ $t(`interestMeasures.${measureName}.name`) }}:
@@ -20,11 +25,9 @@
         </span>
       </div>
     </div>
-
     <div class="ml-auto mt-0.5 flex shrink-0 items-center space-x-1">
       <TaskRuleDetailsPopover :rule="rule" />
-
-      <slot name="actions" />
+      <slot name="actions" :rule="rule" />
     </div>
   </div>
 </template>
@@ -32,14 +35,21 @@
 <script setup lang="ts">
 import { type InterestMeasure, InterestMeasures } from '@rulesMining/types/interestMeasure.types'
 import { computed } from 'vue'
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import type { TaskRule, TaskWithSettings } from '@/api/tasks/types'
 import VCheckbox from '@/components/Form/VCheckbox.vue'
 import { formatDecimal } from '@/utils/format'
 import TaskRuleDetailsPopover from '@/components/Task/TaskRuleDetailsPopover.vue'
+import VIconButton from '@/components/VIconButton.vue'
+
+import IconPhCheckCircle from '~icons/ph/check-circle.vue'
+import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
+import { useSelectionModel } from '@/composables/useSelectionModel'
 
 const props = defineProps<{
   rule: TaskRule
   task?: TaskWithSettings
+  isOdd?: boolean
 }>()
 
 const interestMeasuresKeysMap = {
@@ -57,5 +67,20 @@ const presentMeasures = computed(() => {
   })
 })
 
-const selected = defineModel<TaskRule[]>('selected')
+const selection = defineModel<TaskRule[]>('selected')
+
+const isSelected = computed(() => {
+  return selection.value?.includes(props.rule)
+})
+
+const selectionModel = useSelectionModel({ modelValue: selection })
+
+const {
+  handleRemove,
+  handleToggle: handleToggleSelectedRules,
+  removeRulesMutation,
+  isRuleSelected,
+  isToggleLoading,
+} = useSelectedRules()
+const isInSelectedRules = computed(() => isRuleSelected(props.rule))
 </script>

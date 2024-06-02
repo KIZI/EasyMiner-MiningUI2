@@ -1,219 +1,130 @@
 <template>
-  <SectionCard class="relative min-h-[350px] pb-5 pt-4 [&>*]:px-6">
-    <div class="flex items-center justify-between">
-      <SectionTitle>Selected rules</SectionTitle>
+  <SectionCard class="relative min-h-[350px] py-4 group-px-6">
+    <div class="min-h-16 peer-px">
+      <div class="flex items-center justify-between">
+        <SectionTitle>Selected rules</SectionTitle>
 
-      <div class="-mr-2 flex items-center gap-x-1">
-        <VButton
-          variant="ghost"
-          size="xs"
-          class="shrink-0 gap-x-1.5"
-          @click="ruleSetScorerModal.open"
-        >
-          <icon-ph-lightning class="size-5" />
-          Test model
-        </VButton>
-
-        <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline" @click="openRulesEditor">
-          <icon-ph-note-pencil-light class="size-5" />
-          Rules editor
-        </button>
-        <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline" @click="openKnowledgeExperiment">
-          <icon-ph-lightbulb class="size-5" />
-          Knowledge experiment
-        </button>
-      </div>
-    </div>
-
-    <div class="flex items-center">
-      <div class="mr-4 break-all text-lg font-medium text-primary-900">
-        <Truncate
-          :length="appConfig.truncateLength.ruleSet"
-          :text="ruleSet?.name"
-        />
-      </div>
-
-      <Popover>
-        <PopoverButton
-          :as="VButton"
-          variant="ghost"
-          class="p-1.5"
-        >
-          <icon-ph-note-pencil-light class="size-5" />
-        </PopoverButton>
-        <EditRuleSetPopoverForm :rule-set="ruleSet" />
-      </Popover>
-      <Popover>
-        <PopoverButton
-          :as="VButton"
-          variant="ghost"
-          class="gap-x-2 p-1.5 text-sm"
-        >
-          <icon-ph-plus-square-light class="size-5" />
-        </PopoverButton>
-        <EditRuleSetPopoverForm />
-      </Popover>
-
-      <ChangeRuleSetListbox />
-    </div>
-
-    <div
-      v-if="!hasRules"
-      class="grid h-full place-items-center text-gray-600"
-    >
-      <div class="flex gap-x-3">
-        <icon-ph-info class="size-6" />
-        Add interesting discovered rules
-      </div>
-    </div>
-
-    <div v-if="hasRules">
-      <div class="mt-7 flex items-center gap-x-6">
-        <div class="flex items-center gap-x-2">
-          <span class="text-xs">Order by:</span>
-          <select
-            v-model="order"
-            class="rounded border-gray-300 bg-[right_0.2rem_center] px-2 py-0.5 pr-7 text-xs font-medium leading-normal shadow-sm focus:border-blue-200 focus:ring-blue-200"
-          >
-            <option
-              v-for="size in orderOptions"
-              :key="size.value"
-              :value="size.value"
-            >
-              {{ size.label }}
-            </option>
-          </select>
-        </div>
-
-        <div class="flex h-7 grow items-center">
+        <div class="-mr-2 flex items-center gap-x-1">
           <VButton
             variant="ghost"
-            size="sm"
-            class="mr-2 shrink-0 gap-x-2 text-xs"
-            @click="showSearch = !showSearch"
+            size="xs"
+            class="shrink-0 gap-x-1.5"
+            @click="ruleSetScorerModal.open"
           >
-            <template #icon>
-              <icon-ph-magnifying-glass class="size-4 text-slate-700" />
-            </template>
-            <template v-if="!showSearch">
-              Search rules
-            </template>
+            <icon-ph-lightning class="size-5" />
+            Test model
           </VButton>
-
-          <template v-if="showSearch">
-            <div class="relative flex w-full items-center">
-              <VInput
-                class="h-7 pl-2 pr-6 text-xs"
-                placeholder="Antecedent"
-              />
-              <button class="absolute right-2">
-                <icon-ph-x class="size-3.5 text-slate-700" />
-              </button>
-            </div>
-            <div class="mx-2.5 text-lg">
-              →
-            </div>
-            <div class="relative flex w-full items-center">
-              <VInput
-                class="h-7 pl-2 pr-6 text-xs"
-                placeholder="Consequent"
-              />
-              <button class="absolute right-2">
-                <icon-ph-x class="size-3.5 text-slate-700" />
-              </button>
-            </div>
-          </template>
+          <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline" @click="openRulesEditor">
+            <icon-ph-note-pencil-light class="size-5" />
+            Rules editor
+          </button>
+          <button class="inline-flex items-center gap-x-2 px-2 text-xs hover:underline" @click="openKnowledgeExperiment">
+            <icon-ph-lightbulb class="size-5" />
+            Knowledge experiment
+          </button>
         </div>
       </div>
 
-      <div class="mt-3 min-h-40">
-        <BlockSpinner v-if="ruleSetsRulesQuery.isLoading.value" />
-        <RuleSetRules
-          v-else
-          v-model:selection="selection"
-          :rules="rules"
-        />
-      </div>
-      <div class="mt-10">
-        <div class="grid grid-cols-[1fr_auto_1fr] items-center">
-          <RulesSelectionActions
-            v-model:selection="selection"
-            :rules="rules"
+      <div v-if="ruleSet" class="flex items-center">
+        <div class="mr-4 break-all text-lg font-medium text-primary-900">
+          <Truncate
+            :length="appConfig.truncateLength.ruleSet"
+            :text="ruleSet.name"
           />
-          <div class="mx-auto">
-            <VPagination
-              :total-pages="10"
-              :current-page="1"
-            />
-          </div>
-          <div class="ml-auto">
-            <div class="flex items-center space-x-3">
-              <button class="inline-flex items-center gap-x-2 text-xs hover:underline" @click="exportRuleSet">
-                <icon-ph-export class="size-4 text-gray-700" />
-                Export ruleset
-              </button>
-            </div>
-          </div>
         </div>
+        <Popover>
+          <PopoverButton
+            :as="VButton"
+            variant="ghost"
+            class="p-1.5"
+          >
+            <icon-ph-note-pencil-light class="size-5" />
+          </PopoverButton>
+          <EditRuleSetPopoverForm :rule-set="ruleSet" />
+        </Popover>
+        <Popover>
+          <PopoverButton
+            :as="VButton"
+            variant="ghost"
+            class="gap-x-2 p-1.5 text-sm"
+          >
+            <icon-ph-plus-square-light class="size-5" />
+          </PopoverButton>
+          <EditRuleSetPopoverForm />
+        </Popover>
+        <ChangeRuleSetListbox />
       </div>
     </div>
-  </SectionCard>
 
-  <RuleSetScorerModal />
+    <RulesGrid
+      v-model:filters="filters"
+      :rules="rules"
+      :is-loading="isPending || isLoading"
+      :is-refetching="isRefetching"
+    >
+      <template #empty>
+        <div class="flex gap-x-3">
+          <icon-ph-info class="size-6" />
+          Add interesting discovered rules
+        </div>
+      </template>
+
+      <template #ruleActions="{ rule }">
+        <VIconButton
+          title="Remove from selected rules"
+          class="text-red-700 hover:bg-subtle-white"
+          :loading="isRuleMutationLoading(rule)"
+          @click="handleRemove(rule)"
+        >
+          <icon-ph-x-circle class="size-5" />
+        </VIconButton>
+      </template>
+
+      <template #actions>
+        <div class="flex items-center gap-x-5">
+          <button class="inline-flex items-center gap-x-2 text-xs hover:underline" @click="exportRuleSet">
+            <icon-ph-export class="size-4 text-gray-700" />
+            Export ruleset
+          </button>
+        </div>
+      </template>
+    </RulesGrid>
+
+    <RuleSetScorerModal />
+  </SectionCard>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-
 import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore'
 import EditRuleSetPopoverForm from '@selectedRules/components/EditRuleSetPopoverForm.vue'
 import ChangeRuleSetListbox from '@selectedRules/components/ChangeRuleSetListbox.vue'
-import RuleSetRules from '@selectedRules/components/RuleSetRules.vue'
 import { useRuleSetScorerModal } from '@selectedRules/components/useRuleSetScorerModal'
 import RuleSetScorerModal from '@selectedRules/components/RuleSetScorerModal.vue'
-import type { TaskRule } from '@/api/tasks/types'
+import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
 import SectionCard from '@/components/Layout/SectionCard.vue'
 import SectionTitle from '@/components/Layout/SectionTitle.vue'
-import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue'
 import { Popover, PopoverButton } from '@/components/Popover'
 import VButton from '@/components/VButton.vue'
-import VPagination from '@/components/VPagination.vue'
-import VInput from '@/components/Form/VInput.vue'
 import Truncate from '@/components/Truncate.vue'
 import { appConfig } from '@/config/appConfig'
-import BlockSpinner from '@/components/BlockSpinner.vue'
 import { externalUrls } from '@/utils/externalUrls'
+import RulesGrid from '@/components/Rules/RulesGrid.vue'
+import VIconButton from '@/components/VIconButton.vue'
+import { createTaskRulesFilters } from '@/components/Task/taskRulesFilters'
 
 const { currentRuleSetId } = useSelectedRulesStoreRefs()
 const ruleSetScorerModal = useRuleSetScorerModal()
 const ruleSetsRulesQuery = useRuleSetRulesQuery(currentRuleSetId)
-const { rules, ruleSet } = ruleSetsRulesQuery
+const { rules, ruleSet, isPending, isLoading, isRefetching } = ruleSetsRulesQuery
 
-const hasRules = computed(() => Boolean(ruleSet.value?.rulesCount))
-const selection = ref<TaskRule[]>([])
+const filters = createTaskRulesFilters()
 
-const showSearch = ref(false)
-const order = ref('found')
-const orderOptions = [
-  {
-    label: 'Found order',
-    value: 'found',
-  },
-  {
-    label: 'Confidence',
-    value: 'confidence',
-  },
-  {
-    label: 'Support',
-    value: 'support',
-  },
-  {
-    label: 'Custom order',
-    value: 'custom',
-  },
-]
+const {
+  handleRemove,
+  isRuleMutationLoading,
+} = useSelectedRules()
 
 function openRulesEditor() {
   if (!currentRuleSetId.value) return

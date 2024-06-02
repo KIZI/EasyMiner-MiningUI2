@@ -64,6 +64,13 @@ const draggedAttributes = computed(() => {
 
 const draggedItemRef = ref<HTMLElement>()
 
+const originalPosition = ref({ x: 0, y: 0 })
+const delta = computed(() => {
+  const x = props.draggable.dragPosition.value.x - originalPosition.value.x
+  const y = props.draggable.dragPosition.value.y - originalPosition.value.y
+  return { x, y }
+})
+
 watch(() => props.draggable, async (draggable) => {
   await nextTick()
   if (!draggable || !draggedItemRef.value || !attributeList.dragSource) return

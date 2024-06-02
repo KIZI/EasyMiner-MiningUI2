@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-x-0.5">
+  <div class="flex">
     <VIconButton
       title="Select all"
       @click="$emit('selectAll')"

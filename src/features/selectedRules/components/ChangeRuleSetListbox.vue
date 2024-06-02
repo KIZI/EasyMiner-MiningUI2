@@ -14,7 +14,6 @@
         class="relative z-50 gap-x-2 p-1.5 text-sm"
       >
         <icon-heroicons-chevron-up-down-20-solid class="size-5 text-gray-700" />
-        <!-- Change ruleset -->
       </VButton>
     </ListboxButton>
 
@@ -22,16 +21,6 @@
       class="absolute -left-0.5 -top-1.5 z-40 w-max rounded border border-black/10 bg-white p-1 shadow-lg"
     >
       <div class="flex h-10 items-center pl-8 pr-2">
-        <!-- <div class="relative flex items-center">
-          <VInput
-            ref="searchInputRef"
-            v-model="searchQuery"
-            class="pr-6"
-            @keydown.space.stop
-          />
-          <icon-ph-magnifying-glass class="absolute right-2 h-4 w-4 text-slate-700" />
-        </div> -->
-
         <div class="relative flex items-center">
           <icon-ph-magnifying-glass class="absolute left-2 size-3.5 text-slate-700" />
           <VInput

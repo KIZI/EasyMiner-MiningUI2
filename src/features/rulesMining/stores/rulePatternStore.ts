@@ -54,6 +54,12 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     )
   }
 
+  function setItemCedent(id: number, cedent: Cedent) {
+    const item = itemsMap.value.get(id)
+    if (!item) return
+    item.cedent = cedent
+  }
+
   function setItemOptions({ id, fixedValue }: { id: number, fixedValue: string }) {
     const item = itemsMap.value.get(id)
     if (!item) return
@@ -153,5 +159,6 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     clearItems,
     loadTaskRule,
     setItemOptions,
+    setItemCedent,
   }
 })

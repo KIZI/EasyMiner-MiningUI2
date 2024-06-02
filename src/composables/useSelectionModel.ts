@@ -2,7 +2,7 @@ import type { MaybeRef, Ref } from 'vue'
 import { computed, ref, toValue } from 'vue'
 
 type UseSelectionOptions<T> = {
-  items: MaybeRef<T[]>
+  items?: MaybeRef<T[]>
   modelValue?: Ref<T[]>
 }
 
@@ -18,7 +18,12 @@ export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
     return Boolean(modelValue.value.length)
   })
 
+  const selected = computed(() => {
+    return modelValue.value
+  })
+
   function selectAll() {
+    if (!items.value) return
     modelValue.value = items.value
   }
 
@@ -27,6 +32,7 @@ export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
   }
 
   function invertSelection() {
+    if (!items.value) return
     modelValue.value = items.value.filter(item => !modelValue.value.includes(item))
   }
 
@@ -51,6 +57,7 @@ export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
     invertSelection,
     isItemSelected,
     toggleItem,
+    selected,
     hasItems,
   }
 }

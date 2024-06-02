@@ -33,7 +33,7 @@ export default defineConfig({
         families: [
           {
             name: 'Open Sans',
-            styles: 'wght@0,300..800;1,300..800',
+            styles: 'ital,wght@0,300..800;1,300..800',
           },
         ],
       },

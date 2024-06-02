@@ -3,7 +3,7 @@
     <SelectionButtons v-on="{ selectAll, invertSelection, clearSelection }" />
 
     <div
-      v-if="bulkSelection.length"
+      v-if="bulkSelection.hasItems"
       class="flex gap-x-0.5"
     >
       <VButton
@@ -42,19 +42,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { computed, toRefs } from 'vue'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import type { TaskRule } from '@/api/tasks/types'
 import SelectionButtons from '@/components/Selection/SelectionButtons.vue'
 import VButton from '@/components/VButton.vue'
+import { useSelectionModel } from '@/composables/useSelectionModel'
 
 const props = defineProps<{
   rules: TaskRule[]
 }>()
-const rules = computed(() => {
-  return cloneDeep(props.rules)
-})
+
+const { rules } = toRefs(props)
+
+const selection = defineModel<TaskRule[]>('selection', { default: [] })
+
+const bulkSelection = useSelectionModel({ items: rules, modelValue: selection })
+const { selectAll, invertSelection, clearSelection } = bulkSelection
 
 const selectedRules = useSelectedRules({
   onMutationSuccess: () => {
@@ -63,24 +67,13 @@ const selectedRules = useSelectedRules({
 })
 const { isRuleSelected } = selectedRules
 
-const bulkSelection = defineModel<TaskRule[]>('selection', { required: true })
-const isAnyInSelectedRules = computed(() => bulkSelection.value.some(rule => isRuleSelected(rule)))
-const isAnyNotInSelectedRules = computed(() => bulkSelection.value.some(rule => !isRuleSelected(rule)))
-
-function selectAll() {
-  bulkSelection.value = rules.value
-}
-function invertSelection() {
-  bulkSelection.value = rules.value.filter(rule => !bulkSelection.value.includes(rule))
-}
-function clearSelection() {
-  bulkSelection.value = []
-}
+const isAnyInSelectedRules = computed(() => bulkSelection.selected.value.some(rule => isRuleSelected(rule)))
+const isAnyNotInSelectedRules = computed(() => bulkSelection.selected.value.some(rule => !isRuleSelected(rule)))
 
 function handleAdd() {
-  selectedRules.handleAdd(bulkSelection.value)
+  selectedRules.handleAdd(bulkSelection.selected.value)
 }
 function handleRemove() {
-  selectedRules.handleRemove(bulkSelection.value)
+  selectedRules.handleRemove(bulkSelection.selected.value)
 }
 </script>
