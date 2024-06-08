@@ -52,6 +52,10 @@ class Integration {
       'src' => self::parseAbsolutePath($indexJsAbsolutePath),
       'type' => 'module',
     ];
-    self::$cssFiles[] = self::parseAbsolutePath($indexCssAbsolutePath);
+    self::$cssFiles[] = [
+      'href' => self::parseAbsolutePath($indexCssAbsolutePath),
+      'type' => 'text/css'
+    ];
+  }
   }
 }
