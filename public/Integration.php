@@ -57,5 +57,4 @@ class Integration {
       'type' => 'text/css'
     ];
   }
-  }
 }
