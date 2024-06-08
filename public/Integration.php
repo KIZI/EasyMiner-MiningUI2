@@ -54,7 +54,8 @@ class Integration {
     ];
     self::$cssFiles[] = [
       'href' => self::parseAbsolutePath($indexCssAbsolutePath),
-      'type' => 'text/css'
+      'type' => 'text/css',
+      'rel' => 'stylesheet'
     ];
   }
 }
