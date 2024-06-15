@@ -15,7 +15,7 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
   const interestMeasuresStore = useInterestMeasuresStore()
 
   const itemsMap = ref<Map<MetasourceAttribute['id'], CedentItem>>(new Map())
-  const editedMeasure = ref<CedentItem | null>()
+  const editedItem = ref<CedentItem | null>()
 
   const items = computed(() => Array.from(itemsMap.value.values()))
 
@@ -70,7 +70,7 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     return itemsMap.value.has(id)
   }
 
-  function removeMeasureById(id: number) {
+  function removeItemById(id: number) {
     itemsMap.value.delete(id)
   }
 
@@ -82,24 +82,11 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
   }
 
   function openItemOptions(id: number) {
-    editedMeasure.value = itemsMap.value.get(id)
+    editedItem.value = itemsMap.value.get(id)
   }
 
   function closeItemOptions() {
-    editedMeasure.value = null
-  }
-
-  function setMeasureOptions(id: number, {
-    fixedValue,
-    isNegated = false,
-  }: {
-    fixedValue?: string
-    isNegated?: boolean
-  } = {}) {
-    const item = itemsMap.value.get(id)
-    if (!item) return
-    item.fixedValue = fixedValue
-    item.isNegated = isNegated
+    editedItem.value = null
   }
 
   function clearItems(cedent: Cedent) {
@@ -148,17 +135,25 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     antecedent,
     closeItemOptions,
     consequent,
-    editedMeasure,
+    editedItem,
     getCedentItems,
     hasItem,
     itemsMap,
     openItemOptions,
-    removeMeasureById,
+    removeItemById,
     rulePatternInput,
-    setMeasureOptions,
     clearItems,
     loadTaskRule,
     setItemOptions,
     setItemCedent,
   }
 })
+
+setTimeout(() => {
+  const store = useRulePatternStore()
+  const imStore = useInterestMeasuresStore()
+  store.addItemById(29421, 'Antecedent')
+  store.addItemById(29417, 'Consequent')
+  imStore.setMeasure('CONF', 0.05)
+  imStore.setMeasure('SUPP', 0.06)
+}, 1000)

@@ -19,6 +19,7 @@ export type MinerTaskResponse = {
     tasksCount: number
   }
   task: MinerTask[]
+  tasksCount: number
 }
 
 export type MinerTask = {

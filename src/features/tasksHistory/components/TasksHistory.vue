@@ -1,30 +1,64 @@
 <template>
   <SectionCard class="py-4">
-    <SectionTitle class="px-6">
-      Tasks history
-    </SectionTitle>
+    <div class="flex items-center justify-between px-6">
+      <SectionTitle class="">
+        Tasks history
+      </SectionTitle>
 
-    <div class="relative mt-3 min-h-40 grow overflow-y-auto border-y border-slate-200">
+      <div class="flex gap-x-4">
+        <label
+          v-for="option in stateOptions"
+          :key="option.value"
+          class="flex cursor-pointer select-none items-center gap-x-3 rounded-md bg-slate-100 px-2 py-1.5 text-sm font-medium has-[:checked]:bg-primary-100"
+        >
+          <VCheckbox
+            v-model="stateFilter"
+            class="size-5"
+            :value="option.value"
+          />
+          {{ option.label }}
+        </label>
+      </div>
+    </div>
+
+    <div class="relative mt-3 flex min-h-0 grow flex-col border-y border-slate-200">
       <BlockSpinner
-        v-if="isPending || isLoading"
-        :darken="isRefetching"
+        v-if="false || isLoading || isRefetching"
+        :darken="false || isRefetching"
       />
-      <div class="divide-y divide-slate-100">
-        <TasksHistoryItem
-          v-for="(task, i) in tasks"
-          :key="task.id"
-          :task="task"
-          :is-even="Boolean(i % 2)"
-        />
+      <div ref="listRef" class="h-full min-h-0 overflow-y-auto">
+        <div class="relative divide-y divide-slate-100">
+          <DynamicScroller
+            :items="tasks"
+            :min-item-size="70"
+          >
+            <template #default="{ item, index, active }">
+              <DynamicScrollerItem
+                :item="item"
+                :active="active"
+                :size-dependencies="[
+                  item.name,
+                ]"
+                :data-index="index"
+                class="min-h-[70px]"
+              >
+                <TasksHistoryItem
+                  :task="item"
+                  :is-even="Boolean(index % 2)"
+                  :showState="true"
+                />
+              </DynamicScrollerItem>
+            </template>
+          </DynamicScroller>
+        </div>
       </div>
     </div>
 
     <div class="grid min-h-12 grid-cols-[1fr_auto_1fr] items-center px-6 pt-4">
       <div />
-
       <VPagination
         v-if="tasks.length > 0"
-        v-bind="pagination.bindings"
+        v-bind="pagination.bindings.value"
         class="mx-auto"
       />
     </div>
@@ -32,6 +66,10 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
+import { useEventListener } from '@vueuse/core'
+import { debounce, throttle } from 'lodash-es'
 import { useMinerTasksQuery } from '@/api/miners/useMinerTasksQuery'
 import { usePagination } from '@/api/pagination'
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -39,9 +77,28 @@ import SectionTitle from '@/components/Layout/SectionTitle.vue'
 import VPagination from '@/components/VPagination.vue'
 import BlockSpinner from '@/components/BlockSpinner.vue'
 import TasksHistoryItem from '@/features/tasksHistory/components/TasksHistoryItem.vue'
+import type { TaskState } from '@/api/tasks/types'
+import { VCheckbox } from '@/components/Form'
+
+const stateOptions = [
+  { value: 'solved', label: 'Solved' },
+  { value: 'failed', label: 'Failed' },
+  { value: 'interrupted', label: 'Interrupted' },
+] as const
+
+const stateFilter = ref<TaskState[]>(['solved'])
+
+const listRef = ref<HTMLElement>()
 
 const pagination = usePagination()
-const tasksQuery = useMinerTasksQuery({ pagination: pagination.state })
-const { isPending, isLoading, isRefetching } = tasksQuery
+pagination.onPageChange(() => {
+  if (!listRef.value) return
+  listRef.value.scrollTop = 0
+})
+
+const tasksQuery = useMinerTasksQuery({ pagination: pagination.state, state: stateFilter })
+pagination.setTotalGetter(() => tasksQuery.data.value?.tasksCount ?? 0)
+
+const { isLoading, isRefetching } = tasksQuery
 const { tasks } = tasksQuery
 </script>

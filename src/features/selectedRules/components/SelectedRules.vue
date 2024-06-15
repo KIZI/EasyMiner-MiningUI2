@@ -1,7 +1,7 @@
 <template>
   <SectionCard class="relative min-h-[350px] py-4 group-px-6">
     <div class="min-h-16 peer-px">
-      <div class="flex items-center justify-between">
+      <div class="flex min-h-8 items-center justify-between">
         <SectionTitle>Selected rules</SectionTitle>
 
         <div class="-mr-2 flex items-center gap-x-1">
@@ -61,6 +61,7 @@
       :rules="rules"
       :is-loading="isPending || isLoading"
       :is-refetching="isRefetching"
+      animate
     >
       <template #empty>
         <div class="flex gap-x-3">

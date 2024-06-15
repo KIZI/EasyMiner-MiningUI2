@@ -133,6 +133,6 @@ const handleSubmit = form.handleSubmit((values) => {
 
 function handleRemove() {
   isOpen.value = false
-  rulePatternStore.removeMeasureById(props.item.id)
+  rulePatternStore.removeItemById(props.item.id)
 }
 </script>

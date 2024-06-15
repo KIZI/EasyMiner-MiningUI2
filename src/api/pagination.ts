@@ -1,4 +1,5 @@
-import { type Ref, computed, reactive } from 'vue'
+import { createEventHook } from '@vueuse/core'
+import { type ComputedRef, type Ref, computed, reactive, ref } from 'vue'
 
 export type PaginationInput = {
   page: number
@@ -29,12 +30,31 @@ export function usePagination(options: {
 } = {}) {
   const state = reactive(options.state ?? createPaginationState())
 
+  let totalGetter = () => 0
+
+  const total = computed(() => totalGetter())
+
+  const totalPages = computed(() => {
+    if (!total.value) return 1
+    return Math.ceil(total.value / state.pageSize)
+  })
+
+  const pageChangeHook = createEventHook()
+
   function setPage(value: number) {
     state.page = value
+    pageChangeHook.trigger()
+  }
+
+  function setTotalGetter(getter: () => number) {
+    totalGetter = getter
   }
 
   function setPageSize(value: number) {
     state.pageSize = value
+    if (state.page > totalPages.value) {
+      setPage(totalPages.value)
+    }
   }
 
   const bindings = computed(() => ({
@@ -42,11 +62,13 @@ export function usePagination(options: {
     'onUpdate:pageSize': setPageSize,
     'page': state.page,
     'pageSize': state.pageSize,
-    'totalPages': 10,
+    'totalPages': totalPages.value,
   }))
 
-  return reactive({
+  return {
     bindings,
     state,
-  })
+    setTotalGetter,
+    onPageChange: pageChangeHook.on,
+  }
 }

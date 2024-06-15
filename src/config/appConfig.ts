@@ -6,7 +6,6 @@ type AppConfig = {
   minerId: number
   interestMeasures: Record<InterestMeasure, InterestMeasureConfig>
   truncateLength: Record<string, number>
-  externalUrls: Record<string, string>
   [key: string]: any
 }
 

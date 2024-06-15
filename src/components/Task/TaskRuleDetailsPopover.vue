@@ -3,7 +3,7 @@
     as-tooltip
     class="inline-flex items-center"
   >
-    <PopoverButton :as="VIconButton">
+    <PopoverButton :as="VIconButton" class="hover:bg-subtle-white">
       <icon-ph-info class="size-5 text-gray-700" />
     </PopoverButton>
 

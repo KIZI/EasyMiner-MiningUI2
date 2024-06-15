@@ -1,8 +1,8 @@
 import { onClickOutside } from '@vueuse/core'
-import type { Ref } from 'vue'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import type { MaybeRef, Ref } from 'vue'
+import { onMounted, onUnmounted, ref, toValue, watch } from 'vue'
 
-export function useDialog(open: Ref<boolean>) {
+export function useDialog(open: Ref<boolean>, dismissible: MaybeRef<boolean> = true) {
   const isClosing = ref(false)
   const dialogRef = ref<HTMLDialogElement>()
   const dialogPanelRef = ref<HTMLDialogElement>()
@@ -10,7 +10,7 @@ export function useDialog(open: Ref<boolean>) {
   watch(() => open.value, updateModal)
 
   onClickOutside(dialogPanelRef, () => {
-    if (!open.value) return
+    if (!toValue(dismissible) || !open.value) return
     open.value = false
   })
 
@@ -23,7 +23,6 @@ export function useDialog(open: Ref<boolean>) {
     removeOverflowHidden()
     removeAnimationEndEventListener()
     dialogRef.value?.removeEventListener('cancel', onCancel)
-    console.log('onUnmounted')
   })
 
   function updateModal(value = open.value, oldValue = false) {
@@ -66,6 +65,7 @@ export function useDialog(open: Ref<boolean>) {
 
   function onCancel(e: Event) {
     e.preventDefault()
+    if (!toValue(dismissible)) return
     closeModal()
   }
 

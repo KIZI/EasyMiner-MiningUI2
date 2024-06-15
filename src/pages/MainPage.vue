@@ -1,15 +1,13 @@
 <template>
   <VContainer class="pb-20">
-    <div class="grid grid-cols-[auto_20rem] grid-rows-[600px_600px] gap-2">
+    <div class="grid grid-cols-[auto_20rem] grid-rows-[600px_700px] gap-2">
       <RulesMining />
       <MetasourceAttributes />
 
       <div class="relative flex flex-col gap-x-20 gap-y-2 overflow-hidden">
-        <SectionTransitionGroup>
-          <DiscoveredRules v-if="activeBottomSection === 'discoveredRules'" />
-          <TasksHistory v-if="activeBottomSection === 'tasksHistory'" />
-          <SelectedRules v-if="activeBottomSection === 'selectedRules'" />
-        </SectionTransitionGroup>
+        <DiscoveredRules :class="layout.activeSection === 'discoveredRules' ? 'block' : 'hidden'" />
+        <TasksHistory :class="layout.activeSection === 'tasksHistory' ? 'block' : 'hidden'" />
+        <SelectedRules :class="layout.activeSection === 'selectedRules' ? 'block' : 'hidden'" />
       </div>
 
       <SideNav />
@@ -28,13 +26,10 @@ import { useRouter } from 'vue-router'
 import VContainer from '@/components/Layout/VContainer.vue'
 import { useActiveMetasourceQuery } from '@/api/metasources/useActiveMetasourceQuery'
 import SideNav from '@/components/Layout/SideNav.vue'
-import { activeBottomSection, useInitLayout } from '@/components/Layout'
-import SectionTransitionGroup from '@/components/Transitions/SectionTransitionGroup.vue'
+import { layout } from '@/components/Layout'
 
 const router = useRouter()
 const activeMetasourceQuery = useActiveMetasourceQuery()
-
-useInitLayout()
 
 watchEffect(() => {
   const noAttributes = activeMetasourceQuery.isSuccess.value && !activeMetasourceQuery.attributes.value.length

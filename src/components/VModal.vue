@@ -20,7 +20,8 @@
         </div>
 
         <button
-          class="rounded-md bg-white text-gray-900 hover:text-gray-600"
+          :disabled="!dismissible"
+          class="rounded-md bg-white text-gray-900 hover:text-gray-600 disabled:opacity-10"
           @click="closeModal"
         >
           <icon-ph-x :width="25" />
@@ -34,15 +35,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, toRefs } from 'vue'
 import { useDefaultTwClass } from '@/composables/useDefaultTwClass'
 import { useDialog } from '@/composables/useDialog'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean
   keepAlive?: boolean
-}>()
+  dismissible?: boolean
+}>(), {
+  dismissible: true,
+})
 const emit = defineEmits(['close'])
+
+const { dismissible } = toRefs(props)
 
 const open = computed({
   get: () => props.open,
@@ -56,7 +62,7 @@ const {
   dialogPanelRef,
   dialogRef,
   isClosing,
-} = useDialog(open)
+} = useDialog(open, dismissible)
 
 const showContent = computed(() => {
   return (open.value || isClosing.value)

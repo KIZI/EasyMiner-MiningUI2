@@ -39,7 +39,7 @@
       </div>
 
       <div
-        v-auto-animate="{ ...disableAnimation ? { duration: 0 } : {} }"
+        v-auto-animate="{ ...isAnimationDisabled ? { duration: 0 } : {} }"
         class="divide-y divide-gray-50"
       >
         <slot name="beforeItems" />
@@ -78,7 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import { type HTMLAttributes, h, ref } from 'vue'
+import { type HTMLAttributes, h, nextTick, ref, watch } from 'vue'
+import { computed } from 'vue'
 import AttributesListItem from '@/components/Attributes/AttributesListItem.vue'
 import HLDraggableAttribute from '@/components/Attributes/HLDraggableAttribute.vue'
 import VSpinner from '@/components/VSpinner.vue'
@@ -96,6 +97,11 @@ const props = withDefaults(defineProps<{
   showIcon: false,
 })
 
+const attributesLoaded = ref(false)
+const isAnimationDisabled = computed(() => {
+  return props.disableAnimation || !attributesLoaded.value
+})
+
 const NoItemsMessage = h('i', 'No attributes found')
 
 const {
@@ -106,6 +112,12 @@ const {
   clearSearchQuery,
   dragSource,
 } = useInjectAttributesList()!
+
+watch(attributes, async () => {
+  if (attributes.value.length) {
+    attributesLoaded.value = true
+  }
+}, { immediate: true })
 
 const activeDraggable = ref<Draggable>()
 

@@ -4,7 +4,7 @@
       <SectionTitle class="text-xl font-medium text-gray-900">
         Attributes
       </SectionTitle>
-      <div class="flex items-center gap-x-3">
+      <div class="flex items-center gap-x-1">
         <AttributesListActions />
       </div>
     </div>
@@ -70,8 +70,8 @@
         <AddToPatternPopover
           v-if="unusedAttributes.length > 0"
           #="{events, isOpen}"
-          content-class="px-3 py-3"
-          panel-class="top-9 -left-2"
+          content-class="px-3 py-3 pb-12"
+          panel-class="-bottom-2 -left-3.5"
           @select="addUnusedToCedent"
         >
           <VButton
@@ -79,7 +79,6 @@
             size="sm"
             variant="ghost"
             class="relative z-30 gap-x-2 font-medium text-gray-700"
-            :class="{ 'bg-slate-100': isOpen }"
             v-on="events"
           >
             <icon-ph-plus-circle-bold class="size-5 text-primary-600" />

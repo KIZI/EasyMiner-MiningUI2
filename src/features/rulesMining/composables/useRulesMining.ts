@@ -6,7 +6,6 @@ import { api } from '@/api/api'
 import type { MiningState } from '@/features/rulesMining/types/rulesMining.types'
 import { useMinerQuery } from '@/api/miners/useMinerQuery'
 import { useTaskRulesQuery } from '@/api/tasks/useTaskRulesQuery'
-import { useTaskStateQuery } from '@/api/tasks/useTaskStateQuery'
 import { useAbortController } from '@/composables/useAbortController'
 import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore'
 import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
@@ -19,6 +18,7 @@ import { useTasksStore } from '@/stores/tasksStore'
 import type { CreateTaskInput } from '@/api/tasks/types'
 import { useErrorHandler } from '@/composables/useErrorHandler'
 import { queryKeys } from '@/api/queryKeys'
+import { layout } from '@/components/Layout'
 
 export const useRulesMining = createSharedComposable(() => {
   const { minerId } = useMinerQuery()
@@ -28,13 +28,16 @@ export const useRulesMining = createSharedComposable(() => {
   const tasksStore = useTasksStore()
 
   const { handleError } = useErrorHandler()
-  const { abortRequests, signal } = useAbortController()
-  const aborted = ref(false)
+  const abortController = useAbortController()
+  const { signal } = abortController
+
+  const queryClient = useQueryClient()
 
   const startTaskMutation = useMutation({
     mutationFn: (id: number) => api.tasks.start(id, { signal: signal.value }),
     onSuccess: (task) => {
       tasksStore.setActiveTaskId(task.id)
+      queryClient.invalidateQueries({ queryKey: queryKeys.miner.tasks() })
     },
     onError: handleError,
   })
@@ -54,13 +57,17 @@ export const useRulesMining = createSharedComposable(() => {
 
   const startedTaskId = computed(() => startTaskMutation.data.value?.id)
 
-  const taskStateQuery = useTaskStateQuery(startedTaskId, {
+  const taskRulesQuery = useTaskRulesQuery(startedTaskId, {
     refetchInterval: (query) => {
-      const task = query?.state.data
-      if (!task || query.state.status === 'pending') return false
+      const task = query?.state.data?.task
+      if (!task) return false
 
       if (isTaskRunning(task)) {
         return 500
+      }
+
+      if (task.state === 'solved') {
+        layout.showDiscoveredRules()
       }
 
       return false
@@ -68,27 +75,24 @@ export const useRulesMining = createSharedComposable(() => {
     signal,
   })
 
-  const taskRulesQuery = useTaskRulesQuery(startedTaskId)
-
   const isMiningAvailable = computed(() => {
     const isPatternValid = rulePatternStore.consequent.length > 0
-    const isInterestMesuresValid = interestMeasuresStore.activeMeasures.length > 0
+    const isInterestMeasuresValid = interestMeasuresStore.activeMeasures.length > 0
 
-    return isPatternValid && isInterestMesuresValid
+    return isPatternValid && isInterestMeasuresValid
   })
 
   const isLoading = computed(() => (
     createTaskMutation.isPending.value
     || startTaskMutation.isPending.value
-    || taskStateQuery.isLoading.value
     || taskRulesQuery.isLoading.value
   ))
 
   const miningState = computed<MiningState>(() => {
-    const taskState = taskStateQuery.data.value?.state
+    const taskState = taskRulesQuery.task.value?.state
 
     if (isLoading.value || taskState === 'new') return 'in_progress'
-    if (aborted.value) return 'aborted'
+    if (abortController.aborted.value) return 'aborted'
     if (taskState === 'solved' && !taskRulesQuery.rules.value.length) return 'no_rules_found'
     if (taskState) return taskState
 
@@ -101,14 +105,6 @@ export const useRulesMining = createSharedComposable(() => {
     return 'disabled'
   })
 
-  const queryClient = useQueryClient()
-  watch(miningState, () => {
-    if (miningState.value === 'solved') {
-      console.log('invalidateQueries', { queryKey: queryKeys.miner.tasks() })
-      queryClient.invalidateQueries({ queryKey: queryKeys.miner.tasks() })
-    }
-  })
-
   const isInProgress = computed(() => miningState.value === 'in_progress')
 
   const interestMeasuresInput = computed(() => (
@@ -118,7 +114,7 @@ export const useRulesMining = createSharedComposable(() => {
     ...(interestMeasuresStore.isPruningEnabled ? [{ name: SpecialInterestMeasures.CBA }] : []),
   ]))
 
-  function startMining() {
+  async function startMining() {
     const { antecedent, consequent } = rulePatternStore.rulePatternInput
     const IMs = interestMeasuresInput.value
     const specialIMs = specialInterestMeasuresInput.value
@@ -129,7 +125,7 @@ export const useRulesMining = createSharedComposable(() => {
     )
 
     tasksStore.clearActiveTask()
-    aborted.value = false
+    abortController.reset()
 
     createTaskMutation.mutate({
       IMs,
@@ -142,19 +138,20 @@ export const useRulesMining = createSharedComposable(() => {
     })
   }
 
+  function resetMiningState() {
+    startTaskMutation.reset()
+  }
+
   function abortMining() {
-    abortRequests()
+    abortController.abort()
 
     if (tasksStore.activeTaskId) {
       stopTaskMutation.mutate(tasksStore.activeTaskId)
+      tasksStore.clearActiveTask()
     }
 
     resetMiningState()
-  }
-
-  function resetMiningState() {
-    startTaskMutation.reset()
-    aborted.value = false
+    layout.closeDiscoveredRules()
   }
 
   watch(
@@ -166,11 +163,13 @@ export const useRulesMining = createSharedComposable(() => {
     () => {
       if (isInProgress.value) return
       resetMiningState()
+      abortController.reset()
     },
     { deep: true },
   )
 
   return {
+    startedTaskId,
     isInProgress,
     isLoading,
     miningState,

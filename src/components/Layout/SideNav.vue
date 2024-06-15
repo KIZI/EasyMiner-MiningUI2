@@ -7,8 +7,8 @@
         :label="item.label"
         :icon="item.icon"
         :is-available="item.isAvailable"
-        :is-active="item.section === activeBottomSection"
-        @click="activeBottomSection = item.section"
+        :is-active="layout.isSectionActive(item.section)"
+        @click="layout.setActiveSection(item.section)"
       />
     </nav>
   </div>
@@ -16,40 +16,31 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { BOTTOM_SECTIONS, activeBottomSection } from '.'
+import { SECONDARY_SECTIONS, layout } from '.'
 import SideNavItem from '@/components/Layout/SideNavItem.vue'
 import IconPhListChecks from '~icons/ph/list-checks.vue'
 import IconPhClockCounterClockwise from '~icons/ph/clock-counter-clockwise.vue'
 import IconPhClipboard from '~icons/ph/clipboard.vue'
-import { useActiveTaskStateQuery } from '@/api/tasks/useActiveTaskStateQuery'
-import { isTaskStateRunning } from '@/api/tasks/utils'
-import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
+import { useTasksStore } from '@/stores/tasksStore'
 
-const activeTaskStateQuery = useActiveTaskStateQuery()
-const activeTaskRulesQuery = useActiveTaskRulesQuery()
-
-const isDiscoveredRulesAvailable = computed(() => {
-  const state = activeTaskStateQuery.state.value
-  if (!state || isTaskStateRunning(state)) return false
-  return !activeTaskRulesQuery.isFetching.value
-})
+const tasksStore = useTasksStore()
 
 const navItems = computed(() => ([
   {
     label: 'Discovered rules',
     icon: IconPhListChecks,
-    section: BOTTOM_SECTIONS.discoveredRules,
-    isAvailable: isDiscoveredRulesAvailable.value,
+    section: SECONDARY_SECTIONS.discoveredRules,
+    isAvailable: !!tasksStore.activeTaskId,
   },
   {
     label: 'Tasks history',
     icon: IconPhClockCounterClockwise,
-    section: BOTTOM_SECTIONS.tasksHistory,
+    section: SECONDARY_SECTIONS.tasksHistory,
   },
   {
     label: 'Selected rules',
     icon: IconPhClipboard,
-    section: BOTTOM_SECTIONS.selectedRules,
+    section: SECONDARY_SECTIONS.selectedRules,
   },
 ]))
 </script>

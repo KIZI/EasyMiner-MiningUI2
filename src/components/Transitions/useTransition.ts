@@ -27,6 +27,7 @@ export type VueTransitionProps = {
     enter: number
     leave: number
   }
+  disabled?: boolean
 } & BaseTransitionProps
 
 type UseTransitionOptions = {

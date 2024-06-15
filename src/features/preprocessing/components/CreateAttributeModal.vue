@@ -3,6 +3,7 @@
     :open="isOpen"
     class="max-w-4xl px-5 pb-4 pt-3"
     keep-alive
+    :dismissible="task.state !== 'in_progress'"
     @close="close"
   >
     <IframeWrapper class="mt-2">

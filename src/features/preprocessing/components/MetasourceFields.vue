@@ -22,9 +22,8 @@
         <AttributesList
           class="h-full overflow-y-auto"
           spacing-class="px-6"
-          disable-animation
         >
-          <template #beforeItems>
+          <!-- <template #beforeItems>
             <div
               v-if="activeTasks.length"
               v-auto-animate
@@ -91,7 +90,7 @@
                 </template>
               </div>
             </div>
-          </template>
+          </template> -->
           <template #empty>
             <div class="flex items-start gap-x-3">
               <icon-ph-info class="size-6" />

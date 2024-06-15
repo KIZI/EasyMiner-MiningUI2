@@ -1,6 +1,6 @@
-import type { TaskSimpleResponse } from '@/api/model'
+import type { TaskState } from '@/api/tasks/types'
 
-export type MiningState = TaskSimpleResponse['state'] | (
+export type MiningState = TaskState | (
   'aborted' |
   'available' |
   'blocked_by_interest_measures' |

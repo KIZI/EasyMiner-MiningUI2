@@ -39,7 +39,7 @@ export type TasksRulesResponse = {
   rules?: TaskRule[]
 }
 
-export type TaskState = 'new' | 'in_progress' | 'solved' | 'failed' | 'interrupted'
+export type TaskState = 'new' | 'in_progress' | 'solved' | 'failed' | 'interrupted' | 'solved_heads'
 export type TaskImportState = 'none' | 'waiting' | 'partial' | 'done'
 
 export type TaskSettings = {

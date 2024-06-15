@@ -26,7 +26,7 @@ const rulePatternStore = useRulePatternStore()
 const dropZone = useDropZone<MetasourceAttribute>({
   accepts: [DragSources.antecedent, DragSources.consequent],
   onDrop: (attribute) => {
-    rulePatternStore.removeMeasureById(attribute.id)
+    rulePatternStore.removeItemById(attribute.id)
   },
 })
 const { dropZoneRef } = dropZone

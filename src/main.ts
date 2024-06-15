@@ -1,15 +1,15 @@
 import './style/style.css'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import { gsap } from 'gsap'
-import { Flip } from 'gsap/Flip'
 import App from './App.vue'
 import { i18n } from '@/libs/i18n/i18n'
 import { router } from '@/libs/router'
 import { vueQueryPluginOptions } from '@/libs/vueQuery'
+
 
 const app = createApp(App)
 
@@ -20,5 +20,3 @@ app.use(autoAnimatePlugin)
 app.use(VueQueryPlugin, vueQueryPluginOptions)
 
 app.mount('#MiningUI')
-
-gsap.registerPlugin(Flip)

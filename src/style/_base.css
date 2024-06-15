@@ -71,11 +71,11 @@ body {
 
   .multiselect :is(.multiselect-caret, .multiselect-clear) {
     align-self: start;
-    margin-top: theme('spacing[0.5]');
+    margin-top: theme('spacing[1.5]');
   }
 
   .multiselect-sm {
-    --ms-py: theme('spacing[0.5]');
+    --ms-py: theme('spacing[1.5]');
     --ms-px: theme('spacing[2.5]');
 
     --ms-font-size: theme('fontSize.xs');
@@ -92,6 +92,20 @@ body {
 
   .multiselect-tags {
     min-height: 26px;
+  }
+
+  .multiselect-inline .multiselect-wrapper {
+    justify-content: flex-start;
+  }
+
+  .multiselect-inline .multiselect-tags {
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    margin-right: theme('space.3');
+  }
+
+  .multiselect-inline .multiselect-tag {
+    flex-shrink: 0;
   }
 
   .multiselect-dropdown {

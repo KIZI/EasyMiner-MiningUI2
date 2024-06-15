@@ -5,16 +5,11 @@ import { defineConfig } from 'vite'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
-import Unfonts from 'unplugin-fonts/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue({
-      script: {
-        defineModel: true,
-      },
-    }),
+    vue(),
     Components({
       dirs: [],
       globs: [],
@@ -27,16 +22,6 @@ export default defineConfig({
     Icons({
       compiler: 'vue3',
       autoInstall: true,
-    }),
-    Unfonts({
-      google: {
-        families: [
-          {
-            name: 'Open Sans',
-            styles: 'ital,wght@0,300..800;1,300..800',
-          },
-        ],
-      },
     }),
   ],
   resolve: {

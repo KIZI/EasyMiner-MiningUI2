@@ -2,13 +2,26 @@
   <SectionCard class="py-4 group-px-6">
     <div class="flex min-h-16 items-start justify-between peer-px">
       <div>
-        <div class="flex items-center gap-x-3">
+        <div class="flex min-h-8 items-center gap-x-3">
+          <VIconButton v-if="!isViewLoading && isFromHistory" title="Go back to tasks history" @click="layout.showTasksHistory()">
+            <icon-ph-arrow-left class="size-5" />
+          </VIconButton>
+
           <SectionTitle>
-            <template v-if="state && isTaskStateRunning(state)">
+            <template v-if="isMiningInProgress || isTaskStateRunning(state)">
               Task is in progress...
             </template>
 
-            <template v-else-if="state === 'failed'">
+            <template v-else-if="isViewLoading">
+              Task is loading...
+            </template>
+
+            <template v-else-if="task?.state === 'interrupted'">
+              Task was interrupted
+              <span class="pl-1 text-lg font-normal">(dicovered {{ rules.length }} rules)</span>
+            </template>
+
+            <template v-else-if="task?.state === 'failed'">
               Task failed
             </template>
 
@@ -22,7 +35,7 @@
           </SectionTitle>
 
           <VButton
-            v-if="rules.length && isAnyUnselected"
+            v-if="!isViewLoading && isAnyUnselected"
             size="xs"
             variant="ghost"
             class="gap-x-1.5 font-medium"
@@ -37,14 +50,24 @@
           </VButton>
         </div>
 
-        <div class="mt-1 text-lg font-medium text-primary-900">
-          {{ task?.name }}
+        <div v-if="!isViewLoading" class="mt-1">
+          <div class="text-lg font-medium text-primary-900">
+            {{ task?.name }}
+          </div>
+          <div class="mt-1 space-x-4 text-xs leading-none">
+            <span v-for="measure in taskDetail?.settings.rule0.iMs" :key="measure.name">
+              <span class="pr-1.5">{{ $t(`interestMeasures.${measure.name}.name`) }}:</span>
+              <span class="font-semibold text-primary-700">
+                {{ formatDecimal(measure.threshold) }}
+              </span>
+            </span>
+          </div>
         </div>
       </div>
 
       <div class="-mr-2 flex items-center gap-x-2">
         <VButton
-          v-if="state && !isTaskStateRunning(state)"
+          v-if="!isViewLoading && isTaskFinished"
           variant="ghost"
           size="xs"
           class="shrink-0 gap-x-1.5"
@@ -59,8 +82,9 @@
     <RulesGrid
       v-model:filters="filters"
       :rules="rules"
-      :is-loading="isRulesLoading"
-      :is-refetching="isRulesFetching"
+      :is-loading="isViewLoading"
+      :is-refetching="isRulesRefetching"
+      :task="taskDetail"
     >
       <template #empty>
         <div class="flex gap-x-3">
@@ -103,6 +127,7 @@
 import { computed, ref } from 'vue'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
+import { useRulesMining } from '@rulesMining/composables/useRulesMining'
 import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
 import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -114,7 +139,10 @@ import IconPhCheckCircle from '~icons/ph/check-circle.vue'
 import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
 import RulesGrid from '@/components/Rules/RulesGrid.vue'
 import { createTaskRulesFilters } from '@/components/Task/taskRulesFilters'
+import { formatDecimal } from '@/utils/format'
+import { layout } from '@/components/Layout'
 
+const { isInProgress: isMiningInProgress, startedTaskId } = useRulesMining()
 const filters = createTaskRulesFilters()
 const rulePatternStore = useRulePatternStore()
 
@@ -123,10 +151,18 @@ const {
   task,
   state,
   isLoading: isRulesLoading,
-  isFetching: isRulesFetching,
+  isRefetching: isRulesRefetching,
 } = useActiveTaskRulesQuery()
 
-const { task: taskDetail } = useActiveTaskDetailQuery()
+const { task: taskDetail, isLoading: isTaskDetailLoading } = useActiveTaskDetailQuery()
+
+const isFromHistory = computed(() => {
+  return startedTaskId.value !== task.value?.id
+})
+
+const isTaskFinished = computed(() => {
+  return !isTaskStateRunning(state.value)
+})
 
 function loadTaskToRulePattern() {
   if (!taskDetail.value) return
@@ -135,6 +171,10 @@ function loadTaskToRulePattern() {
 }
 
 const selectedRules = useSelectedRules()
+
+const isViewLoading = computed(() => {
+  return isMiningInProgress.value || isRulesLoading.value || isTaskDetailLoading.value
+})
 
 const rulesNotInSelectedRules = computed(() => {
   return rules.value.filter(rule => !selectedRules.isRuleSelected(rule))

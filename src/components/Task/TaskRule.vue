@@ -35,15 +35,10 @@
 <script setup lang="ts">
 import { type InterestMeasure, InterestMeasures } from '@rulesMining/types/interestMeasure.types'
 import { computed } from 'vue'
-import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import type { TaskRule, TaskWithSettings } from '@/api/tasks/types'
 import VCheckbox from '@/components/Form/VCheckbox.vue'
 import { formatDecimal } from '@/utils/format'
 import TaskRuleDetailsPopover from '@/components/Task/TaskRuleDetailsPopover.vue'
-import VIconButton from '@/components/VIconButton.vue'
-
-import IconPhCheckCircle from '~icons/ph/check-circle.vue'
-import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
 import { useSelectionModel } from '@/composables/useSelectionModel'
 
 const props = defineProps<{
@@ -67,20 +62,10 @@ const presentMeasures = computed(() => {
   })
 })
 
-const selection = defineModel<TaskRule[]>('selected')
-
-const isSelected = computed(() => {
-  return selection.value?.includes(props.rule)
-})
-
+const selection = defineModel<TaskRule[]>('selected', { default: [] })
 const selectionModel = useSelectionModel({ modelValue: selection })
 
-const {
-  handleRemove,
-  handleToggle: handleToggleSelectedRules,
-  removeRulesMutation,
-  isRuleSelected,
-  isToggleLoading,
-} = useSelectedRules()
-const isInSelectedRules = computed(() => isRuleSelected(props.rule))
+const isSelected = computed(() => {
+  return selectionModel.isItemSelected(props.rule)
+})
 </script>

@@ -1,5 +1,7 @@
 <template>
+  <slot v-if="props.disabled" />
   <transition-group
+    v-else
     v-bind="props"
     :style="cssVars"
     name="list"

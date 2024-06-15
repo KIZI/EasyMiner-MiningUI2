@@ -41,7 +41,7 @@ const props = defineProps<{
 const rulePatternStore = useRulePatternStore()
 
 function handleRemove() {
-  rulePatternStore.removeMeasureById(props.item.id)
+  rulePatternStore.removeItemById(props.item.id)
 }
 
 // const { createDraggableEvents } = useDraggable(DRAG_SOURCE.RulePatternItemSet, {

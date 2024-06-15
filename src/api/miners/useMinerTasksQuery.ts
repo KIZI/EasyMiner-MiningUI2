@@ -1,12 +1,19 @@
 import { keepPreviousData, useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { type MaybeRef, computed, toValue } from 'vue'
 import { queryKeys } from '@/api/queryKeys'
 import { api } from '@/api/api'
 import { appConfig } from '@/config/appConfig'
 import type { PaginationInput } from '@/api/pagination'
 import { isTaskStateRunning } from '@/api/tasks/utils'
+import type { TaskState } from '@/api/tasks/types'
 
-export function useMinerTasksQuery({ pagination }: { pagination: PaginationInput }) {
+export function useMinerTasksQuery({
+  pagination,
+  state,
+}: {
+  pagination: PaginationInput
+  state?: MaybeRef<TaskState[]>
+}) {
   const query = useQuery({
     queryFn: () => api.miners.tasks({
       id: appConfig.minerId,
@@ -15,13 +22,14 @@ export function useMinerTasksQuery({ pagination }: { pagination: PaginationInput
         orderby: 'last_modified',
         order: 'DESC',
       },
+      state: toValue(state),
     }),
-    queryKey: [...queryKeys.miner.tasks(), pagination],
+    queryKey: [...queryKeys.miner.tasks(), pagination, state],
     placeholderData: keepPreviousData,
   })
 
   const tasks = computed(() => {
-    return (query.data.value?.task ?? []).filter((task) => !isTaskStateRunning(task.state))
+    return (query.data.value?.task ?? []).filter(task => !isTaskStateRunning(task.state))
   })
 
   return {
