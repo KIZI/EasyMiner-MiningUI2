@@ -1,5 +1,6 @@
 import { createEventHook } from '@vueuse/core'
-import { type ComputedRef, type Ref, computed, reactive, ref } from 'vue'
+import type { MaybeRef } from 'vue'
+import { type Ref, computed, ref, toValue } from 'vue'
 
 export type PaginationInput = {
   page: number
@@ -23,26 +24,27 @@ export function createPaginationState() {
 }
 
 export function usePagination(options: {
-  state?: {
+  state?: Ref<{
     page: number
     pageSize: number
-  }
+  }>
+  totalCount?: MaybeRef<number>
 } = {}) {
-  const state = reactive(options.state ?? createPaginationState())
+  const state = options.state ?? ref(createPaginationState())
 
-  let totalGetter = () => 0
+  let totalGetter = () => toValue(options.totalCount) ?? 0
 
   const total = computed(() => totalGetter())
 
   const totalPages = computed(() => {
     if (!total.value) return 1
-    return Math.ceil(total.value / state.pageSize)
+    return Math.ceil(total.value / state.value.pageSize)
   })
 
   const pageChangeHook = createEventHook()
 
   function setPage(value: number) {
-    state.page = value
+    state.value.page = value
     pageChangeHook.trigger()
   }
 
@@ -51,8 +53,8 @@ export function usePagination(options: {
   }
 
   function setPageSize(value: number) {
-    state.pageSize = value
-    if (state.page > totalPages.value) {
+    state.value.pageSize = value
+    if (state.value.page > totalPages.value) {
       setPage(totalPages.value)
     }
   }
@@ -60,8 +62,8 @@ export function usePagination(options: {
   const bindings = computed(() => ({
     'onUpdate:page': setPage,
     'onUpdate:pageSize': setPageSize,
-    'page': state.page,
-    'pageSize': state.pageSize,
+    'page': state.value.page,
+    'pageSize': state.value.pageSize,
     'totalPages': totalPages.value,
   }))
 

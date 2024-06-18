@@ -21,7 +21,7 @@ export type InterestMeasureType = ValueOf<typeof InterestMeasureTypes>
 
 export type InterestMeasureRange = {
   from: InterestMeasureRangePoint
-  to: InterestMeasureRangePoint
+  to?: InterestMeasureRangePoint
 }
 
 type InterestMeasureRangePoint = {

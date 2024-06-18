@@ -27,7 +27,7 @@
             >
               <select
                 v-bind="field"
-                class="rounded border-blue-300 py-0.5 pr-9 text-sm font-medium focus:border-blue-400 focus:ring-blue-400"
+                class="rounded border-blue-300 py-0.5 pr-9 text-sm font-medium shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option
                   v-for="option in availableMeasures"
@@ -198,14 +198,14 @@ watchEffect(() => {
   const { range } = currentMeasure.value
   if (!range) return
   const min = range.from.value + (range.from.closed ? 0 : 0.01)
-  const max = range.to.value - (range.to.closed ? 0 : 0.01)
+  const max = range.to && (range.to.value - (range.to.closed ? 0 : 0.01))
 
   validationSchema.value = yup.object({
     name: yup.string().required(),
     value: yup.number()
       .required()
-      .min(min)
-      .max(max),
+      // .min(min)
+      // .max(max ?? Infinity),
   })
 })
 
@@ -222,8 +222,8 @@ const maska = computed(() => {
   const { range, type } = currentMeasure.value
   if (!range) return
 
-  const afterPoint = type === 'Double' ? '.00' : ''
-  const wholeNumbers = Array.from({ length: String(range.to.value).length }).fill('0').join('')
+  const afterPoint = type === 'Double' ? '.000' : ''
+  const wholeNumbers = range.to && range.to.value < 10 ? '0' : '00'
 
   return `${wholeNumbers}${afterPoint}`
 })

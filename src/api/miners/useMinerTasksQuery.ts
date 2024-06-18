@@ -11,13 +11,13 @@ export function useMinerTasksQuery({
   pagination,
   state,
 }: {
-  pagination: PaginationInput
+  pagination: MaybeRef<PaginationInput>
   state?: MaybeRef<TaskState[]>
 }) {
   const query = useQuery({
     queryFn: () => api.miners.tasks({
       id: appConfig.minerId,
-      pagination,
+      pagination: toValue(pagination),
       order: {
         orderby: 'last_modified',
         order: 'DESC',

@@ -1,4 +1,4 @@
-import type { CreateTaskInput, Task, TaskWithSettings, TasksRulesResponse } from './types'
+import type { CreateTaskInput, Task, TaskRulesInput, TaskWithSettings, TasksRulesResponse } from './types'
 import { createRequest } from '@/libs/axios'
 
 export default {
@@ -8,8 +8,8 @@ export default {
   state: createRequest<number, Task>(
     id => ({ url: `/tasks/${id}/state` }),
   ),
-  rules: createRequest<number, TasksRulesResponse>(
-    id => ({ url: `/tasks/${id}/rules` }),
+  rules: createRequest<TaskRulesInput, TasksRulesResponse>(
+    params => ({ url: `/tasks/${params.id}/rules`, params }),
   ),
   create: createRequest<CreateTaskInput, TaskWithSettings>(
     task => ({

@@ -1,8 +1,8 @@
 import { storeToRefs } from 'pinia'
-import { useTaskRulesQuery } from '@/api/tasks/useTaskRulesQuery'
+import { type TaskRulesQueryParams, useTaskRulesQuery } from '@/api/tasks/useTaskRulesQuery'
 import { useTasksStore } from '@/stores/tasksStore'
 
-export function useActiveTaskRulesQuery() {
+export function useActiveTaskRulesQuery(params: TaskRulesQueryParams = {}) {
   const { activeTaskId } = storeToRefs(useTasksStore())
-  return useTaskRulesQuery(activeTaskId)
+  return useTaskRulesQuery(activeTaskId, params)
 }

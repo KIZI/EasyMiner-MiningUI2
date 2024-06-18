@@ -34,9 +34,32 @@ export type RuleWithRelation = TaskRule & {
 
 export type TaskRuleRelation = 'positive' | 'neutral' | 'negative'
 
+export type TaskRulesInput = {
+  id: number
+  orderby?: 'conf' | 'supp' | 'lift' | 'default'
+  order?: 'ASC' | 'DESC'
+
+  offset?: number
+  limit?: number
+
+  search?: string
+  searchAntecedent?: string
+  searchConsequent?: string
+
+  minConf?: number
+  maxConf?: number
+
+  minSupp?: number
+  maxSupp?: number
+
+  minLift?: number
+  maxLift?: number
+}
+
 export type TasksRulesResponse = {
-  task?: Task
-  rules?: TaskRule[]
+  task: Task
+  rules: TaskRule[]
+  rulesCount: number
 }
 
 export type TaskState = 'new' | 'in_progress' | 'solved' | 'failed' | 'interrupted' | 'solved_heads'

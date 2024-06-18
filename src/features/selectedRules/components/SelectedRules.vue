@@ -57,7 +57,7 @@
     </div>
 
     <RulesGrid
-      v-model:filters="filters"
+      v-model:dataParams="dataParams"
       :rules="rules"
       :is-loading="isPending || isLoading"
       :is-refetching="isRefetching"
@@ -102,6 +102,7 @@ import ChangeRuleSetListbox from '@selectedRules/components/ChangeRuleSetListbox
 import { useRuleSetScorerModal } from '@selectedRules/components/useRuleSetScorerModal'
 import RuleSetScorerModal from '@selectedRules/components/RuleSetScorerModal.vue'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
+import { ref } from 'vue'
 import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -113,14 +114,14 @@ import { appConfig } from '@/config/appConfig'
 import { externalUrls } from '@/utils/externalUrls'
 import RulesGrid from '@/components/Rules/RulesGrid.vue'
 import VIconButton from '@/components/VIconButton.vue'
-import { createTaskRulesFilters } from '@/components/Task/taskRulesFilters'
+import { createTaskRulesDataParams, type TaskRulesDataParams } from '@/components/Task/taskRulesDataParams'
 
 const { currentRuleSetId } = useSelectedRulesStoreRefs()
 const ruleSetScorerModal = useRuleSetScorerModal()
 const ruleSetsRulesQuery = useRuleSetRulesQuery(currentRuleSetId)
 const { rules, ruleSet, isPending, isLoading, isRefetching } = ruleSetsRulesQuery
 
-const filters = createTaskRulesFilters()
+const dataParams = ref(createTaskRulesDataParams())
 
 const {
   handleRemove,

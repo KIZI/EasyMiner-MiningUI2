@@ -1,6 +1,6 @@
 <template>
   <SectionCard class="py-4 group-px-6">
-    <div class="flex min-h-16 items-start justify-between peer-px">
+    <div class="flex min-h-16 shrink-0 items-start justify-between peer-px">
       <div>
         <div class="flex min-h-8 items-center gap-x-3">
           <VIconButton v-if="!isViewLoading && isFromHistory" title="Go back to tasks history" @click="layout.showTasksHistory()">
@@ -80,11 +80,12 @@
     </div>
 
     <RulesGrid
-      v-model:filters="filters"
+      v-model:dataParams="dataParams"
       :rules="rules"
       :is-loading="isViewLoading"
       :is-refetching="isRulesRefetching"
       :task="taskDetail"
+      :total-count="rulesCount"
     >
       <template #empty>
         <div class="flex gap-x-3">
@@ -124,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { type Ref, computed, ref } from 'vue'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import { useRulesMining } from '@rulesMining/composables/useRulesMining'
@@ -132,27 +133,31 @@ import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
 import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
 import SectionCard from '@/components/Layout/SectionCard.vue'
 import SectionTitle from '@/components/Layout/SectionTitle.vue'
-import VButton from '@/components/VButton.vue'
 import { isTaskStateRunning } from '@/api/tasks/utils'
 import VIconButton from '@/components/VIconButton.vue'
 import IconPhCheckCircle from '~icons/ph/check-circle.vue'
 import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
 import RulesGrid from '@/components/Rules/RulesGrid.vue'
-import { createTaskRulesFilters } from '@/components/Task/taskRulesFilters'
+import { type TaskRulesDataParams, createTaskRulesDataParams } from '@/components/Task/taskRulesDataParams'
 import { formatDecimal } from '@/utils/format'
 import { layout } from '@/components/Layout'
+import VButton from '@/components/VButton.vue'
 
 const { isInProgress: isMiningInProgress, startedTaskId } = useRulesMining()
-const filters = createTaskRulesFilters()
+const dataParams = ref(createTaskRulesDataParams())
 const rulePatternStore = useRulePatternStore()
 
 const {
+  rulesCount,
   rules,
   task,
   state,
   isLoading: isRulesLoading,
   isRefetching: isRulesRefetching,
-} = useActiveTaskRulesQuery()
+} = useActiveTaskRulesQuery({
+  options: dataParams,
+  keepPreviousData: true,
+})
 
 const { task: taskDetail, isLoading: isTaskDetailLoading } = useActiveTaskDetailQuery()
 

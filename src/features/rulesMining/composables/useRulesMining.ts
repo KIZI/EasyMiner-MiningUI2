@@ -19,6 +19,7 @@ import type { CreateTaskInput } from '@/api/tasks/types'
 import { useErrorHandler } from '@/composables/useErrorHandler'
 import { queryKeys } from '@/api/queryKeys'
 import { layout } from '@/components/Layout'
+import { createTaskRulesDataParams } from '@/components/Task/taskRulesDataParams'
 
 export const useRulesMining = createSharedComposable(() => {
   const { minerId } = useMinerQuery()
@@ -58,21 +59,24 @@ export const useRulesMining = createSharedComposable(() => {
   const startedTaskId = computed(() => startTaskMutation.data.value?.id)
 
   const taskRulesQuery = useTaskRulesQuery(startedTaskId, {
-    refetchInterval: (query) => {
-      const task = query?.state.data?.task
-      if (!task) return false
-
-      if (isTaskRunning(task)) {
-        return 500
-      }
-
-      if (task.state === 'solved') {
-        layout.showDiscoveredRules()
-      }
-
-      return false
-    },
     signal,
+    options: createTaskRulesDataParams(),
+    queryOptions: {
+      refetchInterval: (query) => {
+        const task = query?.state.data?.task
+        if (!task) return false
+  
+        if (isTaskRunning(task)) {
+          return 500
+        }
+  
+        if (task.state === 'solved') {
+          layout.showDiscoveredRules()
+        }
+  
+        return false
+      },
+    },
   })
 
   const isMiningAvailable = computed(() => {

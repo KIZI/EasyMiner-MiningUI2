@@ -45,7 +45,6 @@ export const appConfig = {
       defaultValue: 1.1,
       range: {
         from: { value: 0 },
-        to: { value: 5 },
       },
     },
     [InterestMeasures.Length]: {

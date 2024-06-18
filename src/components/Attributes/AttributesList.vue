@@ -29,7 +29,7 @@
 
           <button
             v-if="searchQuery"
-            class="mt-4 flex items-center gap-x-1 hover:underline"
+            class="mt-4 flex items-center gap-x-1 underline hover:no-underline"
             @click="clearSearchQuery"
           >
             <icon-ph-x :width="18" />
