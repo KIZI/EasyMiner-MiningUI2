@@ -43,6 +43,7 @@ import { useRuleSetsQuery } from '@/api/ruleSets/useRuleSetsQuery'
 import { PopoverEditForm, useInjectPopoverState } from '@/components/Popover'
 import { MutationErrorMessage, VField, VInput, useHLForm } from '@/components/Form'
 import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useActiveRuleSetDetailQuery } from '@/api/ruleSets/useRuleSetDetailQuery'
 
 const props = defineProps<{
   ruleSet?: RuleSet
@@ -50,11 +51,10 @@ const props = defineProps<{
 const { ruleSet } = toRefs(props)
 
 const { handleError } = useErrorHandler()
-const { setCurrentRuleSetId } = useSelectedRulesStore()
-const { invalidateCurrentRuleSet } = useSelectedRules()
-const { isOpen } = useInjectPopoverState()!
-
+const { setActiveRuleSetId } = useSelectedRulesStore()
+const activeRuleSetDetailQuery = useActiveRuleSetDetailQuery()
 const ruleSetsQuery = useRuleSetsQuery()
+const { isOpen } = useInjectPopoverState()!
 
 const inputRef = ref<{ $el: HTMLInputElement }>()
 
@@ -70,21 +70,22 @@ const initialValues = computed(() => ({ name: ruleSet.value?.name ?? '' }))
 
 const form = useHLForm<yup.InferType<typeof validationSchema>>({
   validationSchema,
-  initialValues,
+  initialValues: initialValues.value,
   keepValuesOnUnmount: true,
 })
 
 const updateMutation = useMutation({
   mutationFn: api.ruleSets.update,
   onSuccess: () => {
-    invalidateCurrentRuleSet()
+    activeRuleSetDetailQuery.refetch()
+    ruleSetsQuery.refetch()
     isOpen.value = false
   },
 })
 const createMutation = useMutation({
   mutationFn: api.ruleSets.create,
   onSuccess: (newRuleset) => {
-    setCurrentRuleSetId(newRuleset.id)
+    setActiveRuleSetId(newRuleset.id)
     ruleSetsQuery.refetch()
     isOpen.value = false
   },
@@ -93,7 +94,7 @@ const removeMutation = useMutation({
   mutationFn: api.ruleSets.remove,
   onSuccess: async () => {
     await ruleSetsQuery.refetch()
-    setCurrentRuleSetId(ruleSetsQuery.ruleSets.value[0]?.id)
+    setActiveRuleSetId(ruleSetsQuery.ruleSets.value[0]?.id)
     isOpen.value = false
   },
   onError: handleError,
@@ -121,7 +122,7 @@ function handleRemove() {
 }
 
 watch(isOpen, async (value) => {
-  form.resetForm()
+  form.resetForm({ values: initialValues.value })
 
   if (value) {
     await nextTick()

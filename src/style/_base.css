@@ -134,7 +134,7 @@ body {
   }
 
   body.dragging-active * {
-    cursor: move !important;
+    cursor: grabbing !important;
     user-select: none !important;
   }
 
@@ -143,4 +143,8 @@ body {
     -webkit-appearance: none !important;
     margin: 0;
   }
+}
+
+body.dragging-active .drag-overlay {
+  display: block;
 }

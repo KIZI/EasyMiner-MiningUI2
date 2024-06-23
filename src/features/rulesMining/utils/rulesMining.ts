@@ -1,7 +1,7 @@
 import type { InterestMeasureActiveItem } from '@rulesMining/types/interestMeasure.types'
 import type { AttributeSimpleInput, IMSimpleInput } from '@/api/model'
-import type { CedentItem } from '@/features/rulesMining/types/rulePattern.types'
-import { formatFixedValue } from '@/features/rulesMining/utils/format'
+import type { CedentItem } from '@rulesMining/types/rulePattern.types'
+import { formatFixedValue } from '@rulesMining/utils/format'
 import type { Task } from '@/api/tasks/types'
 
 export function patternItemToAttributeSimpleInput(item: CedentItem) {

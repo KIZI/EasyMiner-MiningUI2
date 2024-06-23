@@ -1,9 +1,8 @@
 <template>
   <SectionCard class="relative min-h-[350px] py-4 group-px-6">
-    <div class="min-h-16 peer-px">
+    <div class="shrink-0 peer-px">
       <div class="flex min-h-8 items-center justify-between">
         <SectionTitle>Selected rules</SectionTitle>
-
         <div class="-mr-2 flex items-center gap-x-1">
           <VButton
             variant="ghost"
@@ -25,7 +24,7 @@
         </div>
       </div>
 
-      <div v-if="ruleSet" class="flex items-center">
+      <div v-if="!isViewLoading && ruleSet" class="flex items-center">
         <div class="mr-4 break-all text-lg font-medium text-primary-900">
           <Truncate
             :length="appConfig.truncateLength.ruleSet"
@@ -56,13 +55,11 @@
       </div>
     </div>
 
-    <RulesGrid
-      v-model:dataParams="dataParams"
-      :rules="rules"
-      :is-loading="isPending || isLoading"
-      :is-refetching="isRefetching"
-      animate
-    >
+    <div v-if="!isViewLoading" class="-mt-0.5 text-sm peer-px">
+      contains {{ rulesCount }} {{ $t('common.rules', rulesCount ?? 0) }}
+    </div>
+
+    <RulesGrid>
       <template #empty>
         <div class="flex gap-x-3">
           <icon-ph-info class="size-6" />
@@ -74,8 +71,9 @@
         <VIconButton
           title="Remove from selected rules"
           class="text-red-700 hover:bg-subtle-white"
-          :loading="isRuleMutationLoading(rule)"
-          @click="handleRemove(rule)"
+          :loading="selectedRules.isRuleSelectionLoading(rule)"
+          :disabled="selectedRules.isRuleBeingRemoved(rule)"
+          @click="removeRules([rule])"
         >
           <icon-ph-x-circle class="size-5" />
         </VIconButton>
@@ -102,8 +100,9 @@ import ChangeRuleSetListbox from '@selectedRules/components/ChangeRuleSetListbox
 import { useRuleSetScorerModal } from '@selectedRules/components/useRuleSetScorerModal'
 import RuleSetScorerModal from '@selectedRules/components/RuleSetScorerModal.vue'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
-import { ref } from 'vue'
-import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
+import { type TransitionGroupProps, computed, ref, watch } from 'vue'
+import { keepPreviousData } from '@tanstack/vue-query'
+import { useActiveRuleSetRulesQuery, useInvalidateActiveRuleSetRules, useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
 import SectionCard from '@/components/Layout/SectionCard.vue'
 import SectionTitle from '@/components/Layout/SectionTitle.vue'
@@ -114,36 +113,143 @@ import { appConfig } from '@/config/appConfig'
 import { externalUrls } from '@/utils/externalUrls'
 import RulesGrid from '@/components/Rules/RulesGrid.vue'
 import VIconButton from '@/components/VIconButton.vue'
-import { createTaskRulesDataParams, type TaskRulesDataParams } from '@/components/Task/taskRulesDataParams'
+import { useRulesGrid } from '@/components/Rules/rulesGrid'
+import type { TaskRule } from '@/api/tasks/types'
+import { useActiveRuleSetDetailQuery } from '@/api/ruleSets/useRuleSetDetailQuery'
+import { queryClient } from '@/libs/vueQuery'
+import { queryKeys } from '@/api/queryKeys'
 
-const { currentRuleSetId } = useSelectedRulesStoreRefs()
+const rulesGrid = useRulesGrid()
+const selectedRules = useSelectedRules()
 const ruleSetScorerModal = useRuleSetScorerModal()
-const ruleSetsRulesQuery = useRuleSetRulesQuery(currentRuleSetId)
-const { rules, ruleSet, isPending, isLoading, isRefetching } = ruleSetsRulesQuery
 
-const dataParams = ref(createTaskRulesDataParams())
+const activeRuleSetDetailQuery = useActiveRuleSetDetailQuery({
+  queryOptions: { placeholderData: keepPreviousData },
+})
+const { ruleSet } = activeRuleSetDetailQuery
+const activeRuleSetRulesQuery = useActiveRuleSetRulesQuery({
+  options: rulesGrid.requestParams,
+  queryOptions: { placeholderData: keepPreviousData },
+})
+const { activeRuleSetId, rulesCount } = activeRuleSetRulesQuery
 
-const {
-  handleRemove,
-  isRuleMutationLoading,
-} = useSelectedRules()
+const isViewLoading = computed(() => {
+  return activeRuleSetDetailQuery.isPending.value || activeRuleSetRulesQuery.isPending.value
+})
+
+const isRemoveLoading = ref(false)
+const isRefetching = computed(() => {
+  return !isRemoveLoading.value && activeRuleSetRulesQuery.isRefetching.value
+})
+
+rulesGrid.setDataState({
+  rules: activeRuleSetRulesQuery.rules,
+  totalCount: activeRuleSetRulesQuery.rulesCount,
+  isLoading: isViewLoading,
+  isRefetching,
+})
+
+const isEveryRuleOnCurrentPageRemoved = ref(false)
+
+rulesGrid.setUiState({
+  getItemProps(rule) {
+    if (selectedRules.isRuleBeingRemoved(rule)) {
+      return {
+        'data-removed': 'true',
+      }
+    }
+  },
+  transitionGroup: {
+    onEnter(el) {
+      if (!(el instanceof HTMLElement)) return
+      if (isEveryRuleOnCurrentPageRemoved.value) {
+        el.style.display = 'none'
+        setTimeout(() => {
+          el.style.display = ''
+          el.animate([
+            { opacity: 0 },
+            { opacity: 1 },
+          ], {
+            duration: 500,
+          })
+        }, 500)
+      }
+    },
+    async onLeave(el, done) {
+      const isRemoved = el.getAttribute('data-removed')
+      if (!isRemoved) return done()
+
+      el.animate([
+        { backgroundColor: '#fca5a5' },
+      ], {
+        duration: 400,
+        fill: 'forwards',
+      })
+
+      el.animate([
+        { opacity: 0, overflow: 'hidden' },
+      ], {
+        duration: 300,
+        delay: 300,
+        fill: 'forwards',
+      })
+
+      el.animate([
+        {
+          height: `${el.clientHeight}px`,
+        },
+        { height: '0px', paddingTop: '0px', paddingBottom: '0px' },
+      ], {
+        duration: 300,
+        delay: 500,
+        fill: 'forwards',
+      }).finished.then(done)
+    },
+  },
+})
+rulesGrid.setEventHandlers({
+  removeSelected: async () => {
+    await removeRules(rulesGrid.selection.value)
+  },
+})
+
+async function removeRules(rules: TaskRule[]) {
+  isRemoveLoading.value = true
+  if (rules.length === activeRuleSetRulesQuery.rules.value.length) {
+    isEveryRuleOnCurrentPageRemoved.value = true
+  }
+  try {
+    await selectedRules.removeRules(rules)
+    // If all rules were removed from the current page, go to the previous page
+    if (isEveryRuleOnCurrentPageRemoved.value) {
+      rulesGrid.pagination.previous()
+    }
+    queryClient.invalidateQueries({ queryKey: queryKeys.ruleSets.rules(activeRuleSetId), refetchType: 'none' })
+    await activeRuleSetRulesQuery.refetch()
+  }
+  finally {
+    isRemoveLoading.value = false
+    isEveryRuleOnCurrentPageRemoved.value = false
+    selectedRules.removeRulesMutation.reset()
+  }
+}
 
 function openRulesEditor() {
-  if (!currentRuleSetId.value) return
+  if (!activeRuleSetId.value) return
   if (confirm('Rule editor will be opened in new window. After finishing the work in editor, don´t forget to reload this miner window.')) {
-    window.open(externalUrls.rulesEditor(currentRuleSetId.value), '_blank')
+    window.open(externalUrls.rulesEditor(activeRuleSetId.value), '_blank')
   }
 }
 
 function openKnowledgeExperiment() {
-  if (!currentRuleSetId.value) return
+  if (!activeRuleSetId.value) return
   if (confirm('Are you sure you want to use this rule set as the basis of a knowledge experiment?')) {
-    window.open(externalUrls.knowledgeExperiment(currentRuleSetId.value), '_blank')
+    window.open(externalUrls.knowledgeExperiment(activeRuleSetId.value), '_blank')
   }
 }
 
 function exportRuleSet() {
-  if (!currentRuleSetId.value) return
-  window.open(externalUrls.exportRuleSet(currentRuleSetId.value), '_blank')
+  if (!activeRuleSetId.value) return
+  window.open(externalUrls.exportRuleSet(activeRuleSetId.value), '_blank')
 }
 </script>

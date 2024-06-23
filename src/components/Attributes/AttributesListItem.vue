@@ -18,9 +18,8 @@
       >
         <VCheckbox
           v-if="shouldShowSelection && attribute.isAvailable"
-          v-model="modelValue"
-          class="size-4"
-          :value="attribute"
+          :model-value="isSelected"
+          class="pointer-events-none size-4"
         />
         <component
           :is="icon"
@@ -79,16 +78,15 @@ const props = defineProps<{
 }>()
 
 const attributesList = useInjectAttributesList()!
-const { shouldShowSelection, isInteractive: isListInteractive, selection } = attributesList
-const { modelValue } = selection
+const { shouldShowSelection, isInteractive: isListInteractive, selectionModel } = attributesList
 
 const isSelected = computed(() => {
-  return selection.isItemSelected(props.attribute)
+  return selectionModel.isItemSelected(props.attribute)
 })
 
 function toggleSelection() {
   if (!shouldShowSelection.value) return
-  selection.toggleItem(props.attribute)
+  selectionModel.toggleItem(props.attribute)
 }
 
 const attributeHistogramModal = useAttributeHistogramModal()
@@ -97,7 +95,7 @@ const colorSchemaClass = computed(() => {
   if (props.isDragged) return clsx('bg-primary-100')
   if (isSelected.value) return clsx('bg-primary-100')
   if (props.isEven) return clsx('bg-slate-50')
-  return ''
+  return clsx('bg-white')
 })
 
 const icon = computed(() => {

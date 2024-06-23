@@ -1,7 +1,7 @@
 <template>
   <Listbox
     v-slot="{ open }"
-    v-model="currentRuleSetId"
+    v-model="activeRuleSetId"
     :class="{ 'relative z-[110]': isOpen }"
     as="div"
   >
@@ -81,7 +81,7 @@ import VInput from '@/components/Form/VInput.vue'
 import Truncate from '@/components/Truncate.vue'
 import { appConfig } from '@/config/appConfig'
 
-const { currentRuleSetId } = useSelectedRulesStoreRefs()
+const { activeRuleSetId } = useSelectedRulesStoreRefs()
 const { ruleSets } = useRuleSetsQuery()
 
 const isOpen = ref(false)

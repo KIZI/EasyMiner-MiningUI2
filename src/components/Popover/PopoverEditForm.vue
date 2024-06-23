@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { useInjectPopoverState } from './popoverInjectionState'
 import SlideTransition from '@/components/Transitions/SlideTransition.vue'

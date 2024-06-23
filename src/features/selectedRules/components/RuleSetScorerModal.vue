@@ -6,7 +6,7 @@
   >
     <template #title>
       <h2 class="text-lg font-medium">
-        {{ ruleSet?.name }}
+        {{ activeRuleSet?.name }}
       </h2>
     </template>
 
@@ -21,21 +21,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useSelectedRulesStore } from '@selectedRules/stores/selectedRulesStore'
+import { computed } from 'vue'
 import { useRuleSetScorerModal } from '@selectedRules/components/useRuleSetScorerModal'
+import { useSelectedRulesStore } from '@selectedRules/stores/selectedRulesStore'
+import { storeToRefs } from 'pinia'
 import VModal from '@/components/VModal.vue'
 import IframeWrapper from '@/components/IframeWrapper.vue'
-import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
-import { externalUrl, externalUrls } from '@/utils/externalUrls'
-import { appConfig } from '@/config/appConfig'
+import { externalUrls } from '@/utils/externalUrls'
 
-const selectedRulesStore = useSelectedRulesStore()
-const { ruleSet } = useRuleSetRulesQuery(selectedRulesStore.currentRuleSetId)
+const { activeRuleSet } = storeToRefs(useSelectedRulesStore())
 const ruleSetScorerModal = useRuleSetScorerModal()
 
 const iframeSource = computed(() => {
-  if (!selectedRulesStore.currentRuleSetId) return ''
-  return externalUrls.ruleSetScorer(selectedRulesStore.currentRuleSetId)
+  if (!activeRuleSet.value?.id) return ''
+  return externalUrls.ruleSetScorer(activeRuleSet.value.id)
 })
 </script>

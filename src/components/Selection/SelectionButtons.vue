@@ -8,13 +8,13 @@
     </VIconButton>
     <VIconButton
       title="Invert selection"
-      @click="$emit('invertSelection')"
+      @click="$emit('invert')"
     >
       <icon-fluent-shape-intersect-20-regular :width="25" />
     </VIconButton>
     <VIconButton
       title="Select none"
-      @click="$emit('clearSelection')"
+      @click="$emit('clear')"
     >
       <icon-fluent-square-20-regular :width="25" />
     </VIconButton>
@@ -24,5 +24,5 @@
 <script setup lang="ts">
 import VIconButton from '@/components/VIconButton.vue'
 
-defineEmits(['selectAll', 'clearSelection', 'invertSelection'])
+defineEmits(['selectAll', 'clear', 'invert'])
 </script>

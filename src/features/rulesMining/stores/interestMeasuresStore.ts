@@ -1,4 +1,4 @@
-import {  InterestMeasures } from '@rulesMining/types/interestMeasure.types'
+import { InterestMeasures } from '@rulesMining/types/interestMeasure.types'
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import type { InterestMeasure, InterestMeasureActiveItem } from '@rulesMining/types/interestMeasure.types'

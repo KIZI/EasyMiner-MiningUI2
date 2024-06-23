@@ -40,6 +40,6 @@
 </template>
 
 <script setup lang="ts">
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { Menu, MenuItem, MenuItems } from '@headlessui/vue'
 import SlideTransition from '@/components/Transitions/SlideTransition.vue'
 </script>

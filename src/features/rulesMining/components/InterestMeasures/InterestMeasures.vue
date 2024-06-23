@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-auto pb-6">
+  <div>
     <div class="flex items-start gap-x-7">
       <div class="font-semibold">
         Interest measures
@@ -48,9 +48,9 @@
 <script lang="ts" setup>
 import { SwitchGroup, SwitchLabel } from '@headlessui/vue'
 import { storeToRefs } from 'pinia'
+import { useInterestMeasuresStore } from '@rulesMining/stores/interestMeasuresStore'
 import InterestMeasureItemForm from './InterestMeasureItemForm.vue'
 import { VSwitch } from '@/components/Form'
-import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore'
 import VButton from '@/components/VButton.vue'
 
 const {

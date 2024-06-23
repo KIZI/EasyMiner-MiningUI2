@@ -1,23 +1,30 @@
 import { defineStore, storeToRefs } from 'pinia'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useMinerQuery } from '@/api/miners/useMinerQuery'
+import { useRuleSetsQuery } from '@/api/ruleSets/useRuleSetsQuery'
 
 export const useSelectedRulesStore = defineStore('selectedRules', () => {
   const { ruleSetId } = useMinerQuery()
+  const ruleSetsQuery = useRuleSetsQuery()
 
-  const currentRuleSetId = ref<number>()
+  const activeRuleSetId = ref<number>()
 
   watch(ruleSetId, (id) => {
-    currentRuleSetId.value = id
+    activeRuleSetId.value = id
   }, { immediate: true })
 
-  function setCurrentRuleSetId(id: number) {
-    currentRuleSetId.value = id
+  const activeRuleSet = computed(() => {
+    return ruleSetsQuery.data.value?.find(ruleSet => ruleSet.id === activeRuleSetId.value)
+  })
+
+  function setActiveRuleSetId(id: number) {
+    activeRuleSetId.value = id
   }
 
   return {
-    setCurrentRuleSetId,
-    currentRuleSetId,
+    activeRuleSet,
+    setActiveRuleSetId,
+    activeRuleSetId,
   }
 })
 

@@ -18,24 +18,24 @@
 
             <template v-else-if="task?.state === 'interrupted'">
               Task was interrupted
-              <span class="pl-1 text-lg font-normal">(dicovered {{ rules.length }} rules)</span>
+              <span class="pl-1 text-lg font-normal">(dicovered {{ rulesCount }} rules)</span>
             </template>
 
             <template v-else-if="task?.state === 'failed'">
               Task failed
             </template>
 
-            <template v-else-if="!rules.length">
+            <template v-else-if="!rulesCount">
               No rules discovered
             </template>
 
             <template v-else>
-              Discovered {{ rules.length }} {{ $t('common.rules', rules.length) }}
+              Discovered {{ rulesCount }} {{ $t('common.rules', rulesCount) }}
             </template>
           </SectionTitle>
 
           <VButton
-            v-if="!isViewLoading && isAnyUnselected"
+            v-if="!isViewLoading && isAnyNotInSelectedRules"
             size="xs"
             variant="ghost"
             class="gap-x-1.5 font-medium"
@@ -55,9 +55,11 @@
             {{ task?.name }}
           </div>
           <div class="mt-1 space-x-4 text-xs leading-none">
-            <span v-for="measure in taskDetail?.settings.rule0.iMs" :key="measure.name">
-              <span class="pr-1.5">{{ $t(`interestMeasures.${measure.name}.name`) }}:</span>
-              <span class="font-semibold text-primary-700">
+            <span v-for="measure in task?.settings.rule0.iMs" :key="measure.name">
+              <span class="pr-1.5">
+                {{ $t(`interestMeasures.${measure.name}.name`) }}{{ measure.threshold ? ':' : '' }}
+              </span>
+              <span v-if="measure.threshold" class="font-semibold text-primary-700">
                 {{ formatDecimal(measure.threshold) }}
               </span>
             </span>
@@ -79,14 +81,7 @@
       </div>
     </div>
 
-    <RulesGrid
-      v-model:dataParams="dataParams"
-      :rules="rules"
-      :is-loading="isViewLoading"
-      :is-refetching="isRulesRefetching"
-      :task="taskDetail"
-      :total-count="rulesCount"
-    >
+    <RulesGrid :task="task" highlight-in-selected-rules list-id="discoveredRulesList">
       <template #empty>
         <div class="flex gap-x-3">
           <icon-ph-info class="size-6" />
@@ -97,9 +92,9 @@
       <template #ruleActions="{ rule }">
         <VIconButton
           :title="selectedRules.isRuleSelected(rule) ? 'Remove from selected rules' : 'Add to selected rules'"
-          :loading="selectedRules.isRuleMutationLoading(rule)"
+          :loading="selectedRules.isRuleSelectionLoading(rule)"
           class="text-green-700 hover:bg-subtle-white"
-          @click="selectedRules.handleToggle(rule)"
+          @click="toggleSelectedRule(rule)"
         >
           <component
             :is="selectedRules.isRuleSelected(rule) ? IconPhCheckCircleFill : IconPhCheckCircle"
@@ -125,10 +120,13 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, computed, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import { useRulesMining } from '@rulesMining/composables/useRulesMining'
+import { keepPreviousData } from '@tanstack/vue-query'
+import { storeToRefs } from 'pinia'
+import { useRafFn } from '@vueuse/core'
 import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
 import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -138,67 +136,178 @@ import VIconButton from '@/components/VIconButton.vue'
 import IconPhCheckCircle from '~icons/ph/check-circle.vue'
 import IconPhCheckCircleFill from '~icons/ph/check-circle-fill.vue'
 import RulesGrid from '@/components/Rules/RulesGrid.vue'
-import { type TaskRulesDataParams, createTaskRulesDataParams } from '@/components/Task/taskRulesDataParams'
 import { formatDecimal } from '@/utils/format'
 import { layout } from '@/components/Layout'
 import VButton from '@/components/VButton.vue'
+import { useRulesGrid } from '@/components/Rules/rulesGrid'
+import { useTasksStore } from '@/stores/tasksStore'
+import type { TaskRule } from '@/api/tasks/types'
+import { useActiveRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
+import { queryClient } from '@/libs/vueQuery'
+import { queryKeys } from '@/api/queryKeys'
 
 const { isInProgress: isMiningInProgress, startedTaskId } = useRulesMining()
-const dataParams = ref(createTaskRulesDataParams())
 const rulePatternStore = useRulePatternStore()
+const selectedRules = useSelectedRules()
+const { activeTaskId } = storeToRefs(useTasksStore())
 
-const {
-  rulesCount,
-  rules,
-  task,
-  state,
-  isLoading: isRulesLoading,
-  isRefetching: isRulesRefetching,
-} = useActiveTaskRulesQuery({
-  options: dataParams,
-  keepPreviousData: true,
+const rulesGrid = useRulesGrid({
+  filterByMeasures: true,
 })
 
-const { task: taskDetail, isLoading: isTaskDetailLoading } = useActiveTaskDetailQuery()
+const activeTaskRulesQuery = useActiveTaskRulesQuery({
+  options: rulesGrid.requestParams,
+  queryOptions: {
+    placeholderData: (data) => {
+      if (data?.task.id === activeTaskId.value) {
+        return keepPreviousData(data)
+      }
+    },
+  },
+})
+const { state, isPending: isRulesPending } = activeTaskRulesQuery
+
+const isTaskFinished = computed(() => {
+  return state.value && !isTaskStateRunning(state.value)
+})
+
+const { task, isPending: isTaskDetailPending } = useActiveTaskDetailQuery({
+  queryParams: {
+    enabled: computed(() => !isMiningInProgress.value && !isRulesPending.value),
+  },
+})
+const rulesCount = computed(() => task.value?.rulesCount ?? 0)
+
+const activeRuleSetRulesQuery = useActiveRuleSetRulesQuery()
+const { activeRuleSetId } = activeRuleSetRulesQuery
+
+const isViewLoading = computed(() => {
+  return isMiningInProgress.value || isRulesPending.value || isTaskDetailPending.value
+})
+
+rulesGrid.setDataState({
+  rules: activeTaskRulesQuery.rules,
+  totalCount: activeTaskRulesQuery.rulesCount,
+  isLoading: isViewLoading,
+  isRefetching: activeTaskRulesQuery.isRefetching,
+})
+
+rulesGrid.setEventHandlers({
+  addSelected: async () => {
+    await addToSelectedRules(rulesGrid.selection.value.filter(rule => !selectedRules.isRuleSelected(rule)))
+    rulesGrid.selectionModel.clear()
+  },
+  removeSelected: async () => {
+    await removeFromSelectedRules(rulesGrid.selection.value.filter(rule => selectedRules.isRuleSelected(rule)))
+    rulesGrid.selectionModel.clear()
+  },
+})
+
+rulesGrid.setUiState({
+  getItemProps(item) {
+    if (selectedRules.wasRuleAdded(item)) {
+      return {
+        'data-added': 'true',
+      }
+    }
+    if (selectedRules.wasRuleRemoved(item)) {
+      return {
+        'data-removed': 'true',
+      }
+    }
+  },
+})
+
+watch(() => task.value?.id, () => rulesGrid.reset())
 
 const isFromHistory = computed(() => {
   return startedTaskId.value !== task.value?.id
 })
 
-const isTaskFinished = computed(() => {
-  return !isTaskStateRunning(state.value)
-})
-
 function loadTaskToRulePattern() {
-  if (!taskDetail.value) return
-  rulePatternStore.loadTaskRule(taskDetail.value.settings.rule0)
+  if (!task.value) return
+  rulePatternStore.loadTaskRule(task.value.settings.rule0)
   document.getElementById('rulesMining')?.scrollIntoView({ behavior: 'smooth' })
 }
 
-const selectedRules = useSelectedRules()
+async function addToSelectedRules(rules: TaskRule[]) {
+  try {
+    resetMutationsState()
+    await selectedRules.addRules(rules)
+    await onSelectionSuccess()
+  }
+  catch (e) {}
+}
 
-const isViewLoading = computed(() => {
-  return isMiningInProgress.value || isRulesLoading.value || isTaskDetailLoading.value
+async function removeFromSelectedRules(rules: TaskRule[]) {
+  try {
+    resetMutationsState()
+    await selectedRules.removeRules(rules)
+    await onSelectionSuccess()
+  }
+  catch (e) {}
+}
+
+async function toggleSelectedRule(rules: TaskRule) {
+  try {
+    resetMutationsState()
+    await selectedRules.toggle(rules)
+    await onSelectionSuccess()
+  }
+  catch (e) {}
+}
+
+function resetMutationsState() {
+  selectedRules.removeRulesMutation.reset()
+  selectedRules.addRulesMutation.reset()
+}
+
+async function onSelectionSuccess() {
+  queryClient.invalidateQueries({ queryKey: queryKeys.ruleSets.rules(activeRuleSetId), refetchType: 'none' })
+  await activeRuleSetRulesQuery.refetch()
+  queryClient.refetchQueries({ predicate: query => query.isActive() && query.isStale() })
+
+  const animate = async () => {
+    await Promise.all([
+      blinkAnimation('[data-added]', '#86efac'),
+      blinkAnimation('[data-removed]', '#e2e8f0'),
+    ])
+  }
+
+  animate()
+}
+
+async function blinkAnimation(selector: string, backgroundColor: string) {
+  const listEl = document.getElementById('discoveredRulesList')
+  if (!listEl) return
+  listEl.querySelectorAll(selector).forEach(async (el) => {
+    el.animate([
+      { backgroundColor },
+    ], {
+      duration: 300,
+      direction: 'alternate',
+      iterations: 2,
+    })
+  })
+}
+
+const allRulesQuery = useActiveTaskRulesQuery({
+  queryOptions: {
+    enabled: activeTaskRulesQuery.isSuccess,
+  },
 })
 
 const rulesNotInSelectedRules = computed(() => {
-  return rules.value.filter(rule => !selectedRules.isRuleSelected(rule))
+  return allRulesQuery.rules.value.filter(rule => !selectedRules.isRuleSelected(rule))
+})
+const isAnyNotInSelectedRules = computed(() => {
+  return rulesNotInSelectedRules.value.length > 0
 })
 
-const isAddAllLoading = computed(() => {
-  const { addRulesMutation } = selectedRules
-
-  const addedRulesLength = addRulesMutation.variables.value?.rules.length
-  const rulesNotInSelectedRulesLength = rulesNotInSelectedRules.value.length
-
-  return addedRulesLength === rulesNotInSelectedRulesLength
-})
-
-const isAnyUnselected = computed(() => {
-  return !!rulesNotInSelectedRules.value.length
-})
-
-function addAllToSelectedRules() {
-  selectedRules.handleAdd(rulesNotInSelectedRules.value)
+const isAddAllLoading = ref(false)
+async function addAllToSelectedRules() {
+  isAddAllLoading.value = true
+  await addToSelectedRules(rulesNotInSelectedRules.value)
+  isAddAllLoading.value = false
 }
 </script>

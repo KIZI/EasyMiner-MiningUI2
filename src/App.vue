@@ -7,6 +7,7 @@
     </main>
     <AttributeHistogramModal />
   </div>
+  <div class="drag-overlay absolute inset-0 z-40 hidden" />
   <VueQueryDevtools />
 </template>
 

@@ -1,63 +1,71 @@
 import type { MaybeRef, Ref } from 'vue'
-import { computed, ref, toValue } from 'vue'
+import { computed, reactive, ref, toRaw, toValue, watch, watchEffect } from 'vue'
 
 type UseSelectionOptions<T> = {
   items?: MaybeRef<T[]>
-  modelValue?: Ref<T[]>
+  selection?: Ref<T[]>
+  itemIdentity?: (item: T) => T | string | number
 }
 
 export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
-  options.modelValue ??= ref([])
-  const { modelValue } = options
+  const selection = options.selection ?? ref([])
+  const itemIdentity = options.itemIdentity ?? ((item: T) => item)
 
-  const items = computed(() => {
-    return toValue(options.items)
+  const selectionIdsSet = computed(() => {
+    return new Set(selection.value.map(item => itemIdentity(toRaw(item))))
   })
 
-  const hasItems = computed(() => {
-    return Boolean(modelValue.value.length)
+  const availableItems = computed(() => [...toValue(options.items) ?? []])
+  const availableItemdsIdsSet = computed(() => {
+    return new Set(availableItems.value.map(item => itemIdentity(item)))
   })
 
-  const selected = computed(() => {
-    return modelValue.value
+  watch(availableItems, () => {
+    selection.value = selection.value.filter((item) => {
+      if (!availableItemdsIdsSet.value.size) return false
+      return availableItemdsIdsSet.value.has(itemIdentity(item))
+    })
+  })
+
+  const isAnySelected = computed(() => {
+    return Boolean(selection.value.length)
   })
 
   function selectAll() {
-    if (!items.value) return
-    modelValue.value = items.value
+    if (!availableItems.value) return
+    selection.value = availableItems.value
   }
 
-  function clearSelection() {
-    modelValue.value = []
+  function clear() {
+    selection.value = []
   }
 
-  function invertSelection() {
-    if (!items.value) return
-    modelValue.value = items.value.filter(item => !modelValue.value.includes(item))
+  function invert() {
+    if (!availableItems.value) return
+    selection.value = availableItems.value.filter(item => !isItemSelected(item))
   }
 
   function isItemSelected(item: T) {
-    return modelValue.value.includes(item)
+    return selectionIdsSet.value.has(itemIdentity(item))
   }
 
   function toggleItem(item: T) {
     if (isItemSelected(item)) {
-      const index = modelValue.value.indexOf(item)
-      modelValue.value.splice(index, 1)
+      const index = selection.value.findIndex(i => itemIdentity(i) === itemIdentity(item))
+      selection.value.splice(index, 1)
     }
     else {
-      modelValue.value.push(item)
+      selection.value.push(item)
     }
   }
 
-  return {
-    modelValue,
+  return reactive({
+    selection,
+    isAnySelected,
     selectAll,
-    clearSelection,
-    invertSelection,
+    clear,
+    invert,
     isItemSelected,
     toggleItem,
-    selected,
-    hasItems,
-  }
+  })
 }

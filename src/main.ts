@@ -10,7 +10,6 @@ import { i18n } from '@/libs/i18n/i18n'
 import { router } from '@/libs/router'
 import { vueQueryPluginOptions } from '@/libs/vueQuery'
 
-
 const app = createApp(App)
 
 app.use(router)

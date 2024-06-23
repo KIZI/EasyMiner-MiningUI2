@@ -14,10 +14,10 @@ const props = defineProps<{
 }>()
 
 const dropZoneClass = computed(() => {
-  const defaultClass = clsx('-mx-1.5 min-h-[10em] rounded border-2 border-dashed px-1.5 py-0.5 transition-all')
+  const defaultClass = clsx('relative -mx-1.5 min-h-[10em] rounded border-2 border-dashed px-1.5 py-0.5 transition-all')
 
   const draggedOverClass = clsx({
-    'bg-primary-100': props.isDraggedOver,
+    'bg-primary-100 ring-2 ring-primary-400': props.isDraggedOver,
     'bg-transparent': !props.isDraggedOver,
   })
 

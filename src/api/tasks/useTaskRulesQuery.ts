@@ -1,13 +1,15 @@
-import { type QueryObserverOptions, keepPreviousData, useQuery, type UseQueryOptions } from '@tanstack/vue-query'
+import { type UseQueryOptions, keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { computed, toValue } from 'vue'
 import type { MaybeRef, Ref } from 'vue'
 import { api } from '@/api/api'
 import type { Optional } from '@/libs/vueQuery'
 import { isTaskStateRunning } from '@/api/tasks/utils'
 import type { TaskRulesInput, TasksRulesResponse } from '@/api/tasks/types'
-import { type PaginationInput, getPaginationParams } from '@/api/pagination'
+import { type PaginationInput, getPaginationParams } from '@/components/Pagination/usePagination'
+import { cleanParams } from '@/api/utils'
+import { queryKeys } from '@/api/queryKeys'
 
-type InterestMeasureFilter = { from?: number | null, to?: number | null }
+type InterestMeasureFilter = { from?: string, to?: string }
 
 export type TaskRulesQueryOptions = {
   pagination?: PaginationInput
@@ -27,27 +29,15 @@ export type TaskRulesQueryOptions = {
 export type TaskRulesQueryParams = {
   options?: MaybeRef<TaskRulesQueryOptions>
   signal?: Ref<AbortSignal>
-  keepPreviousData?: boolean
   queryOptions?: Partial<UseQueryOptions<TasksRulesResponse>>
-}
-
-function cleanParams(params: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(params).filter(([, value]) => {
-      if (Array.isArray(value)) return !!value.length
-      if (typeof value === 'string') return !!value
-
-      return value !== undefined && value !== null
-    }),
-  )
 }
 
 export function useTaskRulesQuery(
   taskId: MaybeRef<Optional<number>>,
   params: TaskRulesQueryParams = {},
 ) {
-  const { data, ...query } = useQuery<TasksRulesResponse>({
-    queryKey: ['taskRules', taskId, params.options],
+  const query = useQuery<TasksRulesResponse>({
+    queryKey: [...queryKeys.tasks.rules(taskId), params.options].filter(Boolean),
     enabled: computed(() => Boolean(toValue(taskId))),
     queryFn: () => {
       const {
@@ -73,13 +63,12 @@ export function useTaskRulesQuery(
         }),
       }, { signal: toValue(params.signal) })
     },
-    ...params.keepPreviousData && { placeholderData: keepPreviousData },
     ...params.queryOptions,
   })
 
-  const task = computed(() => data.value?.task)
-  const rulesCount = computed(() => data.value?.rulesCount)
-  const rules = computed(() => data.value?.rules ?? [])
+  const task = computed(() => query.data.value?.task)
+  const rulesCount = computed(() => query.data.value?.rulesCount)
+  const rules = computed(() => query.data.value?.rules ?? [])
   const state = computed(() => task.value?.state)
 
   const isNoRulesDiscovered = computed(() => {

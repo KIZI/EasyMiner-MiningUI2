@@ -10,7 +10,8 @@ export type RuleSet = {
 
 export type RuleSetsRulesResponse = {
   ruleset: RuleSet
-  rule: TaskRule[]
+  rules: TaskRule[]
+  rulesCount: number
 }
 
 export type AddRulesInput = {
@@ -28,3 +29,16 @@ export type CreateRuleSetInput = {
 export type UpdateRuleSetInput = {
   id: number
 } & CreateRuleSetInput
+
+export type RuleSetRulesInput = {
+  id: number
+  orderby?: 'conf' | 'supp' | 'lift' | 'default' | 'cba'
+  order?: 'ASC' | 'DESC'
+
+  offset?: number
+  limit?: number
+
+  search?: string
+  searchAntecedent?: string
+  searchConsequent?: string
+}

@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useActiveMetasourceQuery } from '@/api/metasources/useActiveMetasourceQuery'
-import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 
 export function useMetasourceAttributes() {
   const { attributes: metasourceAttributes, isPending } = useActiveMetasourceQuery()

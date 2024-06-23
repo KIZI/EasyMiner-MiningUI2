@@ -1,19 +1,17 @@
 <template>
-  <SectionCard id="rulesMining" class="scroll-m-5 [&>*]:px-6">
-    <div class="flex items-start justify-between pt-4">
+  <SectionCard id="rulesMining" class="scroll-m-5 group-px-6">
+    <div class="flex items-start justify-between pt-4 peer-px">
       <SectionTitle>
         Association rule pattern
       </SectionTitle>
       <RulePatternTrash />
     </div>
 
-    <div class="flex grow flex-col">
-      <RulePattern />
-      <InterestMeasures />
+    <div class="flex min-h-0 grow flex-col">
+      <RulePattern class="min-h-0 peer-px" />
+      <InterestMeasures class="pb-6 pt-4 peer-px" />
 
-      <hr class="-mx-6 mt-5 border-gray-200">
-
-      <div class="flex h-16 items-center justify-between py-2.5">
+      <div class="mt-2 flex h-16 shrink-0 items-center justify-between border-t border-gray-200 py-2.5 peer-px">
         <RulesMiningHint :state="miningState" />
 
         <div class="flex items-center gap-x-8">

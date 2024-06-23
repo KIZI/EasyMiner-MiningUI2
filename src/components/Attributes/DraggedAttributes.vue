@@ -3,10 +3,7 @@
     <div
       v-if="draggable"
       class="absolute z-50 grid"
-      :style="{
-        left: `${draggable.dragPosition.x - 4}px`,
-        top: `${draggable.dragPosition.y - 4}px`,
-      }"
+      :style="draggable.draggedElementStyle"
     >
       <div
         v-for="(attribute, i) in draggedAttributes"
@@ -33,7 +30,6 @@ import {
   computed,
   nextTick,
   ref,
-  toRef,
   watch,
 } from 'vue'
 import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore'
@@ -47,29 +43,21 @@ const props = defineProps<{
 }>()
 
 const attributeList = useInjectAttributesList()!
+const { selectionModel } = attributeList
 
 const dragAndDropStore = useDragAndDropStore()
 
 const draggedAttributes = computed(() => {
   if (!props.draggable) return []
 
-  if (attributeList.selection.hasItems.value) {
-    if (attributeList.selection.isItemSelected(props.draggable.payload)) {
-      return attributeList.selection.modelValue.value
-    }
+  if (selectionModel.isItemSelected(props.draggable.payload)) {
+    return selectionModel.selection
   }
 
   return [props.draggable.payload]
 })
 
 const draggedItemRef = ref<HTMLElement>()
-
-const originalPosition = ref({ x: 0, y: 0 })
-const delta = computed(() => {
-  const x = props.draggable.dragPosition.value.x - originalPosition.value.x
-  const y = props.draggable.dragPosition.value.y - originalPosition.value.y
-  return { x, y }
-})
 
 watch(() => props.draggable, async (draggable) => {
   await nextTick()
@@ -78,7 +66,6 @@ watch(() => props.draggable, async (draggable) => {
   dragAndDropStore.setDraggedItem({
     elementRef: draggedItemRef.value,
     payload: draggedAttributes.value,
-    position: toRef(draggable, 'dragPosition'),
     source: attributeList.dragSource,
   })
 })

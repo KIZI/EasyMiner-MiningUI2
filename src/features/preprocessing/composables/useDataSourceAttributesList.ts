@@ -1,7 +1,7 @@
 import { createSharedComposable } from '@vueuse/core'
 import { computed } from 'vue'
 import { useActiveDatasourceQuery } from '@/api/datasources/useActiveDatasourceQuery'
-import { type ListAttribute, useAttributesList } from '@/components/Attributes/useAttributesList'
+import { useAttributesList } from '@/components/Attributes/useAttributesList'
 
 export const useDataSourceAttributesList = createSharedComposable(() => {
   const datasourceQuery = useActiveDatasourceQuery()

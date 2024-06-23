@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { type VueTransitionProps, useTransition } from './useTransition'
 import { BOTTOM_SECTIONS } from '@/components/Layout'
 

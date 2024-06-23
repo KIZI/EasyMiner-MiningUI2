@@ -1,5 +1,6 @@
 import { useMouse } from '@vueuse/core'
 import {
+  type StyleValue,
   computed,
   reactive,
   ref,
@@ -13,7 +14,7 @@ export type DragEndFlags = { cancelled?: boolean }
 
 export function useDraggable(options: {
   payload: any
-  onDragStart?: (draggable: any) => void
+  onDragStart?: () => void
   onDragEnd?: (flags: DragEndFlags) => void
 }) {
   const mouseMoveThreshold = 5
@@ -34,13 +35,21 @@ export function useDraggable(options: {
     return mousePosition.value
   })
 
+  const delta = computed(() => {
+    const x = dragPosition.value.x - startPosition.value.x
+    const y = dragPosition.value.y - startPosition.value.y
+    return { x, y }
+  })
+
   watchEffect(() => {
     if (!isMousePressed.value || isMouseDragged.value) return
 
     if (
       Math.abs(mousePosition.value.x - startPosition.value.x) < mouseMoveThreshold
       && Math.abs(mousePosition.value.y - startPosition.value.y) < mouseMoveThreshold
-    ) return
+    ) {
+      return
+    }
 
     isMouseDragged.value = true
   })
@@ -53,10 +62,7 @@ export function useDraggable(options: {
     window.addEventListener('keydown', onKeyPress)
     document.body.classList.toggle('dragging-active', true)
 
-    options?.onDragStart?.({
-      dragPosition,
-      payload: options.payload,
-    })
+    options?.onDragStart?.()
   }
 
   function onDragEnd(flags: DragEndFlags = {}) {
@@ -112,10 +118,22 @@ export function useDraggable(options: {
     touchmove: onTouchMove,
   }
 
+  const draggedElementStyle = computed<StyleValue>(() => {
+    return {
+      position: 'absolute',
+      left: `${startPosition.value.x}px`,
+      top: `${startPosition.value.y}px`,
+      transform: `translate(${delta.value.x}px, ${delta.value.y}px)`,
+    }
+  })
+
   return reactive({
     dragPosition,
     events,
     isDragged,
     payload: options.payload,
+    startPosition,
+    delta,
+    draggedElementStyle,
   })
 }

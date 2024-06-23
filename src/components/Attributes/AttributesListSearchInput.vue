@@ -5,6 +5,7 @@
       v-model="searchQuery"
       placeholder="Search by attribute name..."
       :disabled="!shouldShowSearch"
+      class="pr-8"
     />
   </VClearInput>
 </template>

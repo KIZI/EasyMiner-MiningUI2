@@ -1,8 +1,8 @@
 <template>
   <VContainer class="pb-20">
-    <div class="grid grid-cols-[auto_20rem] grid-rows-[600px_700px] gap-2">
-      <RulesMining />
-      <MetasourceAttributes />
+    <div class="grid grid-cols-[auto_20rem] grid-rows-[max-content_700px] gap-2">
+      <RulesMining class="min-h-[600px]" />
+      <MetasourceAttributes class="max-h-[600px] min-h-full" />
 
       <div class="relative flex flex-col gap-x-20 gap-y-2 overflow-hidden">
         <DiscoveredRules :class="layout.activeSection === 'discoveredRules' ? 'block' : 'hidden'" />
@@ -21,8 +21,10 @@ import MetasourceAttributes from '@rulesMining/components/MetasourceAttributes.v
 import RulesMining from '@rulesMining/components/RulesMining.vue'
 import SelectedRules from '@selectedRules/components/SelectedRules.vue'
 import TasksHistory from '@tasksHistory/components/TasksHistory.vue'
-import { ref, watchEffect } from 'vue'
+import { watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import { useInterestMeasuresStore } from '@rulesMining/stores/interestMeasuresStore'
 import VContainer from '@/components/Layout/VContainer.vue'
 import { useActiveMetasourceQuery } from '@/api/metasources/useActiveMetasourceQuery'
 import SideNav from '@/components/Layout/SideNav.vue'
@@ -37,4 +39,13 @@ watchEffect(() => {
     router.push({ name: 'Preprocessing' })
   }
 })
+
+const store = useRulePatternStore()
+const imStore = useInterestMeasuresStore()
+const metasourceQuery = useActiveMetasourceQuery()
+// watchEffect(() => {
+//   metasourceQuery.attributes.value.forEach(attribute => store.addItem(attribute, 'Antecedent'))
+//   imStore.setMeasure('CONF', 0.05)
+//   imStore.setMeasure('SUPP', 0.06)
+// })
 </script>

@@ -1,4 +1,4 @@
-import type { InterestMeasureRange } from '@/features/rulesMining/types/interestMeasure.types'
+import type { InterestMeasureRange } from '@rulesMining/types/interestMeasure.types'
 
 export function formatInterestMeasureRange(range: InterestMeasureRange) {
   const openingBracket = range.from.closed ? '[' : '('

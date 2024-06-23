@@ -40,7 +40,7 @@
 
       <div class="space-x-2">
         <VButton
-          :disabled="!attributesList.selection.hasItems.value"
+          :disabled="!attributesList.selectionModel.isAnySelected"
           variant="basic"
           size="sm"
           class="gap-x-2 text-xs font-semibold"
@@ -51,7 +51,7 @@
         </VButton>
 
         <VButton
-          :disabled="!attributesList.selection.hasItems.value"
+          :disabled="!attributesList.selectionModel.isAnySelected"
           variant="basic"
           size="sm"
           class="gap-x-2 text-xs font-semibold"
@@ -102,7 +102,7 @@
 import { useRouter } from 'vue-router'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import AddToPatternPopover from './AddToPatternPopover.vue'
-import type { Cedent } from '@/features/rulesMining/types/rulePattern.types'
+import type { Cedent } from '@rulesMining/types/rulePattern.types'
 import AttributesList from '@/components/Attributes/AttributesList.vue'
 import AttributesListActions from '@/components/Attributes/AttributesListActions.vue'
 import AttributesListSearch from '@/components/Attributes/AttributesListSearch.vue'
@@ -135,7 +135,7 @@ function onEditAttributes() {
 }
 
 function addSelectionToCedent(cedent: Cedent) {
-  rulePatternStore.addItems(attributesList.selection.modelValue.value, cedent)
+  rulePatternStore.addItems(attributesList.selection.value, cedent)
 }
 
 function addUnusedToCedent(cedent: Cedent) {
@@ -149,9 +149,9 @@ function addAttributeToCedent(attribute: MetasourceAttribute, cedent: Cedent) {
 dragAndDropStore.$onAction((action) => {
   if (action.name === 'dropItem') {
     const payload = dragAndDropStore.draggedItem?.payload ?? []
-    const isFromSelection = attributesList.selection.modelValue.value.find(item => item.id === payload[0]?.id)
+    const isFromSelection = attributesList.selection.value.find(item => item.id === payload[0]?.id)
     if (isFromSelection) {
-      attributesList.selection.clearSelection()
+      attributesList.selectionModel.clear()
     }
   }
 })

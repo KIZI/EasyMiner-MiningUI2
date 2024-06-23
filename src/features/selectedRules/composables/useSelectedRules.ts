@@ -1,84 +1,84 @@
-import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore'
 import { useMutation } from '@tanstack/vue-query'
 import { computed } from 'vue'
-import { createSharedComposable } from '@vueuse/core'
-import { queryClient } from '@/libs/vueQuery'
-import { queryKeys } from '@/api/queryKeys'
+import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore'
 import type { TaskRule } from '@/api/tasks/types'
 import { api } from '@/api/api'
-import { useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
-import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useActiveRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
-export function useSelectedRules(options: {
-  onMutationSuccess?: () => void
-} = {}) {
-  const { handleError } = useErrorHandler()
+export function useSelectedRules() {
+  const activeRuleSetRulesQuery = useActiveRuleSetRulesQuery()
+  const { activeRuleSetId } = activeRuleSetRulesQuery
 
-  const { currentRuleSetId } = useSelectedRulesStoreRefs()
-  const { rules } = useRuleSetRulesQuery(currentRuleSetId)
+  const ruleSetRulesIdsSet = computed(() => {
+    return new Set(activeRuleSetRulesQuery.rules.value.map(rule => rule.id))
+  })
 
   function isRuleSelected(rule: TaskRule) {
-    return rules.value?.some(selectedRule => selectedRule.id === rule.id)
-  }
-
-  function onMutationSuccess() {
-    options.onMutationSuccess?.()
-    invalidateCurrentRuleSet()
+    return ruleSetRulesIdsSet.value.has(rule.id)
   }
 
   const addRulesMutation = useMutation({
     mutationFn: api.ruleSets.addRules,
-    onSuccess: onMutationSuccess,
-    onError: handleError,
   })
   const removeRulesMutation = useMutation({
     mutationFn: api.ruleSets.removeRules,
-    onSuccess: onMutationSuccess,
-    onError: handleError,
   })
 
-  const isToggleLoading = computed(() => {
-    return addRulesMutation.isPending.value || removeRulesMutation.isPending.value
-  })
+  async function addRules(rules: TaskRule | TaskRule[]) {
+    if (!activeRuleSetId.value) return
+    if (!Array.isArray(rules)) rules = [rules]
 
-  function handleAdd(selected: TaskRule | TaskRule[]) {
-    if (!currentRuleSetId.value) return
-    if (!Array.isArray(selected)) selected = [selected]
-
-    addRulesMutation.mutate({
-      id: currentRuleSetId.value,
-      rules: selected.map(rule => rule.id),
+    await addRulesMutation.mutateAsync({
+      id: activeRuleSetId.value,
+      rules: rules.map(rule => rule.id),
     })
   }
 
-  function handleRemove(selected: TaskRule | TaskRule[]) {
-    if (!currentRuleSetId.value) return
-    if (!Array.isArray(selected)) selected = [selected]
+  async function removeRules(rules: TaskRule | TaskRule[]) {
+    if (!activeRuleSetId.value) return
+    if (!Array.isArray(rules)) rules = [rules]
 
-    removeRulesMutation.mutate({
-      id: currentRuleSetId.value,
-      rules: selected.map(rule => rule.id),
+    await removeRulesMutation.mutateAsync({
+      id: activeRuleSetId.value,
+      rules: rules.map(rule => rule.id),
     })
   }
 
-  function handleToggle(task: TaskRule) {
+  function toggle(task: TaskRule) {
     if (isRuleSelected(task)) {
-      return handleRemove(task)
+      return removeRules(task)
     }
 
-    handleAdd(task)
+    return addRules(task)
   }
 
-  function invalidateCurrentRuleSet() {
-    queryClient.invalidateQueries({ queryKey: queryKeys.ruleSets.rules(currentRuleSetId) })
+  const removedRules = computed(() => {
+    return removeRulesMutation.variables.value?.rules ?? []
+  })
+
+  const addedRules = computed(() => {
+    return addRulesMutation.variables.value?.rules ?? []
+  })
+
+  function isRuleBeingRemoved(rule: TaskRule) {
+    return removedRules.value.includes(rule.id)
   }
 
-  function isRuleMutationLoading(rule: TaskRule) {
-    const removedRules = removeRulesMutation.variables.value?.rules ?? []
-    const addedRules = addRulesMutation.variables.value?.rules ?? []
+  function isRuleBeingAdded(rule: TaskRule) {
+    return addedRules.value.includes(rule.id)
+  }
 
-    const isRemoveLoading = removeRulesMutation.isPending.value && removedRules.includes(rule.id)
-    const isAddLoading = addRulesMutation.isPending.value && addedRules.includes(rule.id)
+  function wasRuleAdded(rule: TaskRule) {
+    return addRulesMutation.isSuccess.value && isRuleBeingAdded(rule)
+  }
+
+  function wasRuleRemoved(rule: TaskRule) {
+    return removeRulesMutation.isSuccess.value && isRuleBeingRemoved(rule)
+  }
+
+  function isRuleSelectionLoading(rule: TaskRule) {
+    const isRemoveLoading = removeRulesMutation.isPending.value && isRuleBeingRemoved(rule)
+    const isAddLoading = addRulesMutation.isPending.value && isRuleBeingAdded(rule)
 
     return isRemoveLoading || isAddLoading
   }
@@ -86,12 +86,16 @@ export function useSelectedRules(options: {
   return {
     addRulesMutation,
     removeRulesMutation,
-    isToggleLoading,
-    handleAdd,
-    handleRemove,
-    handleToggle,
+    addRules,
+    removeRules,
+    toggle,
     isRuleSelected,
-    invalidateCurrentRuleSet,
-    isRuleMutationLoading,
+    isRuleSelectionLoading,
+    isRuleBeingAdded,
+    isRuleBeingRemoved,
+    wasRuleAdded,
+    wasRuleRemoved,
+    addedRules,
+    removedRules,
   }
 }

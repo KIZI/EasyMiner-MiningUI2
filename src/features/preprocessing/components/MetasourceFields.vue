@@ -23,74 +23,6 @@
           class="h-full overflow-y-auto"
           spacing-class="px-6"
         >
-          <!-- <template #beforeItems>
-            <div
-              v-if="activeTasks.length"
-              v-auto-animate
-              class="border-b px-6 pb-3 pt-1"
-            >
-              <div class="mb-2 text-sm font-semibold text-slate-500">
-                Creating:
-              </div>
-              <div
-                class="space-y-2"
-              >
-                <template
-                  v-for="task in activeTasks"
-                  :key="task.id"
-                >
-                  <div
-                    v-for="(attribute, i) in task.attributes"
-                    :key="attribute.id"
-                    class="flex items-center"
-                  >
-                    <template v-if="task.state === 'failed'">
-                      <span class="rounded bg-red-50 px-1.5 py-0.5 text-xs font-semibold leading-tight text-red-700">
-                        Failed
-                      </span>
-                    </template>
-
-                    <template v-else-if="task.state === 'done'">
-                      <span
-                        class="rounded bg-green-50 px-1.5 py-0.5 text-xs font-semibold leading-tight text-green-700"
-                      >
-                        Success
-                      </span>
-                    </template>
-
-                    <VSpinner
-                      v-else
-                      class="size-4 shrink-0 text-primary-800"
-                    />
-
-                    <div class="ml-3 mr-auto truncate text-sm font-medium">
-                      {{ attribute.columnName }}
-                    </div>
-
-                    <template v-if="i === 0">
-                      <template v-if="task.state === 'failed'">
-                        <button
-                          class="ml-2 shrink-0"
-                          @click="dataPreprocessing.reopenTask(task)"
-                        >
-                          <icon-ph-info-bold class="aspect-square w-[22px] text-primary-700" />
-                        </button>
-                      </template>
-
-                      <template v-if="task.state === 'failed'">
-                        <button
-                          class="ml-2 shrink-0"
-                          @click="dataPreprocessing.removeTask(task)"
-                        >
-                          <icon-ph-x-bold class="mt-px aspect-square w-[22px]" />
-                        </button>
-                      </template>
-                    </template>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </template> -->
           <template #empty>
             <div class="flex items-start gap-x-3">
               <icon-ph-info class="size-6" />
@@ -102,16 +34,6 @@
               </div>
             </div>
           </template>
-          <template #itemActions="{ attribute }">
-            <!-- <VButton
-              variant="ghost"
-              class="h-8 w-8 hover:bg-red-100 group-hover:hover:bg-primary-50"
-              @click.stop
-              @mousedown.stop
-            >
-              <icon-ph-trash class="h-5 w-5 text-red-700" />
-            </VButton> -->
-          </template>
         </AttributesList>
       </AttributesDropZone>
     </div>
@@ -121,7 +43,7 @@
         <AttributesListSelectionActions />
 
         <VButton
-          v-if="attributesList.selection.hasItems.value"
+          v-if="attributesList.selectionModel.isAnySelected"
           class="ml-3 gap-x-3 font-medium hover:bg-red-50"
           variant="ghost"
           size="md"
@@ -166,7 +88,6 @@ import { useDropZone } from '@/components/DragAndDrop/useDropZone'
 import type { DatasourceColumn } from '@/api/datasources/types'
 import { useProvideAttributesList } from '@/components/Attributes/attributesListInjection'
 import { type ListAttribute, useAttributesList } from '@/components/Attributes/useAttributesList'
-import VSpinner from '@/components/VSpinner.vue'
 
 const router = useRouter()
 const metasourceQuery = useActiveMetasourceQuery()
@@ -194,13 +115,12 @@ const attributesList = useAttributesList({
 useProvideAttributesList(attributesList)
 
 const dataPreprocessing = useDataPreprocessing()
-const { activeTasks } = dataPreprocessing
 
 const { dropZoneRef, isAvailable, isDraggedOver } = useDropZone<DatasourceColumn[]>({
   accepts: ['datasource'],
   onDrop: (items) => {
     dataPreprocessing.open(items)
-    dataSourceAttributesList.selection.clearSelection()
+    dataSourceAttributesList.selectionModel.clear()
   },
 })
 

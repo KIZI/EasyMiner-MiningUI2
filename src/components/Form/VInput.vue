@@ -16,6 +16,11 @@
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/utils/cn'
 
+export type VInputProps = {
+  isValid?: boolean
+  class?: HTMLAttributes['class']
+}
+
 const props = withDefaults(defineProps<{
   isValid?: boolean
   class?: HTMLAttributes['class']

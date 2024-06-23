@@ -3,6 +3,7 @@ import type {
   CreateRuleSetInput,
   RemoveRulesInput,
   RuleSet,
+  RuleSetRulesInput,
   RuleSetsRulesResponse,
   UpdateRuleSetInput,
 } from './types'
@@ -16,8 +17,8 @@ export default {
   detail: createRequest<number, RuleSet>(
     id => ({ url: `/rule-sets/${id}` }),
   ),
-  rules: createRequest<number, RuleSetsRulesResponse>(
-    id => ({ url: `/rule-sets/${id}/rules` }),
+  rules: createRequest<RuleSetRulesInput, RuleSetsRulesResponse>(
+    params => ({ url: `/rule-sets/${params.id}/rules`, params }),
   ),
   create: createRequest<CreateRuleSetInput, RuleSet>(
     data => ({

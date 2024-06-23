@@ -15,6 +15,7 @@ export default antfu(
       '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       'antfu/if-newline': 'off',
       'curly': ['error', 'multi-line'],
+      'tailwindcss/no-custom-classname': 'off',
     },
   },
 )

@@ -1,9 +1,9 @@
 <template>
   <div class="flex min-h-8 items-center gap-x-2">
-    <SelectionButtons v-on="{ selectAll, invertSelection, clearSelection }" />
+    <SelectionButtons v-on="{ selectAll, invert, clear }" />
 
     <div
-      v-if="bulkSelection.hasItems"
+      v-if="selectionModel.isAnySelected"
       class="flex gap-x-0.5"
     >
       <VButton
@@ -11,8 +11,8 @@
         variant="ghost"
         size="xs"
         class="gap-x-1.5 px-1"
-        :loading="selectedRules.addRulesMutation.isPending.value"
-        :disabled="selectedRules.removeRulesMutation.isPending.value"
+        :loading="isAddLoading"
+        :disabled="isRemoveLoading"
         @click="handleAdd"
       >
         <template #icon>
@@ -27,8 +27,8 @@
         variant="ghost"
         size="xs"
         class="gap-x-1 px-1 hover:bg-red-50"
-        :loading="selectedRules.removeRulesMutation.isPending.value"
-        :disabled="selectedRules.addRulesMutation.isPending.value"
+        :loading="isRemoveLoading"
+        :disabled="isAddLoading"
         @click="handleRemove"
       >
         <template #icon>
@@ -42,38 +42,39 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from 'vue'
+import { computed, ref } from 'vue'
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
-import type { TaskRule } from '@/api/tasks/types'
 import SelectionButtons from '@/components/Selection/SelectionButtons.vue'
 import VButton from '@/components/VButton.vue'
-import { useSelectionModel } from '@/composables/useSelectionModel'
+import { injectRulesGrid } from '@/components/Rules/rulesGrid'
 
-const props = defineProps<{
-  rules: TaskRule[]
-}>()
+const selectedRules = useSelectedRules()
+const rulesGrid = injectRulesGrid()!
 
-const { rules } = toRefs(props)
+const { selection, selectionModel } = rulesGrid
+const { clear, invert, selectAll } = selectionModel
 
-const selection = defineModel<TaskRule[]>('selection', { default: [] })
+const isAnyInSelectedRules = computed(() => selection.value.some(rule => selectedRules.isRuleSelected(rule)))
+const isAnyNotInSelectedRules = computed(() => selection.value.some(rule => !selectedRules.isRuleSelected(rule)))
 
-const bulkSelection = useSelectionModel({ items: rules, modelValue: selection })
-const { selectAll, invertSelection, clearSelection } = bulkSelection
+const isAddLoading = ref(false)
+const isRemoveLoading = ref(false)
 
-const selectedRules = useSelectedRules({
-  onMutationSuccess: () => {
-    clearSelection()
-  },
-})
-const { isRuleSelected } = selectedRules
+async function handleAdd() {
+  const handler = rulesGrid.eventHandlers.addSelected
+  if (!handler) return
 
-const isAnyInSelectedRules = computed(() => bulkSelection.selected.value.some(rule => isRuleSelected(rule)))
-const isAnyNotInSelectedRules = computed(() => bulkSelection.selected.value.some(rule => !isRuleSelected(rule)))
-
-function handleAdd() {
-  selectedRules.handleAdd(bulkSelection.selected.value)
+  isAddLoading.value = true
+  await handler()
+  isAddLoading.value = false
 }
-function handleRemove() {
-  selectedRules.handleRemove(bulkSelection.selected.value)
+
+async function handleRemove() {
+  const handler = rulesGrid.eventHandlers.removeSelected
+  if (!handler) return
+
+  isRemoveLoading.value = true
+  await handler()
+  isRemoveLoading.value = false
 }
 </script>

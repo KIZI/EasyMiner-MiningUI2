@@ -23,6 +23,7 @@
 
           <div class="flex items-start pr-4">
             <button
+              v-if="false"
               class="group inline-flex flex-col items-center gap-y-1.5 bg-cover opacity-70 hover:opacity-100"
               title="Create new miner or open existing one..."
             >
@@ -72,9 +73,6 @@ import { useUserQuery } from '@/api/auth/useUserQuery'
 import imageUser from '@/assets/user.png'
 import imageMiner from '@/assets/new-miner.png'
 import imageHelp from '@/assets/help.png'
-import PopoverButton from '@/components/Popover/PopoverButton.vue'
-import Popover from '@/components/Popover/Popover.vue'
-import PopoverPanel from '@/components/Popover/PopoverPanel.vue'
 import UserMenu from '@/components/Layout/UserMenu.vue'
 
 const { data: miner } = useMinerQuery()

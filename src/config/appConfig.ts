@@ -53,17 +53,7 @@ export const appConfig = {
       defaultValue: 5,
       range: {
         from: { closed: true, value: 1 },
-        to: { closed: true, value: 10 },
       },
-    },
-    [InterestMeasures.AAD]: {
-      name: InterestMeasures.AAD,
-      type: InterestMeasureTypes.Double,
-      range: {
-        from: { value: 0 },
-        to: { closed: true, value: 1 },
-      },
-      defaultValue: 0.1,
     },
     [InterestMeasures.AutoConfSupp]: {
       name: InterestMeasures.AutoConfSupp,

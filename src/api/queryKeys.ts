@@ -1,4 +1,6 @@
 import type { MaybeRef } from '@vueuse/core'
+import { useSelectedRulesStoreRefs } from '@selectedRules/stores/selectedRulesStore'
+import { computed, reactive } from 'vue'
 import type { Optional } from '@/libs/vueQuery'
 
 export const queryKeys = {
@@ -8,14 +10,15 @@ export const queryKeys = {
   },
   ruleSets: {
     list: () => ['ruleSetsList'],
-    rules: (id: MaybeRef<Optional<number>>) => ['ruleSetsRules', id],
+    detail: (id: MaybeRef<Optional<number>>) => ['ruleSets', 'detail', id],
+    rules: (id: MaybeRef<Optional<number>>) => ['ruleSets', 'rules', id],
   },
   tasks: {
-    rules: (id: MaybeRef<Optional<number>>) => ['taskRules', id],
-    state: (id: MaybeRef<Optional<number>>) => ['taskState', id],
+    rules: (id: MaybeRef<Optional<number>>) => ['task', 'rules', id],
+    state: (id: MaybeRef<Optional<number>>) => ['task', 'state', id],
   },
   datasources: {
-    detail: (id: MaybeRef<Optional<number>>) => ['datasourcesDetail', id],
+    detail: (id: MaybeRef<Optional<number>>) => ['datasources', 'detail', id],
   },
   metasources: {
     active: () => ['activeMetasource'],
@@ -23,4 +26,14 @@ export const queryKeys = {
   auth: {
     user: () => ['user'],
   },
+}
+
+export function useQueryKeys() {
+  const { activeRuleSetId } = useSelectedRulesStoreRefs()
+
+  const activeRuleSetRules = computed(() => queryKeys.ruleSets.rules(activeRuleSetId))
+
+  return reactive({
+    activeRuleSetRules,
+  })
 }

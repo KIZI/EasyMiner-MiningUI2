@@ -1,8 +1,8 @@
 import { storeToRefs } from 'pinia'
-import { useTaskDetailQuery } from '@/api/tasks/useTaskDetailQuery'
+import { type TaskDetailQueryParams, useTaskDetailQuery } from '@/api/tasks/useTaskDetailQuery'
 import { useTasksStore } from '@/stores/tasksStore'
 
-export function useActiveTaskDetailQuery() {
+export function useActiveTaskDetailQuery(params?: TaskDetailQueryParams) {
   const { activeTaskId } = storeToRefs(useTasksStore())
-  return useTaskDetailQuery(activeTaskId)
+  return useTaskDetailQuery(activeTaskId, params)
 }

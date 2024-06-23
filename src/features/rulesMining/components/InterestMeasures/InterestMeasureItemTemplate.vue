@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import type { InterestMeasureActiveItem, InterestMeasureConfig } from '@rulesMining/types/interestMeasure.types'
+import type { InterestMeasureActiveItem } from '@rulesMining/types/interestMeasure.types'
 
 defineProps<{
   item?: InterestMeasureActiveItem

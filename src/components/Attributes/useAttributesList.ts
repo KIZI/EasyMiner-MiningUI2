@@ -3,6 +3,7 @@ import {
   type Ref,
   computed,
   ref,
+  toRef,
 } from 'vue'
 import type { DragSource } from '@/components/DragAndDrop/dragAndDropStore'
 import { useSelectionModel } from '@/composables/useSelectionModel'
@@ -30,7 +31,12 @@ export function useAttributesList<Attribute extends ListAttribute>(options: UseA
   const { attributes, isLoading, dragSource } = options
 
   const searchQuery = ref('')
-  const selection = useSelectionModel({ items: attributes, modelValue: options.selection })
+  const selectionModel = useSelectionModel({
+    items: attributes,
+    selection: options.selection,
+    itemIdentity: item => item.id,
+  })
+  const selection = toRef(selectionModel, 'selection')
 
   const shouldShowSearch = ref(false)
   const shouldShowSelection = ref(false)
@@ -58,7 +64,7 @@ export function useAttributesList<Attribute extends ListAttribute>(options: UseA
 
   function toggleSelection() {
     shouldShowSelection.value = !shouldShowSelection.value
-    selection.clearSelection()
+    selectionModel.clear()
   }
 
   function toggleSearch() {
@@ -76,6 +82,7 @@ export function useAttributesList<Attribute extends ListAttribute>(options: UseA
     clearSearchQuery,
     filteredAttributes,
     selection,
+    selectionModel,
     isSelectionDisabled,
     isInteractive,
     searchQuery,

@@ -1,5 +1,5 @@
 import type { Miner, MinerTaskResponse } from './types'
-import { type PaginationInput, getPaginationParams } from '@/api/pagination'
+import { type PaginationInput, getPaginationParams } from '@/components/Pagination/usePagination'
 import type { TaskState } from '@/api/tasks/types'
 import type { OrderInput } from '@/api/types'
 import { createRequest } from '@/libs/axios'

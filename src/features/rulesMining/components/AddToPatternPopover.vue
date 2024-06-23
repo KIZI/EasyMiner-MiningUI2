@@ -42,9 +42,6 @@
 import type { Cedent } from '@rulesMining/types/rulePattern.types'
 import { ref } from 'vue'
 import { Popover, PopoverButton, PopoverPanel } from '@/components/Popover'
-import SlideTransition from '@/components/Transitions/SlideTransition.vue'
-import type { TaskRule } from '@/api/tasks/types'
-import { formatDecimal } from '@/utils/format'
 import VButton from '@/components/VButton.vue'
 import FadeTransition from '@/components/Transitions/FadeTransition.vue'
 

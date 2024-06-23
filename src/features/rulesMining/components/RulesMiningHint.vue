@@ -21,7 +21,7 @@ import clsx from 'clsx'
 import { computed, defineAsyncComponent } from 'vue'
 import type { ClassValue } from 'clsx'
 import type { FunctionalComponent } from 'vue'
-import type { MiningState } from '@/features/rulesMining/types/rulesMining.types'
+import type { MiningState } from '@rulesMining/types/rulesMining.types'
 import VSpinner from '@/components/VSpinner.vue'
 import IconPhInfo from '~icons/ph/info'
 

@@ -1,51 +1,49 @@
 <template>
-  <div>
-    <div class="group">
-      <div class="flex gap-x-4">
-        <div class="font-semibold capitalize">
-          {{ cedent }}
-        </div>
-        <VButton
-          v-if="itemSet.length"
-          :title="`Clear ${cedent}`"
-          variant="ghost"
-          class="hidden size-6 text-red-700 hover:bg-red-50 group-hover:inline-flex"
-          @click="clearItems"
-        >
-          <icon-ph-x class="size-5" />
-        </VButton>
+  <div class="group flex min-h-0 flex-col">
+    <div class="flex gap-x-4">
+      <div class="font-semibold capitalize">
+        {{ cedent }}
       </div>
-      <div
-        ref="dropZoneRef"
-        class="mt-2"
+      <VButton
+        v-if="itemSet.length"
+        :title="`Clear ${cedent}`"
+        variant="ghost"
+        class="hidden size-6 text-red-700 hover:bg-red-50 group-hover:inline-flex"
+        @click="clearItems"
       >
-        <AttributesDropZone
-          :is-dragged-over="dropZone.isDraggedOver.value"
-          :is-available="dropZone.isAvailable.value"
+        <icon-ph-x class="size-5" />
+      </VButton>
+    </div>
+    <div
+      ref="dropZoneRef"
+      class="mt-2 h-full min-h-0"
+    >
+      <AttributesDropZone
+        :is-dragged-over="dropZone.isDraggedOver.value"
+        :is-available="dropZone.isAvailable.value"
+        class="flex h-full min-h-0 flex-col"
+      >
+        <i
+          v-if="!itemSet.length"
+          class="text-sm text-gray-700"
         >
-          <i
-            v-if="!itemSet.length"
-            class="text-sm text-gray-700"
+          Add some attributes
+          <template v-if="cedent === 'Antecedent'"> or leave empty</template>
+          ...
+        </i>
+        <div
+          class="flex h-full min-h-0 flex-wrap content-start items-start gap-2"
+        >
+          <DraggableClone
+            v-for="item in itemSet"
+            :key="item.id"
+            :source="dragSource"
+            :payload="item"
           >
-            Add some attributes
-            <template v-if="cedent === 'Antecedent'"> or leave empty</template>
-            ...
-          </i>
-          <div
-            ref="itemListRef"
-            class="flex flex-wrap items-start gap-2"
-          >
-            <DraggableClone
-              v-for="item in itemSet"
-              :key="item.id"
-              :source="dragSource"
-              :payload="item"
-            >
-              <RulePatternItem :item="item" />
-            </DraggableClone>
-          </div>
-        </AttributesDropZone>
-      </div>
+            <RulePatternItem :item="item" />
+          </DraggableClone>
+        </div>
+      </AttributesDropZone>
     </div>
   </div>
 </template>
@@ -53,12 +51,12 @@
 <script lang="ts" setup>
 import { useAutoAnimate } from '@formkit/auto-animate/vue'
 import { computed, watchEffect } from 'vue'
+import RulePatternItem from '@rulesMining/components/RulePattern/RulePatternItem.vue'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
+import { CEDENT, type Cedent } from '@rulesMining/types/rulePattern.types'
 import AttributesDropZone from '@/components/Attributes/AttributesDropZone.vue'
 import DraggableClone from '@/components/DragAndDrop/DraggableClone.vue'
 import { useDropZone } from '@/components/DragAndDrop/useDropZone'
-import RulePatternItem from '@/features/rulesMining/components/RulePattern/RulePatternItem.vue'
-import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
-import { CEDENT, type Cedent } from '@/features/rulesMining/types/rulePattern.types'
 import { DragSources } from '@/components/DragAndDrop/dragAndDropStore'
 import { autoAnimateKeyframeEffect } from '@/utils/autoAnimate'
 import VButton from '@/components/VButton.vue'

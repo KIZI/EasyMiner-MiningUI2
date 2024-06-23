@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { useDropZone } from '@/components/DragAndDrop/useDropZone'
-import { useRulePatternStore } from '@/features/rulesMining/stores/rulePatternStore'
+import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
 import { DragSources } from '@/components/DragAndDrop/dragAndDropStore'
 import type { MetasourceAttribute } from '@/api/metasources/types'
 

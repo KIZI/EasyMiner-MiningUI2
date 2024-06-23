@@ -41,40 +41,32 @@
           </template>
 
           <template #value>
-            <HLFloating :show="showInvalidSubmission">
-              <template #reference="{ setRef }">
-                <HLField
-                  v-slot="{ field, meta }"
-                  name="value"
+            <HLField
+              v-slot="{ field, meta }"
+              name="value"
+            >
+              <span>
+                <input
+                  v-if="!isCurrentMeasureBooleanType"
+                  ref="valueInputRef"
+                  v-maska
+                  :data-maska="maska"
+                  data-maska-tokens="0:[0-9]:optional"
+                  v-bind="field"
+                  type="text"
+                  inputmode="decimal"
+                  class="w-12 rounded px-0 py-0.5 text-center text-sm font-semibold focus:ring-1 focus:ring-blue-500"
+                  :class="{
+                    'border-blue-300 focus:border-blue-500': meta.valid,
+                    'border-red-500': !meta.valid,
+                  }"
+                  @keydown.enter="handleEnterKey"
+                  @keydown.esc="handleEscKey"
+                  @keydown.delete="handleDeleteKey"
+                  @change="onInputChange"
                 >
-                  <span :ref="setRef">
-                    <input
-                      v-if="!isCurrentMeasureBooleanType"
-                      ref="valueInputRef"
-                      v-maska
-                      :data-maska="maska"
-                      data-maska-tokens="0:[0-9]:optional"
-                      v-bind="field"
-                      type="text"
-                      inputmode="decimal"
-                      class="w-11 rounded px-0 py-0.5 text-center text-sm font-semibold focus:ring-1 focus:ring-blue-500"
-                      :class="{
-                        'border-blue-300 focus:border-blue-500': meta.valid,
-                        'border-red-500': !meta.valid,
-                      }"
-                      @keydown.enter="handleEnterKey"
-                      @keydown.esc="handleEscKey"
-                      @keydown.delete="handleDeleteKey"
-                    >
-                  </span>
-                </HLField>
-              </template>
-
-              <div class="flex w-max gap-x-2 rounded border border-red-100 bg-red-50 px-1.5 py-1 text-xs font-medium leading-none text-red-800 shadow-md">
-                <icon-ph-warning class="size-3.5" />
-                Incorrect input
-              </div>
-            </HLFloating>
+              </span>
+            </HLField>
           </template>
         </InterestMeasureItemTemplate>
 
@@ -84,9 +76,6 @@
             variant="ghost"
             size="md"
             class="p-1"
-            :class="{
-              shake: showInvalidSubmission,
-            }"
           >
             <icon-ph-check-bold class="size-5" />
           </VButton>
@@ -118,10 +107,9 @@
       <div class="absolute left-0 mt-0.5 w-72">
         <div class="text-xs">
           <p v-if="currentMeasure.range" class="italic text-gray-800">
-            <span class="font-semibold">{{ formatInterestMeasureRange(currentMeasure.range) }}</span>,
-            <span class="font-medium">{{ currentMeasure.type }}</span>
+            <span class="shrink-0 font-semibold">{{ formatInterestMeasureRange(currentMeasure.range) }}</span>
           </p>
-          <p class="mt-0.5">
+          <p>
             {{ $t(`interestMeasures.${currentMeasure.name}.description`) }}
           </p>
         </div>
@@ -141,14 +129,13 @@ import {
   onMounted,
   ref,
   watch,
-  watchEffect,
 } from 'vue'
 import * as yup from 'yup'
+import type { InterestMeasure, InterestMeasureActiveItem, InterestMeasureConfig } from '@rulesMining/types/interestMeasure.types'
+import { useInterestMeasuresStore } from '@rulesMining/stores/interestMeasuresStore'
 import InterestMeasureItemTemplate from './InterestMeasureItemTemplate.vue'
-import type { InterestMeasure, InterestMeasureActiveItem, InterestMeasureConfig } from '@/features/rulesMining/types/interestMeasure.types'
 import { HLField, HLFloating } from '@/components/Form'
 import VButton from '@/components/VButton.vue'
-import { useInterestMeasuresStore } from '@/features/rulesMining/stores/interestMeasuresStore'
 
 const props = defineProps<{
   item?: InterestMeasureActiveItem
@@ -194,20 +181,26 @@ const isCurrentMeasureBooleanType = computed(() => {
   return currentMeasure.value.type === 'Boolean'
 })
 
-watchEffect(() => {
+const valueLimits = computed(() => {
   const { range } = currentMeasure.value
-  if (!range) return
-  const min = range.from.value + (range.from.closed ? 0 : 0.01)
-  const max = range.to && (range.to.value - (range.to.closed ? 0 : 0.01))
-
-  validationSchema.value = yup.object({
-    name: yup.string().required(),
-    value: yup.number()
-      .required()
-      // .min(min)
-      // .max(max ?? Infinity),
-  })
+  if (!range) return { min: undefined, max: undefined }
+  const min = range.from.value + (range.from.closed ? 0 : 0.001)
+  const max = range.to && (range.to.value - (range.to.closed ? 0 : 0.001))
+  return { min, max }
 })
+
+function onInputChange() {
+  const value = form.values.value
+  const { min, max } = valueLimits.value
+
+  if (!value) return
+
+  const isOverMax = max && value > max
+  const isUnderMin = min && value < min
+
+  if (isOverMax) form.setFieldValue('value', max)
+  if (isUnderMin) form.setFieldValue('value', min)
+}
 
 watch(() => form.values.name, () => {
   if (!currentMeasure.value?.defaultValue) return
@@ -228,19 +221,10 @@ const maska = computed(() => {
   return `${wholeNumbers}${afterPoint}`
 })
 
-const showInvalidSubmission = ref(false)
-const showInvalidSubmissionTimeout = ref<number>()
-
 const handleSave = form.handleSubmit((values) => {
   const measureValue = isCurrentMeasureBooleanType.value ? 1 : values.value as number
   interestMeasuresStore.setMeasure(values.name, measureValue)
   interestMeasuresStore.closeForm()
-}, () => {
-  clearTimeout(showInvalidSubmissionTimeout.value)
-  showInvalidSubmission.value = true
-  showInvalidSubmissionTimeout.value = setTimeout(() => {
-    showInvalidSubmission.value = false
-  }, 2000)
 })
 
 function handleEdit() {

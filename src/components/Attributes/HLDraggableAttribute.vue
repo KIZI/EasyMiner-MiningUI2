@@ -25,7 +25,7 @@ const draggable = useDraggable({
   payload: props.attribute,
 })
 
-async function onDragStart(draggable: Draggable) {
+async function onDragStart() {
   emit('dragStart', draggable)
 }
 function onDragEnd(flags: DragEndFlags) {

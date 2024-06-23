@@ -37,9 +37,8 @@
           </button>
         </div>
       </div>
-
       <div
-        v-auto-animate="{ ...isAnimationDisabled ? { duration: 0 } : {} }"
+        ref="attributesListRef"
         class="divide-y divide-gray-50"
       >
         <slot name="beforeItems" />
@@ -78,8 +77,9 @@
 </template>
 
 <script setup lang="ts">
-import { type HTMLAttributes, h, nextTick, ref, watch } from 'vue'
+import { type HTMLAttributes, h, ref, watch } from 'vue'
 import { computed } from 'vue'
+import { useAutoAnimate } from '@formkit/auto-animate/vue'
 import AttributesListItem from '@/components/Attributes/AttributesListItem.vue'
 import HLDraggableAttribute from '@/components/Attributes/HLDraggableAttribute.vue'
 import VSpinner from '@/components/VSpinner.vue'
@@ -97,10 +97,8 @@ const props = withDefaults(defineProps<{
   showIcon: false,
 })
 
-const attributesLoaded = ref(false)
-const isAnimationDisabled = computed(() => {
-  return props.disableAnimation || !attributesLoaded.value
-})
+const [attributesListRef, enableAnimation] = useAutoAnimate()
+enableAnimation(false)
 
 const NoItemsMessage = h('i', 'No attributes found')
 
@@ -113,9 +111,10 @@ const {
   dragSource,
 } = useInjectAttributesList()!
 
-watch(attributes, async () => {
+const unwatch = watch(attributes, async () => {
   if (attributes.value.length) {
-    attributesLoaded.value = true
+    enableAnimation(true)
+    unwatch()
   }
 }, { immediate: true })
 

@@ -45,7 +45,7 @@
                 <TasksHistoryItem
                   :task="item"
                   :is-even="Boolean(index % 2)"
-                  :showState="true"
+                  :show-state="true"
                 />
               </DynamicScrollerItem>
             </template>
@@ -58,7 +58,7 @@
       <div />
       <VPagination
         v-if="tasks.length > 0"
-        v-bind="pagination.bindings.value"
+        :pagination="pagination"
         class="mx-auto"
       />
     </div>
@@ -66,17 +66,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
-import { useEventListener } from '@vueuse/core'
-import { debounce, throttle } from 'lodash-es'
+import TasksHistoryItem from '@tasksHistory/components/TasksHistoryItem.vue'
 import { useMinerTasksQuery } from '@/api/miners/useMinerTasksQuery'
-import { usePagination } from '@/api/pagination'
+import { usePagination } from '@/components/Pagination/usePagination'
 import SectionCard from '@/components/Layout/SectionCard.vue'
 import SectionTitle from '@/components/Layout/SectionTitle.vue'
-import VPagination from '@/components/VPagination.vue'
+import VPagination from '@/components/Pagination/VPagination.vue'
 import BlockSpinner from '@/components/BlockSpinner.vue'
-import TasksHistoryItem from '@/features/tasksHistory/components/TasksHistoryItem.vue'
 import type { TaskState } from '@/api/tasks/types'
 import { VCheckbox } from '@/components/Form'
 
@@ -91,10 +89,10 @@ const stateFilter = ref<TaskState[]>(['solved'])
 const listRef = ref<HTMLElement>()
 
 const pagination = usePagination()
-pagination.onPageChange(() => {
-  if (!listRef.value) return
-  listRef.value.scrollTop = 0
-})
+// pagination.onPageChange(() => {
+//   if (!listRef.value) return
+//   listRef.value.scrollTop = 0
+// })
 
 const tasksQuery = useMinerTasksQuery({ pagination: pagination.state, state: stateFilter })
 pagination.setTotalGetter(() => tasksQuery.data.value?.tasksCount ?? 0)

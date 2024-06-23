@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import type { MaybeRef } from '@vueuse/core'
 import type { ValueOf } from 'type-fest'
 import { computed, ref } from 'vue'
 import type { DragEndFlags } from '@/components/DragAndDrop/useDraggable'
@@ -33,10 +32,6 @@ export type DraggedItem<TPayload = any> = {
   elementRef: HTMLElement
   source: DragSource
   payload: TPayload
-  position: MaybeRef<{
-    x: number
-    y: number
-  }>
 }
 
 export const DragSources = {

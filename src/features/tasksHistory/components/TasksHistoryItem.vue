@@ -7,14 +7,13 @@
     @click="handleLoadTask"
   >
     <div class="relative grow space-y-1">
-      <label class="text-sm font-medium leading-relaxed tracking-wide">
-        <VCheckbox
-          v-if="false"
-          class="absolute left-0 mt-1.5 size-4"
-        />
-
+      <VCheckbox
+        v-if="false"
+        class="absolute left-0 mt-1.5 size-4"
+      />
+      <div class="text-sm font-medium leading-relaxed tracking-wide">
         <span>{{ task.name }}</span>
-      </label>
+      </div>
 
       <div class="flex items-baseline gap-x-4 text-xs leading-none">
         <template v-if="showState">

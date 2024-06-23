@@ -3,9 +3,9 @@ import { defineStore } from 'pinia'
 import { sortBy } from 'lodash-es'
 import { useInterestMeasuresStore } from '@rulesMining/stores/interestMeasuresStore'
 import { type InterestMeasure, SpecialInterestMeasures } from '@rulesMining/types/interestMeasure.types'
-import type { Cedent, CedentItem } from '@/features/rulesMining/types/rulePattern.types'
-import { CEDENT } from '@/features/rulesMining/types/rulePattern.types'
-import { patternItemToAttributeSimpleInput } from '@/features/rulesMining/utils/rulesMining'
+import type { Cedent, CedentItem } from '@rulesMining/types/rulePattern.types'
+import { CEDENT } from '@rulesMining/types/rulePattern.types'
+import { patternItemToAttributeSimpleInput } from '@rulesMining/utils/rulesMining'
 import type { MetasourceAttribute } from '@/api/metasources/types'
 import { useActiveMetasourceQuery } from '@/api/metasources/useActiveMetasourceQuery'
 import type { TaskCedent, TaskSettingsRule } from '@/api/tasks/types'
@@ -148,12 +148,3 @@ export const useRulePatternStore = defineStore('rulePattern', () => {
     setItemCedent,
   }
 })
-
-setTimeout(() => {
-  const store = useRulePatternStore()
-  const imStore = useInterestMeasuresStore()
-  store.addItemById(29421, 'Antecedent')
-  store.addItemById(29417, 'Consequent')
-  imStore.setMeasure('CONF', 0.05)
-  imStore.setMeasure('SUPP', 0.06)
-}, 1000)

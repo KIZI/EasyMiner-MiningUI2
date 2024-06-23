@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between px-6 py-4">
       <SectionTitle>Data fields</SectionTitle>
 
-      <div class="flex items-center gap-x-3">
+      <div class="flex items-center gap-x-0.5">
         <AttributesListActions />
       </div>
     </div>
@@ -32,7 +32,7 @@
         <AttributesListSelectionActions />
 
         <VButton
-          v-if="attributesList.selection.hasItems.value"
+          v-if="attributesList.selectionModel.isAnySelected"
           class="ml-3 gap-x-3 font-medium"
           variant="ghost"
           size="md"
@@ -78,15 +78,14 @@ import SectionCard from '@/components/Layout/SectionCard.vue'
 import SectionTitle from '@/components/Layout/SectionTitle.vue'
 
 import VButton from '@/components/VButton.vue'
-import VCheckbox from '@/components/Form/VCheckbox.vue'
 
 const { attributesList } = useDataSourceAttributesList()
 useProvideAttributesList(attributesList)
 
 const dataPreprocessing = useDataPreprocessing()
 function handleAddSelected() {
-  dataPreprocessing.open(attributesList.selection.modelValue.value)
-  attributesList.selection.clearSelection()
+  dataPreprocessing.open(attributesList.selection.value)
+  attributesList.selectionModel.clear()
 }
 
 const shouldRemovePrefix = ref(false)

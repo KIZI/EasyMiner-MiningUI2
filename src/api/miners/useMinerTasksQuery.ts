@@ -3,7 +3,7 @@ import { type MaybeRef, computed, toValue } from 'vue'
 import { queryKeys } from '@/api/queryKeys'
 import { api } from '@/api/api'
 import { appConfig } from '@/config/appConfig'
-import type { PaginationInput } from '@/api/pagination'
+import type { PaginationInput } from '@/components/Pagination/usePagination'
 import { isTaskStateRunning } from '@/api/tasks/utils'
 import type { TaskState } from '@/api/tasks/types'
 
