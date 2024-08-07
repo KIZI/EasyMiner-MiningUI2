@@ -111,12 +111,11 @@ const {
   dragSource,
 } = useInjectAttributesList()!
 
-const unwatch = watch(attributes, async () => {
+watch(attributes, async () => {
   if (attributes.value.length) {
     enableAnimation(true)
-    unwatch()
   }
-}, { immediate: true })
+})
 
 const activeDraggable = ref<Draggable>()
 

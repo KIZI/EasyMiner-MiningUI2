@@ -36,6 +36,9 @@ export default defineConfig({
       '@tasksHistory': resolve(__dirname, './src/features/tasksHistory/'),
     },
   },
+  build: {
+    sourcemap: true,
+  },
   server: {
     proxy: {
       '/easyminercenter/api': {

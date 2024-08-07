@@ -29,6 +29,7 @@ import VContainer from '@/components/Layout/VContainer.vue'
 import { useActiveMetasourceQuery } from '@/api/metasources/useActiveMetasourceQuery'
 import SideNav from '@/components/Layout/SideNav.vue'
 import { layout } from '@/components/Layout'
+import { routesNames } from '@/libs/router'
 
 const router = useRouter()
 const activeMetasourceQuery = useActiveMetasourceQuery()
@@ -36,7 +37,7 @@ const activeMetasourceQuery = useActiveMetasourceQuery()
 watchEffect(() => {
   const noAttributes = activeMetasourceQuery.isSuccess.value && !activeMetasourceQuery.attributes.value.length
   if (noAttributes) {
-    router.push({ name: 'Preprocessing' })
+    router.push({ name: routesNames.preprocessing })
   }
 })
 
