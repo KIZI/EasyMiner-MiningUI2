@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4">
+  <div class="shrink-0  p-4">
     <nav class="space-y-1">
       <SideNavItem
         v-for="item in navItems"
@@ -21,6 +21,7 @@ import IconPhListChecks from '~icons/ph/list-checks.vue'
 import IconPhClockCounterClockwise from '~icons/ph/clock-counter-clockwise.vue'
 import IconPhClipboard from '~icons/ph/clipboard.vue'
 import { useTasksStore } from '@/stores/tasksStore'
+import { useActiveRuleSetDetailQuery } from '@/api/ruleSets/useRuleSetDetailQuery'
 
 const tasksStore = useTasksStore()
 const selectedRulesStore = useSelectedRulesStore()
@@ -38,7 +39,7 @@ const navItems = computed(() => ([
     section: SECONDARY_SECTIONS.tasksHistory,
   },
   {
-    label: 'Selected rules',
+    label: `Selected rules`,
     icon: IconPhClipboard,
     section: SECONDARY_SECTIONS.selectedRules,
     description: selectedRulesStore.activeRuleSet?.name,

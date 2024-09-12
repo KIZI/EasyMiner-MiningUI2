@@ -3,7 +3,7 @@
     :is-edit="Boolean(item)"
     full-width
     create-label="Add"
-    popover-class="w-full"
+    class="w-full"
     @submit="handleSubmit"
     @remove="handleRemove"
   >

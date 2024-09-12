@@ -20,4 +20,12 @@ export const externalUrls = {
   exportRuleSet: (ruleSetId: number) => externalUrl(
     `/rule-sets/text/${ruleSetId}`,
   ),
+  taskDetail: (taskId: number) => externalUrl(
+    `/tasks/task-details/${taskId}`,
+  ),
+  exportTask: (taskId: number) => ({
+    details: externalUrl(`/tasks/task-pmml/${taskId}?miner=${minerId}`),
+    settings: externalUrl(`/tasks/task-setting-pmml/${taskId}?miner=${minerId}`),
+    plainRules: externalUrl(`/tasks/task-rules-text/${taskId}?miner=${minerId}`),
+  }),
 }

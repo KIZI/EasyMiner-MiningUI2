@@ -4,7 +4,9 @@ import {
   computed,
   ref,
   toRef,
+  watch,
 } from 'vue'
+import { whenever } from '@vueuse/core'
 import type { DragSource } from '@/components/DragAndDrop/dragAndDropStore'
 import { useSelectionModel } from '@/composables/useSelectionModel'
 import type { DatasourceColumnType } from '@/api/datasources/types'
@@ -55,8 +57,12 @@ export function useAttributesList<Attribute extends ListAttribute>(options: UseA
     return sortedAttributes.value
   })
 
-  const availableAttributes = computed(() => filteredAttributes.value.filter(attribute => attribute.isAvailable))
+  const availableAttributes = computed(() => attributes.value.filter(attribute => attribute.isAvailable))
   const isSelectionDisabled = computed(() => !availableAttributes.value.length)
+
+  whenever(isSelectionDisabled, () => {
+    shouldShowSelection.value = false
+  })
 
   const isInteractive = computed(() => {
     return options.dragSource || shouldShowSelection.value
@@ -69,6 +75,7 @@ export function useAttributesList<Attribute extends ListAttribute>(options: UseA
 
   function toggleSearch() {
     shouldShowSearch.value = !shouldShowSearch.value
+    if (!shouldShowSearch.value) clearSearchQuery()
   }
 
   function clearSearchQuery() {

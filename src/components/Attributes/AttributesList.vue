@@ -1,85 +1,79 @@
 <template>
-  <div class="select-none overflow-y-auto overflow-x-hidden overscroll-y-contain">
-    <div class="flex flex-col">
+  <div class="flex min-h-0 grow select-none flex-col">
+    <div
+      v-if="!filteredAttributes.length"
+      class="py-4 text-sm"
+    >
       <div
-        v-if="!filteredAttributes.length"
-        class="py-4 text-sm"
+        v-if="isLoading"
+        class="flex items-center gap-x-3"
+        :class="spacingClass"
       >
-        <div
-          v-if="isLoading"
-          class="flex items-center gap-x-3"
-          :class="spacingClass"
-        >
-          <VSpinner />
-          <span>Attributes are loading...</span>
-        </div>
-
-        <div
-          v-else
-          :class="spacingClass"
-        >
-          <slot
-            v-if="!attributes.length"
-            name="empty"
-          >
-            <NoItemsMessage />
-          </slot>
-
-          <NoItemsMessage v-else />
-
-          <button
-            v-if="searchQuery"
-            class="mt-4 flex items-center gap-x-1 underline hover:no-underline"
-            @click="clearSearchQuery"
-          >
-            <icon-ph-x :width="18" />
-            Clear search query
-          </button>
-        </div>
+        <VSpinner />
+        <span>Attributes are loading...</span>
       </div>
+
       <div
-        ref="attributesListRef"
-        class="divide-y divide-gray-50"
+        v-else
+        :class="spacingClass"
       >
-        <slot name="beforeItems" />
-        <template
-          v-for="(attribute, i) in filteredAttributes"
-          :key="attribute.id"
+        <slot
+          v-if="!attributes.length"
+          name="empty"
         >
-          <HLDraggableAttribute
-            v-slot="{ events, isDragged }"
-            :attribute="attribute"
-            @drag-start="onDragStart"
-            @drag-end="onDragEnd"
-          >
-            <AttributesListItem
-              :is-dragged="isDragged"
-              :is-even="i % 2 !== 0"
-              :attribute="attribute"
-              :spacing-class="spacingClass"
-              :show-icon="showIcon"
-              v-on="dragSource ? events : {}"
-            >
-              <template #actions>
-                <slot
-                  name="itemActions"
-                  :attribute="attribute"
-                />
-              </template>
-            </AttributesListItem>
-          </HLDraggableAttribute>
-        </template>
+          <NoItemsMessage />
+        </slot>
+
+        <NoItemsMessage v-else />
+
+        <button
+          v-if="searchQuery"
+          class="mt-4 flex items-center gap-x-1 underline hover:no-underline"
+          @click="clearSearchQuery"
+        >
+          <icon-ph-x :width="18" />
+          Clear search query
+        </button>
       </div>
     </div>
-
+    <RecycleScroller
+      v-slot="{ item, index }"
+      :items="filteredAttributes"
+      :item-size="49"
+      :buffer="100"
+      key-field="id"
+      class="min-h-0 divide-y divide-gray-50"
+    >
+      <HLDraggableAttribute
+        v-slot="{ events, isDragged }"
+        :attribute="item"
+        @drag-start="onDragStart"
+        @drag-end="onDragEnd"
+      >
+        <AttributesListItem
+          :is-dragged="isDragged"
+          :is-even="index % 2 !== 0"
+          :attribute="item"
+          :spacing-class="spacingClass"
+          :show-icon="showIcon"
+          v-on="dragSource ? events : {}"
+        >
+          <template #actions>
+            <slot
+              name="itemActions"
+              :attribute="item"
+            />
+          </template>
+        </AttributesListItem>
+      </HLDraggableAttribute>
+    </RecycleScroller>
     <DraggedAttributes :draggable="activeDraggable" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { type HTMLAttributes, h, ref, watch } from 'vue'
-import { computed } from 'vue'
-import { useAutoAnimate } from '@formkit/auto-animate/vue'
+import { RecycleScroller } from 'vue-virtual-scroller'
 import AttributesListItem from '@/components/Attributes/AttributesListItem.vue'
 import HLDraggableAttribute from '@/components/Attributes/HLDraggableAttribute.vue'
 import VSpinner from '@/components/VSpinner.vue'
@@ -97,9 +91,6 @@ const props = withDefaults(defineProps<{
   showIcon: false,
 })
 
-const [attributesListRef, enableAnimation] = useAutoAnimate()
-enableAnimation(false)
-
 const NoItemsMessage = h('i', 'No attributes found')
 
 const {
@@ -110,12 +101,6 @@ const {
   clearSearchQuery,
   dragSource,
 } = useInjectAttributesList()!
-
-watch(attributes, async () => {
-  if (attributes.value.length) {
-    enableAnimation(true)
-  }
-})
 
 const activeDraggable = ref<Draggable>()
 

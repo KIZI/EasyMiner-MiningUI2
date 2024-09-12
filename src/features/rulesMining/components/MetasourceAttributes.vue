@@ -10,21 +10,16 @@
     </div>
 
     <AttributesListSearch class="mx-3 mb-2" />
-    <AttributesList class="grow overflow-y-auto">
+    <AttributesList class="grow">
       <template #itemActions="{ attribute }">
         <AddToPatternPopover
-          #="{events}"
-          content-class="pr-12 py-1.5 pl-2"
-          panel-class="-top-1.5 -right-1.5"
+          #="{ events }" content-class="pr-12 py-1.5 pl-2" panel-class="-top-1.5 -right-1.5"
           @select="(cedent) => addAttributeToCedent(attribute, cedent)"
         >
           <VButton
-            :disabled="!attribute.isAvailable"
-            variant="ghost"
+            :disabled="!attribute.isAvailable" variant="ghost"
             class="relative z-20 order-1 size-8 hover:bg-slate-200 disabled:opacity-50 group-hover:hover:bg-primary-50"
-            v-on="events"
-            @mousedown.stop
-            @click.stop
+            v-on="events" @mousedown.stop @click.stop
           >
             <icon-ph-plus-circle-bold class="size-5 text-primary-600" />
           </VButton>
@@ -32,30 +27,21 @@
       </template>
     </AttributesList>
 
-    <div
-      v-if="attributesList.shouldShowSelection.value"
-      class="my-4 flex items-center justify-between px-4"
-    >
+    <div v-if="attributesList.shouldShowSelection.value" class="flex items-center justify-between border-t border-gray-50 px-4 py-2">
       <AttributesListSelectionActions />
 
       <div class="space-x-2">
         <VButton
-          :disabled="!attributesList.selectionModel.isAnySelected"
-          variant="basic"
-          size="sm"
-          class="gap-x-2 text-xs font-semibold"
-          @click="() => addSelectionToCedent('Antecedent')"
+          :disabled="!attributesList.selectionModel.isAnySelected" variant="basic" size="sm"
+          class="gap-x-2 text-xs font-semibold" @click="() => addSelectionToCedent('Antecedent')"
         >
           <icon-ph-plus-bold />
           Ant.
         </VButton>
 
         <VButton
-          :disabled="!attributesList.selectionModel.isAnySelected"
-          variant="basic"
-          size="sm"
-          class="gap-x-2 text-xs font-semibold"
-          @click="() => addSelectionToCedent('Consequent')"
+          :disabled="!attributesList.selectionModel.isAnySelected" variant="basic" size="sm"
+          class="gap-x-2 text-xs font-semibold" @click="() => addSelectionToCedent('Consequent')"
         >
           <icon-ph-plus-bold />
           Con.
@@ -68,17 +54,11 @@
     <div class="flex h-16 shrink-0 items-center justify-between p-4">
       <div>
         <AddToPatternPopover
-          v-if="unusedAttributes.length > 0"
-          #="{events, isOpen}"
-          content-class="px-3 py-3 pb-12"
-          panel-class="-bottom-2 -left-3.5"
-          @select="addUnusedToCedent"
+          v-if="unusedAttributes.length > 0" #="{ events, isOpen }" content-class="px-3 py-3 pb-12"
+          panel-class="-bottom-2 -left-3.5" @select="addUnusedToCedent"
         >
           <VButton
-            type="button"
-            size="sm"
-            variant="ghost"
-            class="relative z-30 gap-x-2 font-medium text-gray-700"
+            type="button" size="sm" variant="ghost" class="relative z-30 gap-x-2 font-medium text-gray-700"
             v-on="events"
           >
             <icon-ph-plus-circle-bold class="size-5 text-primary-600" />
@@ -86,12 +66,7 @@
           </VButton>
         </AddToPatternPopover>
       </div>
-      <VButton
-        type="button"
-        size="lg"
-        variant="basic"
-        @click="onEditAttributes"
-      >
+      <VButton type="button" size="lg" variant="basic" @click="onEditAttributes">
         Edit attributes
       </VButton>
     </div>
@@ -101,8 +76,8 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import { useRulePatternStore } from '@rulesMining/stores/rulePatternStore'
-import AddToPatternPopover from './AddToPatternPopover.vue'
 import type { Cedent } from '@rulesMining/types/rulePattern.types'
+import AddToPatternPopover from './AddToPatternPopover.vue'
 import AttributesList from '@/components/Attributes/AttributesList.vue'
 import AttributesListActions from '@/components/Attributes/AttributesListActions.vue'
 import AttributesListSearch from '@/components/Attributes/AttributesListSearch.vue'
@@ -135,7 +110,7 @@ function onEditAttributes() {
 }
 
 function addSelectionToCedent(cedent: Cedent) {
-  rulePatternStore.addItems(attributesList.selection.value, cedent)
+  rulePatternStore.addItems(attributesList.selectionModel.getClone(), cedent)
 }
 
 function addUnusedToCedent(cedent: Cedent) {
@@ -146,12 +121,16 @@ function addAttributeToCedent(attribute: MetasourceAttribute, cedent: Cedent) {
   rulePatternStore.addItem(attribute, cedent)
 }
 
-dragAndDropStore.$onAction((action) => {
-  if (action.name === 'dropItem') {
-    const payload = dragAndDropStore.draggedItem?.payload ?? []
-    const isFromSelection = attributesList.selection.value.find(item => item.id === payload[0]?.id)
-    if (isFromSelection) {
-      attributesList.selectionModel.clear()
+rulePatternStore.$onAction((action) => {
+  // if (action.name !== 'hasItem') {
+  //   console.log('action', action)
+  // }
+  if (action.name === 'addItem' || action.name === 'addItems') {
+    let items = action.args[0]
+    if (!Array.isArray(items)) items = [items]
+
+    for (const item of items) {
+      attributesList.selectionModel.removeItem(item)
     }
   }
 })

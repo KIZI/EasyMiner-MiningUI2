@@ -1,25 +1,16 @@
 <template>
   <Teleport to="body">
-    <div
-      v-if="draggable"
-      class="absolute z-50 grid"
-      :style="draggable.draggedElementStyle"
-    >
+    <div v-if="draggable" class="absolute z-50 grid" :style="draggable.draggedElementStyle">
       <div
-        v-for="(attribute, i) in draggedAttributes"
-        :key="attribute.id"
-        :ref="retrieveFirstItemRef(i)"
-        class="relative col-start-1 row-start-1 rounded border border-white bg-primary-200 px-3 py-1.5 text-sm font-medium text-gray-800"
-        :style="{
+        v-for="(attribute, i) in visualisedDraggedAttributes" :key="attribute.id" :ref="retrieveFirstItemRef(i)"
+        class="relative col-start-1 row-start-1 rounded border px-3 py-1.5 text-sm font-medium text-gray-800"
+        :class="[i === 5 ? 'border-primary-400 bg-white' : 'border-white bg-primary-200']" :style="{
           zIndex: 50 + draggedAttributes.length - i,
           left: `${i * 0.5}rem`,
           top: `${i * 1.8}rem`,
         }"
       >
-        <Truncate
-          :length="appConfig.truncateLength.attribute"
-          :text="attribute.name"
-        />
+        <Truncate :length="appConfig.truncateLength.attribute" :text="attribute.name" />
       </div>
     </div>
   </Teleport>
@@ -51,10 +42,28 @@ const draggedAttributes = computed(() => {
   if (!props.draggable) return []
 
   if (selectionModel.isItemSelected(props.draggable.payload)) {
-    return selectionModel.selection
+    return selectionModel.getClone()
   }
 
   return [props.draggable.payload]
+})
+
+const visualisedDraggedAttributes = computed(() => {
+  if (draggedAttributes.value.length < 2) return draggedAttributes.value
+
+  const visualizedElements = draggedAttributes.value.slice(0, 5) as {
+    id: number
+    name: string
+  }[]
+
+  if (visualizedElements.length < selectionModel.selection.length) {
+    visualizedElements.push({
+      id: 0,
+      name: `+${selectionModel.selection.length - 5}`,
+    })
+  }
+
+  return visualizedElements
 })
 
 const draggedItemRef = ref<HTMLElement>()
@@ -64,7 +73,7 @@ watch(() => props.draggable, async (draggable) => {
   if (!draggable || !draggedItemRef.value || !attributeList.dragSource) return
 
   dragAndDropStore.setDraggedItem({
-    elementRef: draggedItemRef.value,
+    draggable,
     payload: draggedAttributes.value,
     source: attributeList.dragSource,
   })

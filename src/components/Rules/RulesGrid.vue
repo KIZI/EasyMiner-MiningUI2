@@ -7,7 +7,7 @@
           v-model="order.orderBy"
           class="rounded border-gray-300 bg-[right_0.2rem_center] px-2 py-0.5 pr-7 text-xs font-medium leading-normal shadow-sm focus:border-primary-500 focus:ring-primary-500"
         >
-          <option v-for="size in taskRulesOrderOptions" :key="size.value" :value="size.value">
+          <option v-for="size in filteredRulesOrderOptions" :key="size.value" :value="size.value">
             {{ size.label }}
           </option>
         </select>
@@ -31,7 +31,7 @@
         </VButton>
         <template v-if="showSearch">
           <div class="relative flex w-full items-center">
-            <HLDebounce v-model="filters.antecedent" #="{debouncedModel}">
+            <HLDebounce v-model="filters.antecedent" #="{ debouncedModel }">
               <VClearInput v-model="filters.antecedent">
                 <VInput v-model="debouncedModel.value" class="h-7 pl-2 pr-8 text-xs" placeholder="Antecedent" />
               </VClearInput>
@@ -41,7 +41,7 @@
             →
           </div>
           <div class="relative flex w-full items-center">
-            <HLDebounce v-model="filters.consequent" #="{debouncedModel}">
+            <HLDebounce v-model="filters.consequent" #="{ debouncedModel }">
               <VClearInput v-model="filters.consequent">
                 <VInput v-model="debouncedModel.value" class="h-7 pl-2 pr-8 text-xs" placeholder="Consequent" />
               </VClearInput>
@@ -52,39 +52,17 @@
     </div>
 
     <div v-if="rulesGrid.options.filterByMeasures" class="mt-4 flex items-center gap-x-4">
-      <div class="flex items-center gap-x-2">
+      <div v-if="isIMOnTask(InterestMeasures.Conf)" class="flex items-center gap-x-2">
         <span class="text-xs font-medium">Confidence:</span>
         <div class="flex items-center gap-1">
-          <HLDebounce v-model="filters.confidence.from" #="{debouncedModel}">
+          <HLDebounce v-model="filters.confidence.from" #="{ debouncedModel }">
             <VInput
-              v-model="debouncedModel.value"
-              v-maska data-maska="W.##"
-              data-maska-tokens="W:[0-1]:optional" placeholder="0"
-              class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
+              v-model="debouncedModel.value" v-maska data-maska="W.##" data-maska-tokens="W:[0-1]:optional"
+              placeholder="0" class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
             />
           </HLDebounce>
           <span class="font-semibold text-gray-700">;</span>
-          <HLDebounce v-model="filters.confidence.to" #="{debouncedModel}">
-            <VInput
-              v-model="debouncedModel.value" v-maska data-maska="W.##"
-              data-maska-tokens="W:[0-1]:optional" placeholder="1"
-              class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
-            />
-          </HLDebounce>
-        </div>
-      </div>
-      <div class="flex items-center gap-x-2">
-        <span class="text-xs font-medium">Support:</span>
-        <div class="flex items-center gap-1">
-          <HLDebounce v-model="filters.support.from" #="{debouncedModel}">
-            <VInput
-              v-model="debouncedModel.value" v-maska data-maska="W.##"
-              data-maska-tokens="W:[0-1]:optional" placeholder="0"
-              class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
-            />
-          </HLDebounce>
-          <span class="font-semibold text-gray-700">;</span>
-          <HLDebounce v-model="filters.support.to" #="{debouncedModel}">
+          <HLDebounce v-model="filters.confidence.to" #="{ debouncedModel }">
             <VInput
               v-model="debouncedModel.value" v-maska data-maska="W.##" data-maska-tokens="W:[0-1]:optional"
               placeholder="1" class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
@@ -92,17 +70,35 @@
           </HLDebounce>
         </div>
       </div>
-      <div class="flex items-center gap-x-2">
+      <div v-if="isIMOnTask(InterestMeasures.Support)" class="flex items-center gap-x-2">
+        <span class="text-xs font-medium">Support:</span>
+        <div class="flex items-center gap-1">
+          <HLDebounce v-model="filters.support.from" #="{ debouncedModel }">
+            <VInput
+              v-model="debouncedModel.value" v-maska data-maska="W.##" data-maska-tokens="W:[0-1]:optional"
+              placeholder="0" class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
+            />
+          </HLDebounce>
+          <span class="font-semibold text-gray-700">;</span>
+          <HLDebounce v-model="filters.support.to" #="{ debouncedModel }">
+            <VInput
+              v-model="debouncedModel.value" v-maska data-maska="W.##" data-maska-tokens="W:[0-1]:optional"
+              placeholder="1" class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
+            />
+          </HLDebounce>
+        </div>
+      </div>
+      <div v-if="isIMOnTask(InterestMeasures.Lift)" class="flex items-center gap-x-2">
         <span class="text-xs font-medium">Lift:</span>
         <div class="flex items-center gap-1">
-          <HLDebounce v-model="filters.lift.from" #="{debouncedModel}">
+          <HLDebounce v-model="filters.lift.from" #="{ debouncedModel }">
             <VInput
               v-model="debouncedModel.value" v-maska data-maska="##.##" placeholder="0"
               class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
             />
           </HLDebounce>
           <span class="font-semibold text-gray-700">;</span>
-          <HLDebounce v-model="filters.lift.to" #="{debouncedModel}">
+          <HLDebounce v-model="filters.lift.to" #="{ debouncedModel }">
             <VInput
               v-model="debouncedModel.value" v-maska data-maska="#N.##" data-maska-tokens="N:[0-9]:optional"
               placeholder="∞" class="h-6 w-10 p-0 text-center text-xs font-medium leading-none"
@@ -129,8 +125,7 @@
   </div>
 
   <div
-    v-else
-    :id="listId"
+    v-else :id="listId"
     class="relative mt-3 min-h-40 grow overflow-x-hidden overflow-y-scroll border-y border-slate-200 px-0"
   >
     <div class="relative min-h-full">
@@ -140,12 +135,8 @@
           <TransitionGroup v-bind="transitionGroup">
             <template v-for="(rule, i) in rules" :key="rule.id">
               <RulesGridItem
-                v-bind="getItemProps(rule)"
-                :rule="rule"
-                :task="task"
-                :is-odd="i % 2 > 0"
-                :highlight-in-selected-rules="highlightInSelectedRules"
-                class="border-b"
+                v-bind="getItemProps(rule)" :rule="rule" :task="task" :is-odd="i % 2 > 0"
+                :highlight-in-selected-rules="highlightInSelectedRules" class="border-b"
                 :class="i < rules.length - 1 ? 'border-b-slate-100' : 'border-transparent'"
               >
                 <template #actions>
@@ -175,6 +166,7 @@
 <script setup lang="ts">
 import { type Component, type TransitionGroupProps, computed, ref, toRefs, watch } from 'vue'
 import { vMaska } from 'maska'
+import { InterestMeasures } from '@rulesMining/types/interestMeasure.types'
 import { injectRulesGrid, orderOptions, taskRulesOrderOptions } from './rulesGrid'
 import BlockSpinner from '@/components/BlockSpinner.vue'
 import VPagination from '@/components/Pagination/VPagination.vue'
@@ -182,9 +174,9 @@ import RulesSelectionActions from '@/components/Rules/RulesSelectionActions.vue'
 import { HLDebounce, VClearInput, VInput } from '@/components/Form'
 import VButton from '@/components/VButton.vue'
 import RulesGridItem from '@/components/Rules/RulesGridItem.vue'
-import type { TaskWithSettings } from '@/api/tasks/types'
+import type { TaskRule, TaskWithSettings } from '@/api/tasks/types'
 
-defineProps<{
+const props = defineProps<{
   task?: TaskWithSettings
   highlightInSelectedRules?: boolean
   listId?: string
@@ -202,6 +194,20 @@ const {
   hasRules,
   resetFilters,
 } = rulesGrid
+
+function isIMOnTask(measureName: string) {
+  if (!props.task) return true
+  return props.task.settings.rule0.iMs.find(
+    im => im.name.toLowerCase() === measureName.toLowerCase() && Number(im.threshold) > 0,
+  )
+}
+
+const filteredRulesOrderOptions = computed(() => {
+  return taskRulesOrderOptions.filter((orderOption) => {
+    if (orderOption.value === 'default') return true
+    return isIMOnTask(orderOption.value)
+  })
+})
 
 const { isLoading, isRefetching, rules } = toRefs(dataState)
 const { transitionGroup, getItemProps } = toRefs(uiState)

@@ -6,7 +6,7 @@
 import { debounce } from 'lodash-es'
 import { computed } from 'vue'
 
-const modelValue = defineModel()
+const modelValue = defineModel<string>()
 
 const debouncedSetter = debounce((value, modelValueSnapshot) => {
   if (modelValueSnapshot !== modelValue.value) return

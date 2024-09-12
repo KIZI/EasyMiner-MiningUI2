@@ -16,31 +16,33 @@
           @remove="handleRemove(item)"
         />
       </div>
-      <Popover>
-        <PopoverButton
+      <PopoverRoot>
+        <PopoverTrigger
           :as="VButton"
           variant="basic"
           class="gap-x-1.5 px-1 py-px text-2xs font-medium"
         >
           <icon-ph-plus-bold class="size-3" />
           Add
-        </PopoverButton>
+        </PopoverTrigger>
 
         <EditCedentFilterItemPopoverForm
           @save="handleSave"
         />
-      </Popover>
+      </PopoverRoot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { PopoverTrigger } from 'radix-vue'
 import CedentFilterItemComponent from '@/components/Rules/CedentFilterItem.vue'
 import EditCedentFilterItemPopoverForm from '@/components/Rules/EditCedentFilterItemPopoverForm.vue'
 import VButton from '@/components/VButton.vue'
 import type { CedentFilter, CedentFilterItem } from '@/components/Rules/types'
 import { Popover, PopoverButton } from '@/components/Popover'
+import PopoverRoot from '@/components/RadixPopover/PopoverRoot.vue'
 
 defineProps<{
   label: string

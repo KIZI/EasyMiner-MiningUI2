@@ -31,26 +31,26 @@
             :text="ruleSet.name"
           />
         </div>
-        <Popover>
-          <PopoverButton
+        <PopoverRoot>
+          <PopoverTrigger
             :as="VButton"
             variant="ghost"
             class="p-1.5"
           >
             <icon-ph-note-pencil-light class="size-5" />
-          </PopoverButton>
+          </PopoverTrigger>
           <EditRuleSetPopoverForm :rule-set="ruleSet" />
-        </Popover>
-        <Popover>
-          <PopoverButton
+        </PopoverRoot>
+        <PopoverRoot>
+          <PopoverTrigger
             :as="VButton"
             variant="ghost"
             class="gap-x-2 p-1.5 text-sm"
           >
             <icon-ph-plus-square-light class="size-5" />
-          </PopoverButton>
+          </PopoverTrigger>
           <EditRuleSetPopoverForm />
-        </Popover>
+        </PopoverRoot>
         <ChangeRuleSetListbox />
       </div>
     </div>
@@ -81,10 +81,12 @@
 
       <template #actions>
         <div class="flex items-center gap-x-5">
-          <button class="inline-flex items-center gap-x-2 text-xs hover:underline" @click="exportRuleSet">
+          <a
+            v-if="activeRuleSetId" target="_blank" :href="externalUrls.exportRuleSet(activeRuleSetId)" class="inline-flex items-center gap-x-2 text-xs hover:underline"
+          >
             <icon-ph-export class="size-4 text-gray-700" />
             Export ruleset
-          </button>
+          </a>
         </div>
       </template>
     </RulesGrid>
@@ -102,6 +104,7 @@ import RuleSetScorerModal from '@selectedRules/components/RuleSetScorerModal.vue
 import { useSelectedRules } from '@selectedRules/composables/useSelectedRules'
 import { type TransitionGroupProps, computed, ref, watch } from 'vue'
 import { keepPreviousData } from '@tanstack/vue-query'
+import { PopoverTrigger } from 'radix-vue'
 import { useActiveRuleSetRulesQuery, useInvalidateActiveRuleSetRules, useRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -118,6 +121,7 @@ import type { TaskRule } from '@/api/tasks/types'
 import { useActiveRuleSetDetailQuery } from '@/api/ruleSets/useRuleSetDetailQuery'
 import { queryClient } from '@/libs/vueQuery'
 import { queryKeys } from '@/api/queryKeys'
+import PopoverRoot from '@/components/RadixPopover/PopoverRoot.vue'
 
 const rulesGrid = useRulesGrid()
 const selectedRules = useSelectedRules()

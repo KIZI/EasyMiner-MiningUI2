@@ -5,41 +5,24 @@
         {{ cedent }}
       </div>
       <VButton
-        v-if="itemSet.length"
-        :title="`Clear ${cedent}`"
-        variant="ghost"
-        class="hidden size-6 text-red-700 hover:bg-red-50 group-hover:inline-flex"
-        @click="clearItems"
+        v-if="itemSet.length" :title="`Clear ${cedent}`" variant="ghost"
+        class="size-6 text-red-700 hover:bg-red-50 group-hover:inline-flex xl:hidden" @click="clearItems"
       >
         <icon-ph-x class="size-5" />
       </VButton>
     </div>
-    <div
-      ref="dropZoneRef"
-      class="mt-2 h-full min-h-0"
-    >
+    <div ref="dropZoneRef" class="mt-2 h-full min-h-0">
       <AttributesDropZone
-        :is-dragged-over="dropZone.isDraggedOver.value"
-        :is-available="dropZone.isAvailable.value"
+        :is-dragged-over="dropZone.isDraggedOver.value" :is-available="dropZone.isAvailable.value"
         class="flex h-full min-h-0 flex-col"
       >
-        <i
-          v-if="!itemSet.length"
-          class="text-sm text-gray-700"
-        >
+        <i v-if="!itemSet.length" class="text-sm text-gray-700">
           Add some attributes
           <template v-if="cedent === 'Antecedent'"> or leave empty</template>
           ...
         </i>
-        <div
-          class="flex h-full min-h-0 flex-wrap content-start items-start gap-2"
-        >
-          <DraggableClone
-            v-for="item in itemSet"
-            :key="item.id"
-            :source="dragSource"
-            :payload="item"
-          >
+        <div class="flex h-full min-h-0 flex-wrap content-start items-start gap-2  overflow-y-auto overflow-x-visible">
+          <DraggableClone v-for="item in itemSet" :key="item.id" :source="dragSource" :payload="item">
             <RulePatternItem :item="item" />
           </DraggableClone>
         </div>
@@ -84,9 +67,7 @@ const dropZone = useDropZone<MetasourceAttribute[] | MetasourceAttribute>({
   accepts: [DragSources.metasource, otherCedentDragSource.value],
   onDrop: (payload) => {
     const attributes = Array.isArray(payload) ? payload : [payload]
-    attributes.forEach((attribute) => {
-      rulePatternStore.addItem(attribute, props.cedent)
-    })
+    rulePatternStore.addItems(attributes, props.cedent)
   },
 })
 const { dropZoneRef } = dropZone

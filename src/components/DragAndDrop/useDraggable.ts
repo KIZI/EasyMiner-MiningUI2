@@ -4,9 +4,11 @@ import {
   computed,
   reactive,
   ref,
+  toValue,
   watch,
   watchEffect,
 } from 'vue'
+import type { DragSource } from '@/components/DragAndDrop/dragAndDropStore'
 
 export type Draggable = ReturnType<typeof useDraggable>
 
@@ -14,6 +16,7 @@ export type DragEndFlags = { cancelled?: boolean }
 
 export function useDraggable(options: {
   payload: any
+  source?: DragSource
   onDragStart?: () => void
   onDragEnd?: (flags: DragEndFlags) => void
 }) {
@@ -23,6 +26,7 @@ export function useDraggable(options: {
   const isMouseDragged = ref(false)
   const isTouchDragged = ref(false)
 
+  const inputSource = ref<'mouse' | 'touch' | null>(null)
   const isDragged = computed(() => isMouseDragged.value || isTouchDragged.value)
 
   const mouse = useMouse({ touch: false })
@@ -31,7 +35,7 @@ export function useDraggable(options: {
 
   const startPosition = ref({ x: 0, y: 0 })
   const dragPosition = computed(() => {
-    if (isTouchDragged.value) return touchPosition.value
+    if (inputSource.value === 'touch') return touchPosition.value
     return mousePosition.value
   })
 
@@ -80,14 +84,15 @@ export function useDraggable(options: {
   }
 
   function onMouseDown() {
+    inputSource.value = 'mouse'
     isMousePressed.value = true
     startPosition.value = mousePosition.value
     document.addEventListener('mouseup', onMouseUp)
   }
 
   function onMouseUp() {
-    endMousePress()
     onDragEnd()
+    endMousePress()
   }
 
   function endMousePress() {
@@ -99,15 +104,18 @@ export function useDraggable(options: {
 
   function onTouchMove(e: TouchEvent) {
     e.preventDefault()
+    inputSource.value = 'touch'
     isTouchDragged.value = true
 
     const touch = e.touches[0]
     touchPosition.value = { x: touch.clientX, y: touch.clientY }
   }
   function onTouchEnd() {
+    onDragEnd()
     isTouchDragged.value = false
   }
   function onTouchCancel() {
+    onDragEnd()
     isTouchDragged.value = false
   }
 
@@ -132,6 +140,7 @@ export function useDraggable(options: {
     events,
     isDragged,
     payload: options.payload,
+    source: options.source,
     startPosition,
     delta,
     draggedElementStyle,

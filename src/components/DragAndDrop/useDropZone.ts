@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { useMouseInElement } from '@vueuse/core'
+import { useElementBounding, useMouseInElement } from '@vueuse/core'
 import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore'
 import type { DragSource } from '@/components/DragAndDrop/dragAndDropStore'
 
@@ -10,26 +10,33 @@ export function useDropZone<TPayload>(options: {
   const dragAndDropStore = useDragAndDropStore()
 
   const dropZoneRef = ref<HTMLElement>()
+  const dropZoneBounding = useElementBounding(dropZoneRef)
 
-  const { isOutside: isMouseOutside } = useMouseInElement(dropZoneRef)
-  const isMouseInDropZone = computed(() => !isMouseOutside.value)
+  const isDraggedInDropZone = computed(() => {
+    if (!dragAndDropStore.draggedItem) return false
 
-  dragAndDropStore.$onAction((action) => {
-    if (action.name === 'dropItem') {
-      if (action.args[0]?.cancelled) return
-      onDraggedItemDrop()
-    }
+    const draggable = dragAndDropStore.draggedItem.draggable
+    const dragPosition = draggable.dragPosition
+
+    const minX = dragPosition.x >= dropZoneBounding.x.value
+    const maxX = dragPosition.x <= dropZoneBounding.x.value + dropZoneBounding.width.value
+
+    const minY = dragPosition.y >= dropZoneBounding.y.value
+    const maxY = dragPosition.y <= dropZoneBounding.y.value + dropZoneBounding.height.value
+
+    const isInX = minX && maxX
+    const isInY = minY && maxY
+
+    return isInX && isInY
   })
 
-  function onDraggedItemDrop() {
-    if (!dragAndDropStore.draggedItem) return
-    if (!isMouseInDropZone.value) return
-
-    options.onDrop(dragAndDropStore.draggedItem.payload)
-  }
+  dragAndDropStore.dropItemEventHook.on(() => {
+    if (!isDraggedInDropZone.value) return
+    options.onDrop(dragAndDropStore.draggedItem!.payload)
+  })
 
   const isDraggedOverFlag = computed(() => {
-    return dragAndDropStore.isActive && isMouseInDropZone.value
+    return dragAndDropStore.isActive && isDraggedInDropZone.value
   })
 
   const isAvailable = computed(() => {

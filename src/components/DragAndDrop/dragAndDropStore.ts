@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import type { ValueOf } from 'type-fest'
 import { computed, ref } from 'vue'
-import type { DragEndFlags } from '@/components/DragAndDrop/useDraggable'
+import { createEventHook, useEventBus } from '@vueuse/core'
+import type { DragEndFlags, Draggable } from '@/components/DragAndDrop/useDraggable'
 
 export const useDragAndDropStore = defineStore('dragAndDrop', () => {
   const draggedItem = ref<DraggedItem | null>()
+  const dropItemEventHook = createEventHook()
 
   const isActive = computed(() => !!draggedItem.value)
 
@@ -13,6 +15,10 @@ export const useDragAndDropStore = defineStore('dragAndDrop', () => {
   }
 
   function dropItem(flags: DragEndFlags = {}) {
+    if (!draggedItem.value) return
+    if (flags.cancelled) return
+
+    dropItemEventHook.trigger()
     clearDraggedItem()
   }
 
@@ -25,13 +31,14 @@ export const useDragAndDropStore = defineStore('dragAndDrop', () => {
     draggedItem,
     dropItem,
     setDraggedItem,
+    dropItemEventHook,
   }
 })
 
 export type DraggedItem<TPayload = any> = {
-  elementRef: HTMLElement
   source: DragSource
   payload: TPayload
+  draggable: Draggable
 }
 
 export const DragSources = {

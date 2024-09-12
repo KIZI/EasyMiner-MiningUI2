@@ -16,6 +16,8 @@ export const useInterestMeasuresStore = defineStore('interestMeasures', () => {
   const rulePatternStore = useRulePatternStore()
 
   const pruning = ref(false)
+  const rulesLimit = ref(1000)
+
   const isPruningAvailable = computed(() => {
     const isConsequentSingle = rulePatternStore.consequent.length === 1
     const hasAttributeAnyValue = !rulePatternStore.consequent[0]?.fixedValue
@@ -89,6 +91,7 @@ export const useInterestMeasuresStore = defineStore('interestMeasures', () => {
     pruning,
     isPruningAvailable,
     isPruningEnabled,
+    rulesLimit,
     getMeasure,
     setMeasure,
     removeMeasure,

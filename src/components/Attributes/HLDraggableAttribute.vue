@@ -6,6 +6,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { type DragEndFlags, type Draggable, useDraggable } from '@/components/DragAndDrop/useDraggable'
 import { useDragAndDropStore } from '@/components/DragAndDrop/dragAndDropStore'
 import type { ListAttribute } from '@/components/Attributes/useAttributesList'
@@ -22,7 +23,7 @@ const dragAndDropStore = useDragAndDropStore()
 const draggable = useDraggable({
   onDragEnd,
   onDragStart,
-  payload: props.attribute,
+  payload: computed(() => props.attribute),
 })
 
 async function onDragStart() {

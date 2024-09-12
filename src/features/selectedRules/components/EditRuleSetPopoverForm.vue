@@ -3,7 +3,7 @@
     :is-edit="isEdit"
     :title="ruleSet ? 'Edit RuleSet' : 'Create a new RuleSet'"
     remove-confirm-label="Do you really want to delete this RuleSet?"
-    popover-class="w-64"
+    class="w-64"
     confirm-remove
     preserve-height
     :is-create-loading="currentMutation.isPending.value"
@@ -58,7 +58,7 @@ const { isOpen } = useInjectPopoverState()!
 
 const inputRef = ref<{ $el: HTMLInputElement }>()
 
-const isEdit = computed(() => Boolean(ruleSet))
+const isEdit = computed(() => !!ruleSet.value)
 
 const validationSchema = yup.object({
   name: yup.string().trim()

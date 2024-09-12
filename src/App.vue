@@ -2,7 +2,7 @@
   <div class="grid h-full grid-rows-[auto_1fr]">
     <AppHeader />
     <TheBackdrop />
-    <main class="-mt-10 grid min-h-0">
+    <main class="-mt-6 grid min-h-0 xl:-mt-10">
       <router-view />
     </main>
     <AttributeHistogramModal />

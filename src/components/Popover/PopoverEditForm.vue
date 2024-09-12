@@ -1,16 +1,21 @@
 <template>
-  <SlideTransition
-    direction="up"
-    :duration="{ enter: 200, leave: 150 }"
-  >
-    <div
-      v-if="isOpen"
-      class="absolute bottom-0 z-[110] h-0"
-      :class="popoverClass"
+  <PopoverPortal>
+    <PopoverContent
+      v-bind="$attrs"
+      side="bottom"
+      align="start"
+      :class="[
+        'z-[110]',
+        'animation-duration-200',
+        'data-[state=open]:animate-in',
+        'data-[state=closed]:animate-out',
+        'data-[state=closed]:fade-out-0',
+        'data-[state=open]:fade-in-0',
+        'data-[state=closed]:slide-out-to-bottom-0.5',
+        'data-[state=open]:slide-in-from-bottom-0.5',
+      ]"
     >
-      <div
-        class="pt-1"
-      >
+      <div class="pt-1">
         <div
           class="rounded-md bg-white px-3 pb-4 shadow-lg ring-1 ring-black/5"
           :class="{
@@ -108,11 +113,12 @@
           </SwitchTransition>
         </div>
       </div>
-    </div>
-  </SlideTransition>
+    </PopoverContent>
+  </PopoverPortal>
 </template>
 
 <script setup lang="ts">
+import { PopoverArrow, PopoverClose, PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'radix-vue'
 import { ref, watchEffect } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { useInjectPopoverState } from './popoverInjectionState'
@@ -120,6 +126,8 @@ import SlideTransition from '@/components/Transitions/SlideTransition.vue'
 import SwitchTransition from '@/components/Transitions/SwitchTransition.vue'
 import VButton from '@/components/VButton.vue'
 import { useBackdropModel } from '@/components/Backdrop'
+
+defineOptions({ inheritAttrs: false })
 
 const props = defineProps<{
   isEdit?: boolean

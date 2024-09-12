@@ -9,9 +9,9 @@
 
     <div class="flex min-h-0 grow flex-col">
       <RulePattern class="min-h-0 peer-px" />
-      <InterestMeasures class="pb-6 pt-4 peer-px" />
+      <InterestMeasures class="pt-4 peer-px" />
 
-      <div class="mt-2 flex h-16 shrink-0 items-center justify-between border-t border-gray-200 py-2.5 peer-px">
+      <div class="mt-2.5 flex h-16 shrink-0 items-center justify-between border-t border-gray-200 py-2.5 peer-px">
         <RulesMiningHint :state="miningState" />
 
         <div class="flex items-center gap-x-8">

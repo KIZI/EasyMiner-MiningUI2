@@ -1,5 +1,5 @@
 <template>
-  <SectionCard class="py-4">
+  <SectionCard class="pt-4">
     <div class="flex items-center justify-between px-6">
       <SectionTitle class="">
         Tasks history
@@ -23,10 +23,18 @@
 
     <div class="relative mt-3 flex min-h-0 grow flex-col border-y border-slate-200">
       <BlockSpinner
-        v-if="false || isLoading || isRefetching"
-        :darken="false || isRefetching"
+        v-if="isLoading || isRefetching"
+        :darken="isRefetching"
       />
+
       <div ref="listRef" class="h-full min-h-0 overflow-y-auto">
+        <div v-if="!isLoading && tasks.length === 0" class="grid size-full place-items-center">
+          <div class="flex gap-x-3">
+            <icon-ph-info class="size-6" />
+            There are no tasks in history yet.
+          </div>
+        </div>
+
         <div class="relative divide-y divide-slate-100">
           <DynamicScroller
             :items="tasks"
@@ -54,7 +62,7 @@
       </div>
     </div>
 
-    <div class="grid min-h-12 grid-cols-[1fr_auto_1fr] items-center px-6 pt-4">
+    <div v-if="!isLoading && tasks.length > 0" class="grid min-h-12 grid-cols-[1fr_auto_1fr] items-center px-6 py-4">
       <div />
       <VPagination
         v-if="tasks.length > 0"

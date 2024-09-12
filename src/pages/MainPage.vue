@@ -1,13 +1,13 @@
 <template>
-  <VContainer class="pb-20">
-    <div class="grid grid-cols-[auto_20rem] grid-rows-[max-content_700px] gap-2">
-      <RulesMining class="min-h-[600px]" />
-      <MetasourceAttributes class="max-h-[600px] min-h-full" />
+  <VContainer class="pb-2 xl:pb-10">
+    <div class="grid grid-cols-[auto_20rem] grid-rows-[700px_700px] items-stretch gap-2">
+      <RulesMining class="min-w-0" />
+      <MetasourceAttributes class="h-full shrink-0" />
 
       <div class="relative flex flex-col gap-x-20 gap-y-2 overflow-hidden">
-        <DiscoveredRules :class="layout.activeSection === 'discoveredRules' ? 'block' : 'hidden'" />
-        <TasksHistory :class="layout.activeSection === 'tasksHistory' ? 'block' : 'hidden'" />
-        <SelectedRules :class="layout.activeSection === 'selectedRules' ? 'block' : 'hidden'" />
+        <DiscoveredRules class="min-w-0" :class="layout.activeSection === 'discoveredRules' ? 'block' : 'hidden'" />
+        <TasksHistory class="min-w-0" :class="layout.activeSection === 'tasksHistory' ? 'block' : 'hidden'" />
+        <SelectedRules class="min-w-0" :class="layout.activeSection === 'selectedRules' ? 'block' : 'hidden'" />
       </div>
 
       <SideNav />

@@ -16,6 +16,7 @@ export default antfu(
       'antfu/if-newline': 'off',
       'curly': ['error', 'multi-line'],
       'tailwindcss/no-custom-classname': 'off',
+      'vue/prefer-separate-static-class': 'off',
     },
   },
 )

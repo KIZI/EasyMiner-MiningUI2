@@ -24,7 +24,7 @@ export function useRuleSetDetailQuery(id: MaybeRef<Optional<number>>, params: Ru
   }
 }
 
-export function useActiveRuleSetDetailQuery(params: RuleSetsDetailQueryParams) {
+export function useActiveRuleSetDetailQuery(params?: RuleSetsDetailQueryParams) {
   const { activeRuleSetId } = useSelectedRulesStoreRefs()
   return useRuleSetDetailQuery(activeRuleSetId, params)
 }

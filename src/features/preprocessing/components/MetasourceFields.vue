@@ -20,7 +20,7 @@
         :is-dragged-over="isDraggedOver"
       >
         <AttributesList
-          class="h-full overflow-y-auto"
+          class="h-full"
           spacing-class="px-6"
         >
           <template #empty>

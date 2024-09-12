@@ -1,5 +1,6 @@
 import type { MaybeRef, Ref } from 'vue'
-import { computed, reactive, ref, toRaw, toValue, watch, watchEffect } from 'vue'
+import { computed, reactive, ref, toValue, watch } from 'vue'
+import { looseIndexOf } from '@vue/shared'
 
 type UseSelectionOptions<T> = {
   items?: MaybeRef<T[]>
@@ -9,31 +10,11 @@ type UseSelectionOptions<T> = {
 
 export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
   const selection = options.selection ?? ref([])
-  const itemIdentity = options.itemIdentity ?? ((item: T) => item)
 
-  const selectionIdsSet = computed(() => {
-    return new Set(selection.value.map(item => itemIdentity(toRaw(item))))
-  })
-
-  const availableItems = computed(() => [...toValue(options.items) ?? []])
-  const availableItemdsIdsSet = computed(() => {
-    return new Set(availableItems.value.map(item => itemIdentity(item)))
-  })
-
-  watch(availableItems, () => {
-    selection.value = selection.value.filter((item) => {
-      if (!availableItemdsIdsSet.value.size) return false
-      return availableItemdsIdsSet.value.has(itemIdentity(item))
-    })
-  })
-
-  const isAnySelected = computed(() => {
-    return Boolean(selection.value.length)
-  })
+  const isAnySelected = computed(() => selection.value.length > 0)
 
   function selectAll() {
-    if (!availableItems.value) return
-    selection.value = availableItems.value
+    selection.value = toValue(options.items) ?? []
   }
 
   function clear() {
@@ -41,22 +22,45 @@ export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
   }
 
   function invert() {
-    if (!availableItems.value) return
-    selection.value = availableItems.value.filter(item => !isItemSelected(item))
+    const invertedSelection: T[] = []
+    for (const item of toValue(options.items) ?? []) {
+      if (!isItemSelected(item)) {
+        invertedSelection.push(item)
+      }
+    }
+    selection.value = invertedSelection
+  }
+
+  function getItemIndex(item: T) {
+    return looseIndexOf(selection.value, item)
   }
 
   function isItemSelected(item: T) {
-    return selectionIdsSet.value.has(itemIdentity(item))
+    return getItemIndex(item) > -1
+  }
+
+  function addItem(item: T) {
+    if (isItemSelected(item)) return
+    selection.value.push(item)
+  }
+
+  function removeItem(item: T) {
+    const index = getItemIndex(item)
+    if (index === -1) return
+    selection.value.splice(index, 1)
   }
 
   function toggleItem(item: T) {
     if (isItemSelected(item)) {
-      const index = selection.value.findIndex(i => itemIdentity(i) === itemIdentity(item))
-      selection.value.splice(index, 1)
+      removeItem(item)
     }
     else {
-      selection.value.push(item)
+      addItem(item)
     }
+  }
+
+  function getClone() {
+    return [...selection.value]
   }
 
   return reactive({
@@ -67,5 +71,8 @@ export function useSelectionModel<T>(options: UseSelectionOptions<T>) {
     invert,
     isItemSelected,
     toggleItem,
+    addItem,
+    removeItem,
+    getClone,
   })
 }

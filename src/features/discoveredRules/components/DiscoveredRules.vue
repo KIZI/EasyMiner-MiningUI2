@@ -3,7 +3,10 @@
     <div class="flex min-h-16 shrink-0 items-start justify-between peer-px">
       <div>
         <div class="flex min-h-8 items-center gap-x-3">
-          <VIconButton v-if="!isViewLoading && isFromHistory" title="Go back to tasks history" @click="layout.showTasksHistory()">
+          <VIconButton
+            v-if="!isViewLoading && isFromHistory" title="Go back to tasks history"
+            @click="layout.showTasksHistory()"
+          >
             <icon-ph-arrow-left class="size-5" />
           </VIconButton>
 
@@ -35,12 +38,8 @@
           </SectionTitle>
 
           <VButton
-            v-if="!isViewLoading && isAnyNotInSelectedRules"
-            size="xs"
-            variant="ghost"
-            class="gap-x-1.5 font-medium"
-            icon-class="text-green-700"
-            :loading="isAddAllLoading"
+            v-if="!isViewLoading && isAnyNotInSelectedRules" size="xs" variant="ghost"
+            class="gap-x-1.5 font-medium" icon-class="text-green-700" :loading="isAddAllLoading"
             @click="addAllToSelectedRules"
           >
             <template #icon>
@@ -69,10 +68,7 @@
 
       <div class="-mr-2 flex items-center gap-x-2">
         <VButton
-          v-if="!isViewLoading && isTaskFinished"
-          variant="ghost"
-          size="xs"
-          class="shrink-0 gap-x-1.5"
+          v-if="!isViewLoading && isTaskFinished" variant="ghost" size="xs" class="shrink-0 gap-x-1.5"
           @click="loadTaskToRulePattern"
         >
           <icon-ph-arrow-up class="size-5" />
@@ -92,8 +88,7 @@
       <template #ruleActions="{ rule }">
         <VIconButton
           :title="selectedRules.isRuleSelected(rule) ? 'Remove from selected rules' : 'Add to selected rules'"
-          :loading="selectedRules.isRuleSelectionLoading(rule)"
-          class="text-green-700 hover:bg-subtle-white"
+          :loading="selectedRules.isRuleSelectionLoading(rule)" class="text-green-700 hover:bg-subtle-white"
           @click="toggleSelectedRule(rule)"
         >
           <component
@@ -104,15 +99,72 @@
       </template>
 
       <template #actions>
-        <div class="flex items-center gap-x-5">
-          <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
+        <div v-if="task" class="flex items-center gap-x-5">
+          <a
+            target="_blank" :href="externalUrls.taskDetail(task.id)"
+            class="inline-flex items-center gap-x-1.5 text-xs hover:underline"
+          >
             <icon-ph-arrow-square-out class="size-4 text-gray-700" />
             Task detail
-          </button>
-          <button class="inline-flex items-center gap-x-2 text-xs hover:underline">
-            <icon-ph-export class="size-4 text-gray-700" />
-            Export task
-          </button>
+          </a>
+          <PopoverRoot>
+            <PopoverTrigger>
+              <VButton variant="ghost" size="xs" class="gap-x-1.5">
+                <icon-ph-export class="size-4 text-gray-700" />
+                Export task
+              </VButton>
+            </PopoverTrigger>
+
+            <PopoverContent
+              :align-offset="-8" :side-offset="6" align="end" side="top" class="" :class="[
+                'z-[110]',
+                'animation-duration-300',
+                'data-[state=open]:animate-in',
+                'data-[state=closed]:animate-out',
+                'data-[state=closed]:fade-out-0',
+                'data-[state=open]:fade-in-0',
+                'data-[state=open]:data-[side=bottom]:slide-in-from-top-1',
+                'data-[state=open]:data-[side=left]:slide-in-from-right-1',
+                'data-[state=open]:data-[side=right]:slide-in-from-left-1',
+                'data-[state=open]:data-[side=top]:slide-in-from-bottom-1',
+                'data-[state=closed]:data-[side=bottom]:slide-out-to-top-1',
+                'data-[state=closed]:data-[side=left]:slide-out-to-right-1',
+                'data-[state=closed]:data-[side=right]:slide-out-to-left-1',
+                'data-[state=closed]:data-[side=top]:slide-out-to-bottom-1',
+              ]"
+            >
+              <div class="max-w-md text-pretty rounded-md bg-white px-3 pb-4 pt-2 shadow-lg ring-1 ring-black/10">
+                <div class="mb-3.5 text-md font-medium">
+                  Export discovered rules:
+                </div>
+                <div class="flex flex-col gap-3">
+                  <a
+                    class="inline-flex items-center gap-x-2 hover:underline"
+                    :href="externalUrls.exportTask(task.id).details" target="_blank" size="md"
+                  >
+                    <icon-ph-export class="size-5 text-gray-700" />
+                    <span class="text-xs">Task details (GUHA PMML)</span>
+                  </a>
+                  <a
+                    class="inline-flex items-center gap-x-2 hover:underline"
+                    :href="externalUrls.exportTask(task.id).settings" target="_blank" size="md"
+                  >
+                    <icon-ph-export class="size-5 text-gray-700" />
+                    <span class="text-xs">Task setting (GUHA PMML)</span>
+                  </a>
+                  <a
+                    class="inline-flex items-center gap-x-2 hover:underline"
+                    :href="externalUrls.exportTask(task.id).plainRules" target="_blank" size="md"
+                  >
+                    <icon-ph-export class="size-5 text-gray-700" />
+                    <span class="text-xs">Plain Text</span>
+                  </a>
+                </div>
+              </div>
+
+              <PopoverArrow class="fill-primary-700/50" :width="14" :height="7" />
+            </PopoverContent>
+          </PopoverRoot>
         </div>
       </template>
     </RulesGrid>
@@ -127,6 +179,7 @@ import { useRulesMining } from '@rulesMining/composables/useRulesMining'
 import { keepPreviousData } from '@tanstack/vue-query'
 import { storeToRefs } from 'pinia'
 import { useRafFn } from '@vueuse/core'
+import { PopoverArrow, PopoverContent } from 'radix-vue'
 import { useActiveTaskRulesQuery } from '@/api/tasks/useActiveTaskRulesQuery'
 import { useActiveTaskDetailQuery } from '@/api/tasks/useActiveTaskDetailQuery'
 import SectionCard from '@/components/Layout/SectionCard.vue'
@@ -145,6 +198,9 @@ import type { TaskRule } from '@/api/tasks/types'
 import { useActiveRuleSetRulesQuery } from '@/api/ruleSets/useRuleSetRulesQuery'
 import { queryClient } from '@/libs/vueQuery'
 import { queryKeys } from '@/api/queryKeys'
+import { externalUrls } from '@/utils/externalUrls'
+import PopoverRoot from '@/components/RadixPopover/PopoverRoot.vue'
+import PopoverTrigger from '@/components/RadixPopover/PopoverTrigger.vue'
 
 const { isInProgress: isMiningInProgress, startedTaskId } = useRulesMining()
 const rulePatternStore = useRulePatternStore()
@@ -236,7 +292,7 @@ async function addToSelectedRules(rules: TaskRule[]) {
     await selectedRules.addRules(rules)
     await onSelectionSuccess()
   }
-  catch (e) {}
+  catch (e) { }
 }
 
 async function removeFromSelectedRules(rules: TaskRule[]) {
@@ -245,7 +301,7 @@ async function removeFromSelectedRules(rules: TaskRule[]) {
     await selectedRules.removeRules(rules)
     await onSelectionSuccess()
   }
-  catch (e) {}
+  catch (e) { }
 }
 
 async function toggleSelectedRule(rules: TaskRule) {
@@ -254,7 +310,7 @@ async function toggleSelectedRule(rules: TaskRule) {
     await selectedRules.toggle(rules)
     await onSelectionSuccess()
   }
-  catch (e) {}
+  catch (e) { }
 }
 
 function resetMutationsState() {

@@ -123,6 +123,7 @@ export const useRulesMining = createSharedComposable(() => {
     const { antecedent, consequent } = rulePatternStore.rulePatternInput
     const IMs = interestMeasuresInput.value
     const specialIMs = specialInterestMeasuresInput.value
+    const limitHits = interestMeasuresStore.rulesLimit
 
     const name = constructMinerLabel(
       rulePatternStore.antecedent,
@@ -139,7 +140,7 @@ export const useRulesMining = createSharedComposable(() => {
       consequent,
       miner: minerId,
       name,
-      limitHits: 1000,
+      limitHits,
     })
   }
 

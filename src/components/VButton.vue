@@ -1,5 +1,6 @@
 <template>
-  <button
+  <component
+    :is="as"
     v-bind="attrsExcludingClass"
     :class="buttonClass"
     :disabled="isDisabled"
@@ -22,7 +23,7 @@
       />
     </span>
     <slot />
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -40,12 +41,14 @@ const props = withDefaults(defineProps<{
   disabled?: boolean
   loading?: boolean
   iconClass?: string
+  as?: any
 }>(), {
   variant: 'basic',
   iconClass: '',
   disabled: false,
   loading: false,
   size: undefined,
+  as: 'button',
 })
 
 type VButtonVariant = 'primary' |

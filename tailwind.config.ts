@@ -1,10 +1,11 @@
 import colors from 'tailwindcss/colors'
 import formsPlugin from '@tailwindcss/forms'
 import type { Config } from 'tailwindcss'
+import { tailwindAnimate } from './src/libs/tailwindAnimate'
 
 module.exports = {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  plugins: [formsPlugin, {
+  plugins: [formsPlugin, tailwindAnimate, {
     handler: ({ addUtilities, matchUtilities, theme }) => {
       matchUtilities(
         {
@@ -41,9 +42,6 @@ module.exports = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.75' },
         },
-      },
-      animation: {
-        'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
     },
   },

@@ -5,7 +5,7 @@
       spacingClass,
       colorSchemaClass,
       {
-        'group hover:bg-primary-200': attribute.isAvailable,
+        'group [.hover_&]:bg-primary-200': attribute.isAvailable,
         'cursor-pointer': attribute.isAvailable && isListInteractive,
       },
     ]"
@@ -35,7 +35,7 @@
         class="inline-flex min-w-0 select-none items-center gap-2 py-2 text-sm font-medium"
         :class="{
           'text-gray-500': !attribute.isAvailable,
-          'cursor-pointer': isListInteractive,
+          'cursor-pointer': attribute.isAvailable && isListInteractive,
         }"
         :title="attribute.name.length > 50 ? attribute.name : ''"
       >
@@ -43,10 +43,13 @@
       </label>
     </div>
 
-    <div class="ml-auto flex items-center gap-x-0.5">
+    <div class="ml-auto flex items-center gap-x-0.5" @click.stop>
       <VButton
         variant="ghost"
-        class="size-8 hover:bg-slate-200 group-hover:hover:bg-primary-50"
+        class="size-8"
+        :class="[
+          attribute.isAvailable && isListInteractive ? 'hover:bg-primary-50' : 'hover:bg-slate-200',
+        ]"
         @click.stop="attributeHistogramModal.open(attribute.id, attribute.source)"
         @mousedown.stop
       >
@@ -68,6 +71,8 @@ import { useAttributeHistogramModal } from '@/components/Attributes/useAttribute
 import { useInjectAttributesList } from '@/components/Attributes/attributesListInjection'
 import type { ListAttribute } from '@/components/Attributes/useAttributesList'
 import VButton from '@/components/VButton.vue'
+import NominalIcon from '~icons/carbon/character-upper-case'
+import NumericIcon from '~icons/carbon/character-whole-number'
 
 const props = defineProps<{
   attribute: ListAttribute
@@ -100,9 +105,9 @@ const colorSchemaClass = computed(() => {
 
 const icon = computed(() => {
   if (props.attribute.type === 'nominal') {
-    return defineAsyncComponent(() => import('~icons/carbon/character-upper-case'))
+    return NominalIcon
   }
 
-  return defineAsyncComponent(() => import('~icons/carbon/character-whole-number'))
+  return NumericIcon
 })
 </script>

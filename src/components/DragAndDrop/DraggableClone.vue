@@ -48,7 +48,7 @@ async function onDragStart() {
   if (!draggableRef.value || !sourceRef.value) return
 
   dragAndDropStore.setDraggedItem({
-    elementRef: draggableRef.value,
+    draggable,
     payload: props.payload,
     source: props.source,
   })
