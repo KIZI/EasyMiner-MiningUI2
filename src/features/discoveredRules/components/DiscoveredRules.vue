@@ -1,7 +1,7 @@
 <template>
   <SectionCard class="py-4 group-px-6">
-    <div class="flex min-h-16 shrink-0 items-start justify-between peer-px">
-      <div>
+    <div class="min-h-16 peer-px">
+      <div class="flex shrink-0 items-start justify-between">
         <div class="flex min-h-8 items-center gap-x-3">
           <VIconButton
             v-if="!isViewLoading && isFromHistory" title="Go back to tasks history"
@@ -9,34 +9,27 @@
           >
             <icon-ph-arrow-left class="size-5" />
           </VIconButton>
-
           <SectionTitle>
             <template v-if="isMiningInProgress || isTaskStateRunning(state)">
               Task is in progress...
             </template>
-
             <template v-else-if="isViewLoading">
               Task is loading...
             </template>
-
             <template v-else-if="task?.state === 'interrupted'">
               Task was interrupted
               <span class="pl-1 text-lg font-normal">(dicovered {{ rulesCount }} rules)</span>
             </template>
-
             <template v-else-if="task?.state === 'failed'">
               Task failed
             </template>
-
             <template v-else-if="!rulesCount">
               No rules discovered
             </template>
-
             <template v-else>
               Discovered {{ rulesCount }} {{ $t('common.rules', rulesCount) }}
             </template>
           </SectionTitle>
-
           <VButton
             v-if="!isViewLoading && isAnyNotInSelectedRules" size="xs" variant="ghost"
             class="gap-x-1.5 font-medium" icon-class="text-green-700" :loading="isAddAllLoading"
@@ -48,32 +41,30 @@
             Add all to Selected rules
           </VButton>
         </div>
-
-        <div v-if="!isViewLoading" class="mt-1">
-          <div class="text-lg font-medium text-primary-900">
-            {{ task?.name }}
-          </div>
-          <div class="mt-1 space-x-4 text-xs leading-none">
-            <span v-for="measure in task?.settings.rule0.iMs" :key="measure.name">
-              <span class="pr-1.5">
-                {{ $t(`interestMeasures.${measure.name}.name`) }}{{ measure.threshold ? ':' : '' }}
-              </span>
-              <span v-if="measure.threshold" class="font-semibold text-primary-700">
-                {{ formatDecimal(measure.threshold) }}
-              </span>
-            </span>
-          </div>
+        <div class="-mr-2 flex shrink-0 items-center gap-x-2">
+          <VButton
+            v-if="!isViewLoading && isTaskFinished" variant="ghost" size="xs" class="gap-x-1.5"
+            @click="loadTaskToRulePattern"
+          >
+            <icon-ph-arrow-up class="size-5" />
+            Load task to rule pattern
+          </VButton>
         </div>
       </div>
-
-      <div class="-mr-2 flex items-center gap-x-2">
-        <VButton
-          v-if="!isViewLoading && isTaskFinished" variant="ghost" size="xs" class="shrink-0 gap-x-1.5"
-          @click="loadTaskToRulePattern"
-        >
-          <icon-ph-arrow-up class="size-5" />
-          Load task to rule pattern
-        </VButton>
+      <div v-if="!isViewLoading" class="mt-1">
+        <div class="text-lg font-medium text-primary-900">
+          {{ task?.name }}
+        </div>
+        <div class="mt-2 space-x-4 text-xs leading-none">
+          <span v-for="measure in task?.settings.rule0.iMs" :key="measure.name">
+            <span class="pr-1.5">
+              {{ $t(`interestMeasures.${measure.name}.name`) }}{{ measure.threshold ? ':' : '' }}
+            </span>
+            <span v-if="measure.threshold" class="font-semibold text-primary-700">
+              {{ formatDecimal(measure.threshold) }}
+            </span>
+          </span>
+        </div>
       </div>
     </div>
 
